@@ -41,8 +41,8 @@ public class DriveTrain extends BaseHardware {
     private final FieldManager field = PanelsField.INSTANCE.getField();
     private final List<Pose> trail = new ArrayList<>();
 
-    private static final double TRAIL_SPACING = 1.0;   // inches between recorded points
-    private static final int    TRAIL_MAX     = 600;   // oldest points dropped after this
+    private static final double TRAIL_SPACING = 3.0;   // inches between recorded points
+    private static final int    TRAIL_MAX     = 60;   // oldest points dropped after this
     private static final double ROBOT_RADIUS  = 9.0;   // inches, ~18" robot
 
     private double headingOffset = 0;
@@ -162,7 +162,7 @@ follower.update();
         if (!field.getShouldUpdateCanvas()) return;
 
         // 1. Planned path (the path segment currently being followed), blue
-        if (follower.following()) {
+        if (follower.following() && follower.currentSegment() != null) {
             field.setStyle("blue", "blue", 0.5);
             Pose prev = follower.poseAt(0.0);
             for (int i = 1; i <= 20; i++) {

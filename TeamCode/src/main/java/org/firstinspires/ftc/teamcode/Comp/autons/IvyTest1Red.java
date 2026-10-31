@@ -43,7 +43,7 @@ public class IvyTest1Red extends OpMode {
     }
 
 
-    private Command autoRoutine() {
+    private Command CyclePark() {
         return sequential(
                 robot.driveTrain.cmdAtFollow(basicpath()),
                 robot.driveTrain.cmdAtFollow(Park())
@@ -51,6 +51,7 @@ public class IvyTest1Red extends OpMode {
         );
     }
 
+private Command autoRoutine;
 
     @Override
     public void init() {
@@ -73,7 +74,8 @@ public class IvyTest1Red extends OpMode {
     @Override
     public void start() {
         robot.start();
-        schedule(autoRoutine());
+        autoRoutine = CyclePark();
+        schedule(autoRoutine);
 
 
     }
@@ -84,7 +86,7 @@ public class IvyTest1Red extends OpMode {
 
         Scheduler.execute();
 
-        telemetry.addData("auto running", autoRoutine().isScheduled());
+        telemetry.addData("auto running", autoRoutine.isScheduled());
         telemetry.update();
 
     }
