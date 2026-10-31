@@ -10,6 +10,9 @@ import org.firstinspires.ftc.teamcode.Common.Settings;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.OpModeStorage;
 
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.Scheduler;
+
 
 // CHANGED: renamed so it doesn't clash with the Scrimmage TeleOp (two OpModes can't share a name).
 @TeleOp(name = "Comp TeleOp")
@@ -63,8 +66,27 @@ public class Telop extends OpMode {
     // CHANGED: Pedro headings are in RADIANS.
     private Pose op_pose = new Pose(90, 0, Math.toRadians(80));
 
+    private Command DriveToCommand = null;
+
+    private static final Pose poseA = new Pose (30,115,315); //right side of the red hive relative to the driveteam
+    private static final Pose poseB = new Pose (88.3,113.3,210); // left side of the red hive on the right side relative to the driveteam
+    private static final Pose poseY = new Pose (23.2,21,40); // left side of the red hive on the left side relative to the driveteam
+    private static final Pose poseX = new Pose (86.4,20,135); // right side of the red hive on the left side relative to the driveteam
+
+    private void goHold(Pose target, boolean SpinLauncher ){
+        if (DriveToCommand != null && DriveToCommand.isScheduled()){
+            DriveToCommand.cancel();
+        }
+        DriveToCommand = robot.driveTrain.cmdHoldPos(target);
+        Scheduler.schedule(DriveToCommand);
+        if(SpinLauncher){
+            robot.launcher.cmdLauncherForward();
+        }
+    }
+
     @Override
     public void init() {
+        Scheduler.reset();
         robot.hardwareMap = hardwareMap;
         robot.telemetry = telemetry;
         robot.init();
@@ -106,6 +128,37 @@ public class Telop extends OpMode {
         if (Math.abs(gamepad1.right_stick_y) > Settings.JOYSTICK_DEADBAND_STICK) {
 
         }
+        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a))goHold(poseA,true);
+        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b))goHold(poseB,true);
+        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y))goHold(poseY,true);
+        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x))goHold(poseX,true);
+
+        gp1_prev_a = gamepad1.a;
+        gp1_prev_b = gamepad1.b;
+        gp1_prev_y = gamepad1.y;
+        gp1_prev_x = gamepad1.x;
+
+        boolean sticksMove =
+                Math.abs(gamepad1.left_stick_x) > Settings.JOYSTICK_DEADBAND_STICK
+                || Math.abs(gamepad1.left_stick_y) > Settings.JOYSTICK_DEADBAND_STICK
+                || Math.abs(gamepad1.right_stick_x) > Settings.JOYSTICK_DEADBAND_STICK;
+
+        boolean Holding = DriveToCommand != null && DriveToCommand.isScheduled();
+
+        if(Holding && (sticksMove || gamepad1.dpad_right)){
+            DriveToCommand.cancel();
+                    Holding  = false;
+        }
+
+        if (!Holding){
+            robot.driveTrain.cmdTeleOp(
+                    CommonLogic.joyStickMath(gamepad1.left_stick_y * -1),
+                    CommonLogic.joyStickMath(gamepad1.left_stick_x * -1),
+                    CommonLogic.joyStickMath(gamepad1.right_stick_x * -1),
+                    driveSpeed
+            );
+        }
+
 
         //gamepad1
         // CHANGED: gamepad 1 is driving and speed changes only for now. The launcher, blocker,
@@ -113,7 +166,7 @@ public class Telop extends OpMode {
         // out below so they are easy to restore.
 
         // CHANGED: the Comp bot has no TransitionR servo, so every transitionR line is commented out.
-        if ((gamepad1.b)) {
+        /*if ((gamepad1.b)) {
             //robot.intake.cmdIntakeForward();
             //robot.transitionR.cmdSpinng();
 
@@ -129,6 +182,8 @@ public class Telop extends OpMode {
             //robot.intake.cmdIntakeReverse();
             //robot.transitionR.cmdTumble();
         }
+
+         */
 
         // TODO (reminder): Launcher now has state tracking. Still to do here:
         //  1. Map a button to robot.feeder.cmdFeederBackward() (no button assigned yet).
@@ -322,7 +377,7 @@ public class Telop extends OpMode {
 
 
 
-
+        Scheduler.execute();
         // robot.loop() -> driveTrain.loop() -> follower.update(), which sends
         // the power to the motors. Must come AFTER cmdTeleOp.
         robot.loop();
@@ -351,6 +406,7 @@ public class Telop extends OpMode {
     public void stop() {
         // ADDED: without this, DriveTrain.stop() never saves the pose.
         robot.stop();
+        Scheduler.reset();
     }
 
 }

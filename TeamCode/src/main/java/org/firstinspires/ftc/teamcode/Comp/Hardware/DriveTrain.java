@@ -136,6 +136,9 @@ follower.update();
     public Command cmdAtFollow(Path atPath) {
         return PedroCommands.follow(follower, atPath).requiring(this);
     }
+    public Command cmdHoldPos(Pose target){
+        return PedroCommands.hold(follower,target).requiring(this);
+    }
 
 
 //****************************************************************************
