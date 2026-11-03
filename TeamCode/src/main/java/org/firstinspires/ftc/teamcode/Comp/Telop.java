@@ -88,14 +88,17 @@ public class Telop extends OpMode {
     }
 
     private void goHold(Pose target, boolean SpinLauncher ){
-        if (DriveToCommand != null && DriveToCommand.isScheduled()){
+        if (DriveToCommand != null && DriveToCommand.isScheduled()) {
+            DriveToCommand.execute();
+
+            DriveToCommand = robot.driveTrain.cmdHoldPos(target);
+            lastTarget = target;
+            Scheduler.schedule(DriveToCommand);
+            if (SpinLauncher) {
+                robot.launcher.cmdLauncherForward();
+            }
+        } else{
             DriveToCommand.cancel();
-        }
-        DriveToCommand = robot.driveTrain.cmdHoldPos(target);
-        lastTarget = target;
-        Scheduler.schedule(DriveToCommand);
-        if(SpinLauncher){
-            robot.launcher.cmdLauncherForward();
         }
     }
 
