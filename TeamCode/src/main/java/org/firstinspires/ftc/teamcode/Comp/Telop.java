@@ -62,6 +62,8 @@ public class Telop extends OpMode {
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
     private double driveSpeed = robot.driveTrain.NORMALSPEED;
+    private Pose lastTarget = null;
+
 
     // CHANGED: Pedro headings are in RADIANS.
     private Pose op_pose = new Pose(90, 0, Math.toRadians(80));
@@ -72,12 +74,25 @@ public class Telop extends OpMode {
     private static final Pose poseB = new Pose (88.3,113.3,210); // left side of the red hive on the right side relative to the driveteam
     private static final Pose poseY = new Pose (23.2,21,40); // left side of the red hive on the left side relative to the driveteam
     private static final Pose poseX = new Pose (86.4,20,135); // right side of the red hive on the left side relative to the driveteam
+    private static final double InLaunchPosition = 5.0;
+
+    private boolean InLaunchPosition(){
+        Pose p = robot.driveTrain.getPose();
+        for(Pose target: new Pose[]{ poseA, poseB, poseY, poseX}){
+            if(Math.hypot(p.x() - target.x(), p.y() - target.y()) <= InLaunchPosition){
+                return true;
+            }
+        }
+        return false;
+
+    }
 
     private void goHold(Pose target, boolean SpinLauncher ){
         if (DriveToCommand != null && DriveToCommand.isScheduled()){
             DriveToCommand.cancel();
         }
         DriveToCommand = robot.driveTrain.cmdHoldPos(target);
+        lastTarget = target;
         Scheduler.schedule(DriveToCommand);
         if(SpinLauncher){
             robot.launcher.cmdLauncherForward();
@@ -114,7 +129,7 @@ public class Telop extends OpMode {
     @Override
     public void loop() {
 
-        if (bAutoTurn) {
+       /* if (bAutoTurn) {
             // auto-turn code goes here later (use FASTSPEED / MORNINGSPEED,
             // DTrain_FASTSPEED and DTrain_SLOWSPEED don't exist).
         } else {
@@ -124,6 +139,8 @@ public class Telop extends OpMode {
                     CommonLogic.joyStickMath(gamepad1.right_stick_x),
                     driveSpeed);   // CHANGED: was robot.driveTrain.NORMALSPEED
         }
+
+        */
 
         if (Math.abs(gamepad1.right_stick_y) > Settings.JOYSTICK_DEADBAND_STICK) {
 
