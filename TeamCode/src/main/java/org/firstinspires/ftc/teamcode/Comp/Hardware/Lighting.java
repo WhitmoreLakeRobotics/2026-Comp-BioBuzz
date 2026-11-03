@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.Comp.Hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.Servo;
-
+@Disabled
 @Configurable
 public class Lighting extends BaseHardware{
 

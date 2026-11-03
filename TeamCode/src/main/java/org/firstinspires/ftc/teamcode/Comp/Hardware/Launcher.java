@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Comp.Hardware;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -54,7 +55,7 @@ public class Launcher extends BaseHardware {
 
         launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);   // our own PID; velocity still reads
         launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
+        launcherMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         resetState();
         pidTimer.reset();
     }
