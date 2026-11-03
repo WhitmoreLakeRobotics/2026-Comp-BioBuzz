@@ -26,10 +26,10 @@ public class Launcher extends BaseHardware {
     public static double OFF_RPM_THRESHOLD = 50;       // |RPM| below this counts as stopped
 
     // ---------------- PID CONSTANTS ----------------
-    public static double LAUNCHER_KP = 0.0002;
-    public static double LAUNCHER_KI = 0.0;            // still unused
-    public static double LAUNCHER_KD = 0.0;
-    public static double LAUNCHER_KF = 1 / 6000.0;     // feedforward per RPM
+    public static double LAUNCHER_KP = 0.00155; //was 0.00135
+    public static double LAUNCHER_KI = 0.00000005;            // still unused
+    public static double LAUNCHER_KD = 0.0000002;
+    public static double LAUNCHER_KF = 0.0003187541;     // feedforward per RPM was 0.0004166672
 
     private static final double TICKS_PER_REV = 28;    // motor-shaft encoder; change if geared
     private static final double MIN_POWER = -1.0;
