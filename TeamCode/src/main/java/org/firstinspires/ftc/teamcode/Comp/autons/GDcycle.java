@@ -18,8 +18,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
 @Disabled
-@Autonomous(name = "BlueGDcycle", group = "Comp")
-public class BlueGDcycle extends OpMode {
+@Autonomous(name = "GDcycle", group = "Comp")
+public class GDcycle extends OpMode {
 
     Robot robot = new Robot();
     private TelemetryManager telemetryM;

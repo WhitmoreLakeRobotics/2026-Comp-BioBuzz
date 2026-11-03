@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
-@Autonomous(name = "IvyTest1", group = "Ivy")
+@Autonomous(name = "IvyTest1", group = "")
 public class IvyTest1 extends OpMode {
 
 

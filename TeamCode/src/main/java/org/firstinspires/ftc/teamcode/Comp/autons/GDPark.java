@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
-@Autonomous(name = "GDPark",group = "comp")
+@Autonomous(name = "GDPark",group = "")
 public class GDPark extends OpMode{
     Robot robot = new Robot();
     private final PoseFactory poseFactory = PoseFactory.degrees();
@@ -26,12 +26,11 @@ public class GDPark extends OpMode{
 
 
     public static final PoseFactory pf = PoseFactory.degrees();
-    private final Pose start = poseFactory.of(93, 133, 90);
-    private final Pose path1Start = poseFactory.of(93, 133, -90);
-    private final Pose end = poseFactory.of(128, 45, 180);
+    private final Pose start = poseFactory.of(46, 7, 90);
+    private final Pose end = poseFactory.of(15, 94, 90);
 
     public Path parkp() {
-        return line(path1Start, end).linear(path1Start, end);
+        return line(start, end).linear(start, end);
     }
     protected Command startToScore() {
 
