@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
 
+import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
@@ -16,48 +16,34 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
-// Starts next to on the right side of the upper red flower goes a short distance up and go to
-// flower then parks on the upper red loading zone
-@Autonomous(name = "RedU_Flwr_Inpark", group = "PP")
-public class RedU_Flwr_InPark extends OpMode {
-
+//starts in corner and goes to upper side park area red
+@Autonomous(name = "LZPark", group = "")
+public class LZPark extends OpMode {
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
 
-    public static final PoseFactory pf = PoseFactory.degrees();
-    public static Pose startPose = pf.of(60, 132, 270);
-    public static Pose Scorepose = pf.of(60, 120, 275);
-    public static Pose Parkpose = pf.of(17, 112, 295);
-    public static Pose Flowerp2 = pf.of(56, 128, 160);
 
-    public Path Score1() {
-        return Paths.line(startPose, Scorepose).linear(startPose, Scorepose);
 
-    }
+        private final PoseFactory Pf = PoseFactory.degrees();
 
-    public Path FlowerP() {
-        return Paths.line(Scorepose, Flowerp2).linear(Scorepose, Flowerp2);
-    }
 
-    public Path Score2() {
-        return Paths.line(Flowerp2, Scorepose).linear(Flowerp2, Scorepose);
-    }
+        private final Pose path1Start = Pf .of (8, 133, 0);
+        private final Pose path1 = Pf.of(14, 113, 0);
 
-    public Path Park() {
-        return Paths.line(Scorepose, Parkpose).linear(Scorepose, Parkpose);
+        public Path cool_path() {
+            return line(path1Start, path1).linear(path1Start, path1);
+        }
 
-    }
-
-    protected Command UBcycle1() {
+    protected Command startToScore() {
         return sequential(
-                robot.driveTrain.cmdAtFollow(Score1()),
-                robot.driveTrain.cmdAtFollow(FlowerP()),
-                robot.driveTrain.cmdAtFollow(Score2()),
-                robot.driveTrain.cmdAtFollow(Park())
+                robot.driveTrain.cmdAtFollow(cool_path())
+
         );
+
     }
 
-    private Command auto;
+
+private Command auto;
 
     @Override
     public void init() {
@@ -66,9 +52,10 @@ public class RedU_Flwr_InPark extends OpMode {
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(startPose);
+        robot.driveTrain.cmdOpmodestartPose(path1Start);
 
     }
+
 
     @Override
     public void init_loop() {
@@ -76,11 +63,13 @@ public class RedU_Flwr_InPark extends OpMode {
 
     }
 
+
     @Override
     public void start() {
         robot.start();
-        auto = UBcycle1();
+        auto = startToScore();
         schedule(auto);
+
 
     }
 
@@ -95,12 +84,13 @@ public class RedU_Flwr_InPark extends OpMode {
         // Driver Station: only the few things the drive team needs
         telemetry.addData("auto running", auto.isScheduled());
         telemetry.update();
-
     }
+
 
     @Override
     public void stop() {
         robot.stop();
+
 
     }
 

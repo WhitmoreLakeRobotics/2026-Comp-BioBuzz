@@ -16,47 +16,52 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
-//starts in corner and goes to upper side park area blue
-@Autonomous(name = "BlueUPark", group = "Ivy")
-public class BlueUPark extends OpMode  {
+//starts lower facing hive then Tries to launch then drives by garden to park on the lower
+//side of the red lower loading zone
+@Autonomous(name = "GD1cycle_Park", group = "")
+public class GD1cycle_Park extends OpMode {
+
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
-
-
-
-
     public static final PoseFactory pf = PoseFactory.degrees();
 
+    public static Pose Startpose = pf.of(56, 10, 90);
+    public static Pose scorePose = pf.of(60, 20, 95);
+    public static Pose Pickupgarden = pf.of(9, 10, 270);
+    public static Pose Park = pf.of(13, 90, 260);
 
-    public static Pose startpose = pf.of(133, 8, 180);
-    public static Pose parkpose = pf.of(127, 25, 180);
-
-
-    public Path pthpark() {
-        return Paths.line(startpose, parkpose).constant(startpose);
+    public Path Pickup() {
+        return Paths.line(Startpose, Pickupgarden).linear(Startpose, Pickupgarden);
     }
 
+    public Path Launchp2() {
+        return Paths.line(Pickupgarden, scorePose).linear(Pickupgarden, scorePose);
+    }
 
+    public Path DrivetoPark() {
+        return Paths.line(scorePose, Park).linear(scorePose, Park);
+    }
 
-    protected Command startToScore() {
+    protected Command Onecycle() {
         return sequential(
-                robot.driveTrain.cmdAtFollow(pthpark())
+                robot.driveTrain.cmdAtFollow(Pickup()),
+                robot.driveTrain.cmdAtFollow(Launchp2()),
+                robot.driveTrain.cmdAtFollow(DrivetoPark())
         );
 
     }
 
     private Command auto;
 
-
-
     @Override
     public void init() {
+
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         robot.hardwareMap = hardwareMap;
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(startpose);
+        robot.driveTrain.cmdOpmodestartPose(Startpose);
 
     }
 
@@ -67,11 +72,10 @@ public class BlueUPark extends OpMode  {
 
     }
 
-
     @Override
     public void start() {
         robot.start();
-        auto = startToScore();
+        auto = Onecycle();
         schedule(auto);
 
 
@@ -88,18 +92,15 @@ public class BlueUPark extends OpMode  {
         // Driver Station: only the few things the drive team needs
         telemetry.addData("auto running", auto.isScheduled());
         telemetry.update();
-    }
 
+
+    }
 
     @Override
     public void stop() {
         robot.stop();
 
-
     }
 
-    public enum stage {
-        _00_unknown,
 
-    }
 }

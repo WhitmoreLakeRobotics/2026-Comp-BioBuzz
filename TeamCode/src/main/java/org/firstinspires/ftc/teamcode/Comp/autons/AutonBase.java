@@ -6,7 +6,7 @@ import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 
-public class ppAutonBase extends OpMode {
+public class AutonBase extends OpMode {
 
 
     public static Follower follower;

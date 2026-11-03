@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
-@Autonomous(name = "BlueLPark",group = "comp")
-public class BlueLPark extends OpMode{
+@Autonomous(name = "GDPark",group = "comp")
+public class GDPark extends OpMode{
     Robot robot = new Robot();
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private TelemetryManager telemetryM;
