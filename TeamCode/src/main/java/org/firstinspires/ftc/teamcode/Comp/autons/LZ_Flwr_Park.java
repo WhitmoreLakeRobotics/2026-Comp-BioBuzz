@@ -12,48 +12,50 @@ import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
-// Starts next to on the right side of the upper red flower goes a short distance up and go to
-// flower then parks on the upper red loading zone
+// Starts next to on the flower on the LZ end goes a short distance up and go to score
+// flower then parks on the LZ corner of loading zone
+@Disabled
 @Autonomous(name = "LZ_Flwr_Inpark", group = "")
-public class LZ_Flwr_InPark extends OpMode {
+public class LZ_Flwr_Park extends OpMode {
 
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
 
     public static final PoseFactory pf = PoseFactory.degrees();
     public static Pose startPose = pf.of(60, 132, 270);
-    public static Pose Scorepose = pf.of(60, 120, 275);
-    public static Pose Parkpose = pf.of(17, 112, 295);
-    public static Pose Flowerp2 = pf.of(56, 128, 160);
+    public static Pose scorePose = pf.of(60, 120, 275);
+    public static Pose parkPose = pf.of(17, 112, 295);
+    public static Pose flowerHivePose = pf.of(56, 128, 160);
 
-    public Path Score1() {
-        return Paths.line(startPose, Scorepose).linear(startPose, Scorepose);
-
-    }
-
-    public Path FlowerP() {
-        return Paths.line(Scorepose, Flowerp2).linear(Scorepose, Flowerp2);
-    }
-
-    public Path Score2() {
-        return Paths.line(Flowerp2, Scorepose).linear(Flowerp2, Scorepose);
-    }
-
-    public Path Park() {
-        return Paths.line(Scorepose, Parkpose).linear(Scorepose, Parkpose);
+    public Path pthScore1() {
+        return Paths.line(startPose, scorePose).linear(startPose, scorePose);
 
     }
 
-    protected Command UBcycle1() {
+    public Path pthFlower() {
+        return Paths.line(scorePose, flowerHivePose).linear(scorePose, flowerHivePose);
+    }
+
+    public Path pthScore2() {
+        return Paths.line(flowerHivePose, scorePose).linear(flowerHivePose, scorePose);
+    }
+
+    public Path pthPark() {
+        return Paths.line(scorePose, parkPose).linear(scorePose, parkPose);
+
+    }
+
+    protected Command cmdLZcycle1() {
         return sequential(
-                robot.driveTrain.cmdAtFollow(Score1()),
-                robot.driveTrain.cmdAtFollow(FlowerP()),
-                robot.driveTrain.cmdAtFollow(Score2()),
-                robot.driveTrain.cmdAtFollow(Park())
+                robot.driveTrain.cmdAtFollow(pthScore1()),
+                robot.driveTrain.cmdAtFollow(pthFlower()),
+                robot.driveTrain.cmdAtFollow(pthScore2()),
+                robot.driveTrain.cmdAtFollow(pthPark())
         );
     }
 
@@ -79,7 +81,7 @@ public class LZ_Flwr_InPark extends OpMode {
     @Override
     public void start() {
         robot.start();
-        auto = UBcycle1();
+        auto = cmdLZcycle1();
         schedule(auto);
 
     }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
 
+import static com.pedropathing.api.Paths.curve;
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
@@ -26,12 +27,13 @@ public class GDPark extends OpMode{
 
 
     public static final PoseFactory pf = PoseFactory.degrees();
-    private final Pose start = poseFactory.of(46, 7, 90);
-    private final Pose end = poseFactory.of(15, 94, 90);
-
+    private final Pose startPose = poseFactory.of(46, 7, 90);
+    private final Pose endPose = poseFactory.of(15, 94, 90);
+    public static Pose CPparkpathPose = pf.of(24, 39, 0);
     public Path parkp() {
-        return line(start, end).linear(start, end);
+        return curve(startPose, CPparkpathPose, endPose).linear(startPose, endPose);
     }
+
     protected Command startToScore() {
 
         return sequential(
@@ -51,7 +53,7 @@ public class GDPark extends OpMode{
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(start);
+        robot.driveTrain.cmdOpmodestartPose(startPose);
 
     }
 

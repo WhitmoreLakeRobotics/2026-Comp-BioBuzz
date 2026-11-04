@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
 @Autonomous(name = "IvyTest1", group = "")
-public class IvyTest1 extends OpMode {
+public class GD_Score_Park extends OpMode {
 
 
     Robot robot = new Robot();
@@ -27,23 +27,27 @@ public class IvyTest1 extends OpMode {
 
     public static final PoseFactory pf = PoseFactory.degrees();
 
+/*  Replaced these with calls to AutonBase poses
 
     public static Pose startpose = pf.of(56, 8, 90);
-    public static Pose endscore = pf.of(56, 25, 90);
+    public static Pose scorePose = pf.of(56, 25, 90);
     public static Pose parkpose = pf.of(10, 90, 90);
+*/
     public static Pose CPparkpath = pf.of(24, 39, 0);
 
+
     public Path pth1Score() {
-        return Paths.line(startpose, endscore).constant(startpose);
+        return Paths.line(AutonBase.GDstartPose, AutonBase.GDscorePose).constant(AutonBase.GDscorePose);
     }
 
     public Path pthPark() {
-        return Paths.curve(endscore, CPparkpath, parkpose).constant(parkpose);
+        return Paths.curve(AutonBase.GDscorePose, CPparkpath, AutonBase.GDparkPose).constant(AutonBase.GDparkPose);
     }
 
-    protected Command startToScore() {
+    protected Command cmdScorePark() {
         return sequential(
                 robot.driveTrain.cmdAtFollow(pth1Score()),
+                robot.cmdShootSequence(),
                 robot.driveTrain.cmdAtFollow(pthPark())
         );
 
@@ -60,7 +64,7 @@ public class IvyTest1 extends OpMode {
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(startpose);
+        robot.driveTrain.cmdOpmodestartPose(AutonBase.GDstartPose);
 
     }
 
@@ -75,7 +79,7 @@ public class IvyTest1 extends OpMode {
     @Override
     public void start() {
         robot.start();
-        auto = startToScore();
+        auto = cmdScorePark();
         schedule(auto);
 
 
