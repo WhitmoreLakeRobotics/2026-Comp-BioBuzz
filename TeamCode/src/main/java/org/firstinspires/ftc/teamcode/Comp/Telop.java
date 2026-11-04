@@ -61,6 +61,7 @@ public class Telop extends OpMode {
     private boolean bAutoTurn = false;
 
     private boolean shootAborted = false;
+    private boolean bAutoDrive = false;
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
     private double driveSpeed = robot.driveTrain.NORMALSPEED;
@@ -145,40 +146,39 @@ public class Telop extends OpMode {
 
         */
 
-        if (Math.abs(gamepad1.right_stick_y) > Settings.JOYSTICK_DEADBAND_STICK) {
+
+
+
+        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(poseA,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(poseB,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(poseY,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(poseX,true); bAutoDrive = true;}
+
+        if (bAutoDrive) {
+            if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){
+             bAutoDrive = false;
+            }
+
+       
+
+
+        }else{
+            DriveToCommand.cancel();
+
+                robot.driveTrain.cmdTeleOp(
+                        CommonLogic.joyStickMath(gamepad1.left_stick_y * -1),
+                        CommonLogic.joyStickMath(gamepad1.left_stick_x * -1),
+                        CommonLogic.joyStickMath(gamepad1.right_stick_x * -1),
+                        driveSpeed
+                );
+
 
         }
-        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a))goHold(poseA,true);
-        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b))goHold(poseB,true);
-        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y))goHold(poseY,true);
-        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x))goHold(poseX,true);
 
         gp1_prev_a = gamepad1.a;
         gp1_prev_b = gamepad1.b;
         gp1_prev_y = gamepad1.y;
         gp1_prev_x = gamepad1.x;
-
-        boolean sticksMove =
-                Math.abs(gamepad1.left_stick_x) > Settings.JOYSTICK_DEADBAND_STICK
-                || Math.abs(gamepad1.left_stick_y) > Settings.JOYSTICK_DEADBAND_STICK
-                || Math.abs(gamepad1.right_stick_x) > Settings.JOYSTICK_DEADBAND_STICK;
-
-        boolean Holding = DriveToCommand != null && DriveToCommand.isScheduled();
-
-        if(Holding && (sticksMove || gamepad1.dpad_right)){
-            DriveToCommand.cancel();
-                    Holding  = false;
-        }
-
-        if (!Holding){
-            robot.driveTrain.cmdTeleOp(
-                    CommonLogic.joyStickMath(gamepad1.left_stick_y * -1),
-                    CommonLogic.joyStickMath(gamepad1.left_stick_x * -1),
-                    CommonLogic.joyStickMath(gamepad1.right_stick_x * -1),
-                    driveSpeed
-            );
-        }
-
 
         //gamepad1
         // CHANGED: gamepad 1 is driving and speed changes only for now. The launcher, blocker,
