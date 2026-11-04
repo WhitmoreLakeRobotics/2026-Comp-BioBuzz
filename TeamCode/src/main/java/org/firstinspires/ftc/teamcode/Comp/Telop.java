@@ -93,14 +93,14 @@ public class Telop extends OpMode {
     private void goHold(Pose target, boolean SpinLauncher ){
         if (DriveToCommand != null && DriveToCommand.isScheduled()) {
             DriveToCommand.cancel();
-
+        }
             DriveToCommand = robot.driveTrain.cmdHoldPos(target);
             lastTarget = target;
             Scheduler.schedule(DriveToCommand);
             if (SpinLauncher) {
                 robot.launcher.cmdLauncherForward();
             }
-        }
+
     }
 
     @Override
@@ -156,6 +156,7 @@ public class Telop extends OpMode {
 
         if (bAutoDrive) {
             if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){
+                DriveToCommand.cancel();
              bAutoDrive = false;
             }
 
@@ -163,7 +164,7 @@ public class Telop extends OpMode {
 
 
         }else{
-            DriveToCommand.cancel();
+
 
                 robot.driveTrain.cmdTeleOp(
                         CommonLogic.joyStickMath(gamepad1.left_stick_y * -1),
