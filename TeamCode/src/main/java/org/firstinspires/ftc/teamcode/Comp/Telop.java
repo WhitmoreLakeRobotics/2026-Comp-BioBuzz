@@ -60,6 +60,8 @@ public class Telop extends OpMode {
     private int tHeading = 0;
     private boolean bAutoTurn = false;
 
+    private boolean shootAborted = false;
+
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
     private double driveSpeed = robot.driveTrain.NORMALSPEED;
     private Pose lastTarget = null;
@@ -70,10 +72,10 @@ public class Telop extends OpMode {
 
     private Command DriveToCommand = null;
 
-    private static final Pose poseA = new Pose (30,115,315); //right side of the red hive relative to the driveteam
-    private static final Pose poseB = new Pose (88.3,113.3,210); // left side of the red hive on the right side relative to the driveteam
-    private static final Pose poseY = new Pose (23.2,21,40); // left side of the red hive on the left side relative to the driveteam
-    private static final Pose poseX = new Pose (86.4,20,135); // right side of the red hive on the left side relative to the driveteam
+    private static final Pose poseA = new Pose (30,115, Math.toRadians(315)); //right side of the red hive relative to the driveteam
+    private static final Pose poseB = new Pose (88.3,113.3, Math.toRadians(210)); // left side of the red hive on the right side relative to the driveteam
+    private static final Pose poseY = new Pose (23.2,21, Math.toRadians(40)); // left side of the red hive on the left side relative to the driveteam
+    private static final Pose poseX = new Pose (86.4,20, Math.toRadians(135)); // right side of the red hive on the left side relative to the driveteam
     private static final double InLaunchPosition = 5.0;
 
     private boolean InLaunchPosition(){
@@ -89,7 +91,7 @@ public class Telop extends OpMode {
 
     private void goHold(Pose target, boolean SpinLauncher ){
         if (DriveToCommand != null && DriveToCommand.isScheduled()) {
-            DriveToCommand.execute();
+            DriveToCommand.cancel();
 
             DriveToCommand = robot.driveTrain.cmdHoldPos(target);
             lastTarget = target;
@@ -97,8 +99,6 @@ public class Telop extends OpMode {
             if (SpinLauncher) {
                 robot.launcher.cmdLauncherForward();
             }
-        } else{
-            DriveToCommand.cancel();
         }
     }
 
@@ -361,7 +361,19 @@ public class Telop extends OpMode {
         boolean shootHeld = gamepad2.right_trigger_pressed;
 
         if (shootHeld) {
-            robot.tripleThreat.cmdShoot();
+            if(!shootAborted){
+                robot.tripleThreat.cmdShoot();
+            }
+            if(robot.tripleThreat.didLastShotAbort()){
+                shootAborted = true;
+            }
+            else{
+                shootAborted = false;
+            }
+            if(gp2_prev_right_trigger){
+                robot.tripleThreat.cmdCeaseFire();
+            }
+            gp2_prev_right_trigger = shootHeld;
             /* old latch version, replaced by the TripleThreat state machine:
             robot.launcher.cmdLauncherForward();
 
