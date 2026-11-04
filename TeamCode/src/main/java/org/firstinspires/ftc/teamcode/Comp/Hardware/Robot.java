@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Comp.Hardware;
 
 
 import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
@@ -155,5 +156,10 @@ public class Robot extends BaseHardware {
     /** End the volley: stop the feeder and close the blocker (the launcher keeps spinning). */
     public Command cmdCeaseFireSequence() {
         return instant(() -> tripleThreat.cmdCeaseFire()).requiring(this);
+    }
+    public Command cmdIntakeatSpeed() {
+        return sequential(
+                instant(() -> intake.cmdIntakeForward()),
+               waitMs(4000),instant(() -> intake.cmdIntakeStop()));
     }
 }

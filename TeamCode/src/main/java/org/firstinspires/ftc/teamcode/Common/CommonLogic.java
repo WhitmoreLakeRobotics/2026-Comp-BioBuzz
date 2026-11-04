@@ -46,6 +46,15 @@ public class CommonLogic extends Object {
         return Math.abs(Math.pow(joyValue, 2)) * sign;
     }
 
+    //*******************************************************************************
+    public static double DeadBand(double joyValue){
+        if (joyValue < Settings.JOYSTICK_DEADBAND_STICK){
+            return 0.0;
+        }else{
+            return joyValue;
+        }
+    }
+
     //*********************************************************************************************
     public static boolean inRange(double value, double targetValue, double tol) {
         // function to tell if an encoder is within tolerance

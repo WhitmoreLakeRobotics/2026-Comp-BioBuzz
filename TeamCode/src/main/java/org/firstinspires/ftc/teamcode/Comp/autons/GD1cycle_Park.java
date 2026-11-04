@@ -25,13 +25,16 @@ public class GD1cycle_Park extends OpMode {
     private TelemetryManager telemetryM;
     public static final PoseFactory pf = PoseFactory.degrees();
 
-    public static Pose Startpose = pf.of(56, 10, 90);
-    public static Pose scorePose = pf.of(60, 20, 95);
+    public static Pose Startpose = pf.of(56, 10, -90);
+    public static Pose scorePose = pf.of(60, 20, -95);
     public static Pose Pickupgarden = pf.of(9, 10, 270);
     public static Pose Park = pf.of(13, 90, 260);
 
+    public Path Launchp1() {
+            return Paths.line(Startpose,scorePose).linear(Startpose,scorePose);
+        }
     public Path Pickup() {
-        return Paths.line(Startpose, Pickupgarden).linear(Startpose, Pickupgarden);
+        return Paths.line(scorePose, Pickupgarden).linear(scorePose, Pickupgarden);
     }
 
     public Path Launchp2() {
@@ -39,13 +42,18 @@ public class GD1cycle_Park extends OpMode {
     }
 
     public Path DrivetoPark() {
+
         return Paths.line(scorePose, Park).linear(scorePose, Park);
     }
 
     protected Command Onecycle() {
         return sequential(
+                robot.driveTrain.cmdAtFollow(Launchp1()),
+                robot.cmdShootSequence(),
                 robot.driveTrain.cmdAtFollow(Pickup()),
+                robot.cmdIntakeatSpeed(),
                 robot.driveTrain.cmdAtFollow(Launchp2()),
+                robot.cmdShootSequence(),
                 robot.driveTrain.cmdAtFollow(DrivetoPark())
         );
 
@@ -75,6 +83,7 @@ public class GD1cycle_Park extends OpMode {
     @Override
     public void start() {
         robot.start();
+        robot.launcher.cmdLauncherForward();
         auto = Onecycle();
         schedule(auto);
 
