@@ -301,7 +301,7 @@ public class Telop extends OpMode {
 
         }
 
-        if ((gamepad2.y)) {
+        if ((gamepad1.y)) {
             robot.intake.cmdIntakeReverse();
             //robot.transitionR.cmdTumble();
 
