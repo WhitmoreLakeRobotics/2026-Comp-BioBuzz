@@ -27,18 +27,18 @@ public class LZPark extends OpMode {
         private final PoseFactory Pf = PoseFactory.degrees();
 
 
-        private final Pose path1Start = Pf .of (8, 133, 0);
+        private final Pose path1Start = Pf .of (8, 133, 270);
         private final Pose path1 = Pf.of(14, 113, 0);
 
-        public Path cool_path() {
+        public Path pthCool() {
             return line(AutonBase.LZstartPose, AutonBase.LZscorePose);
         }
         public Path pthPark() {
-            return line(AutonBase.LZscorePose, AutonBase.LZparkPose)-
+            return line(AutonBase.LZscorePose, AutonBase.LZparkPose);
         }
     protected Command startToScore() {
         return sequential(
-                robot.driveTrain.cmdAtFollow(cool_path())
+                robot.driveTrain.cmdAtFollow(pthCool())
 
         );
 
