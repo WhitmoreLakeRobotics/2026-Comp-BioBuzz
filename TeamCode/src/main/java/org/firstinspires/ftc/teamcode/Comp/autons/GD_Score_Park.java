@@ -79,6 +79,7 @@ public class GD_Score_Park extends OpMode {
     @Override
     public void start() {
         robot.start();
+        robot.launcher.cmdLauncherForward();
         auto = cmdScorePark();
         schedule(auto);
 
