@@ -14,7 +14,8 @@ public class Lighting extends BaseHardware{
     private static double Off = 0.0;
     private static double Green = 0.5;
     private double currentColor = Off;
-    private double Red = 27.7;
+    //private double Red = 27.7;   // MJD: old value, servo positions must be 0.0 to 1.0
+    private double Red = 0.277; // MJD
 
     @Override
     public void init(){

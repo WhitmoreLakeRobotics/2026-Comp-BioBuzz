@@ -132,6 +132,8 @@ follower.update();
     public boolean cmdPathIsDone() {
         return !follower.isBusy();
     }
+    public boolean isBusy() { return follower.isBusy(); } // MJD
+    public String getModeText() { return String.valueOf(follower.mode()); } // MJD
 
     public Command cmdAtFollow(Path atPath) {
         return PedroCommands.follow(follower, atPath).requiring(this);
