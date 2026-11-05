@@ -112,7 +112,7 @@ public class Telop extends OpMode {
         // CHANGED: autonomousEndPose is null if TeleOp runs without Auto first, so use a fallback.
         Pose startPose = OpModeStorage.autonomousEndPose;
         if (startPose == null) {
-            startPose = new Pose(0, 0, 0);   // TODO: set a real default start pose
+            startPose = new Pose(8, 8, 8);   // TODO: set a real default start pose
         }
         robot.driveTrain.cmdOpmodestartPose(startPose);
     }

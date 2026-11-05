@@ -16,7 +16,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
-@Autonomous(name = "IvyTest1", group = "")
+@Autonomous
+        (name = "Gd_Score_Park", group = "")
 public class GD_Score_Park extends OpMode {
 
 

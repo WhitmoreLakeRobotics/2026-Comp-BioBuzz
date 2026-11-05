@@ -5,6 +5,9 @@ import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDparkPose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDstartPose;
+
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.api.PoseFactory;
@@ -27,11 +30,14 @@ public class GDPark extends OpMode{
 
 
     public static final PoseFactory pf = PoseFactory.degrees();
-    private final Pose startPose = poseFactory.of(46, 7, 90);
+   /* private final Pose startPose = poseFactory.of(46, 7, 90);
     private final Pose endPose = poseFactory.of(15, 94, 90);
+
+    */
     public static Pose CPparkpathPose = pf.of(24, 39, 0);
-    public Path parkp() {
-        return curve(startPose, CPparkpathPose, endPose).linear(startPose, endPose);
+
+   public Path parkp() {
+        return curve( GDstartPose, CPparkpathPose, GDparkPose).linear(GDstartPose, GDparkPose);
     }
 
     protected Command startToScore() {
@@ -53,7 +59,7 @@ public class GDPark extends OpMode{
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(startPose);
+        robot.driveTrain.cmdOpmodestartPose(GDstartPose);
 
     }
 
