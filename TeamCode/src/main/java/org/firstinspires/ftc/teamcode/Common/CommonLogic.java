@@ -47,13 +47,17 @@ public class CommonLogic extends Object {
     }
 
     //*******************************************************************************
-    public static double DeadBand(double joyValue){
-        if (joyValue < Settings.JOYSTICK_DEADBAND_STICK){
-            return 0.0;
-        }else{
-            return joyValue;
-        }
-    }
+    // MJD: fixed - old version treated every negative stick value as zero
+    public static double DeadBand(double joyValue){ // MJD
+        return Math.abs(joyValue) < Settings.JOYSTICK_DEADBAND_STICK ? 0.0 : joyValue; // MJD
+    } // MJD
+    //public static double DeadBand(double joyValue){
+    //    if (joyValue < Settings.JOYSTICK_DEADBAND_STICK){
+    //        return 0.0;
+    //    }else{
+    //        return joyValue;
+    //    }
+    //}
 
     //*********************************************************************************************
     public static boolean inRange(double value, double targetValue, double tol) {
