@@ -62,6 +62,7 @@ public class Telop extends OpMode {
 
     // private boolean shootAborted = false;
     private boolean bAutoDrive = false;
+    private boolean poseDriveCalled = false; // MJD: a drive-to-pose button was pressed and we have not left that spot
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
     private double driveSpeed = robot.driveTrain.NORMALSPEED;
@@ -73,10 +74,10 @@ public class Telop extends OpMode {
 
     private Command DriveToCommand = null;
 
-    private static final Pose poseA = new Pose (30,115, Math.toRadians(315)); //right side of the red hive relative to the driveteam
-    private static final Pose poseB = new Pose (88.3,113.3, Math.toRadians(45)); // left side of the red hive on the right side relative to the driveteam
-    private static final Pose poseY = new Pose (23.2,21, Math.toRadians(40)); // left side of the red hive on the left side relative to the driveteam
-    private static final Pose poseX = new Pose (86.4,20, Math.toRadians(135)); // right side of the red hive on the left side relative to the driveteam
+    private static final Pose poseA = new Pose (30,131, Math.toRadians(120)); //right side of the red hive relative to the driveteam
+    private static final Pose poseB = new Pose (88.3,127, Math.toRadians(50)); // left side of the red hive on the right side relative to the driveteam
+    private static final Pose poseY = new Pose (29,15, Math.toRadians(230)); // left side of the red hive on the left side relative to the driveteam
+    private static final Pose poseX = new Pose (86.4,15, Math.toRadians(310)); // right side of the red hive on the left side relative to the driveteam
     private static final double InLaunchPosition = 5.0;
 
     private boolean InLaunchPosition(){
@@ -96,6 +97,7 @@ public class Telop extends OpMode {
         }
             DriveToCommand = robot.driveTrain.cmdHoldPos(target);
             lastTarget = target;
+            poseDriveCalled = true; // MJD
             Scheduler.schedule(DriveToCommand);
             if (SpinLauncher) {
                 robot.launcher.cmdLauncherForward();
@@ -153,10 +155,10 @@ public class Telop extends OpMode {
 
 
 
-        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(poseA,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(poseB,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(poseY,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(poseX,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(poseY,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(poseX,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(poseA,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(poseB,true); bAutoDrive = true;}
 
         if (bAutoDrive) {
             if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){
@@ -299,7 +301,7 @@ public class Telop extends OpMode {
 
         }
 
-        if ((gamepad2.y)) {
+        if ((gamepad1.y)) {
             robot.intake.cmdIntakeReverse();
             //robot.transitionR.cmdTumble();
 
@@ -424,7 +426,13 @@ public class Telop extends OpMode {
 
 
 
-        robot.lighting.cmdInLaunchPosition(InLaunchPosition());
+        boolean inLaunchPos = InLaunchPosition(); // MJD
+        if (!bAutoDrive && !inLaunchPos) { // MJD: driver took over and left the spot, back to the normal speed
+            poseDriveCalled = false; // MJD
+        } // MJD
+        robot.launcher.setPoseSpeedMode(poseDriveCalled && inLaunchPos); // MJD: pose speed only when called AND light is green
+        //robot.lighting.cmdInLaunchPosition(InLaunchPosition());   // MJD: old
+        robot.lighting.cmdInLaunchPosition(inLaunchPos); // MJD
         Scheduler.execute();
         // robot.loop() -> driveTrain.loop() -> follower.update(), which sends
         // the power to the motors. Must come AFTER cmdTeleOp.
@@ -443,6 +451,7 @@ public class Telop extends OpMode {
             telemetry.addData("Launcher at speed", robot.launcher.isLauncherAtSpeed());
             telemetry.addData("Feeder at speed", robot.feeder.isFeederAtSpeed());
             telemetry.addData("Blocker open", robot.pollenBlocker.isOpen());
+            telemetry.addData("Pose launch speed on", poseDriveCalled && InLaunchPosition()); // MJD
             telemetry.addData("bAutoDrive", bAutoDrive);
             telemetry.addData("Hold cmd scheduled", DriveToCommand != null && DriveToCommand.isScheduled());
             telemetry.addData("Follower busy", robot.driveTrain.isBusy());
