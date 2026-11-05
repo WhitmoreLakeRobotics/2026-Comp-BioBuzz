@@ -3,6 +3,14 @@ package org.firstinspires.ftc.teamcode.Comp.autons;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDflowerPose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDparkPose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.Garden;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.Garden;
+import static org.firstinspires.ftc.teamcode.Comp.autons.GD1cycle_Park.scorePose;
+
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.api.Paths;
@@ -27,33 +35,33 @@ public class LZ_2cycle_Park extends OpMode {
     private TelemetryManager telemetryM;
 
     public static final PoseFactory pf = PoseFactory.degrees();
-    public static Pose startPose = pf.of(60, 132, 270);
+  /*  public static Pose startPose = pf.of(60, 132, 270);
     public static Pose scorePose = pf.of(60, 120, 275);
     public static Pose parkPose = pf.of(17, 112, 295);
     public static Pose flowerHivePose = pf.of(56, 128, 160);
-
-    public static Pose Pickupgarden = pf.of(9, 10, 270);
+*/
+    //public static Pose Pickupgarden = pf.of(9, 10, 270);
     public Path pthScore1() {
-        return Paths.line(startPose, scorePose).linear(startPose, scorePose);
+        return Paths.line(LZstartPose, LZscorePose).linear(LZstartPose, LZscorePose);
 
     }
 
     public Path pthFlower() {
-        return Paths.line(scorePose, flowerHivePose).linear(scorePose, flowerHivePose);
+        return Paths.line(scorePose, GDflowerPose).linear(scorePose, GDflowerPose);
     }
 
     public Path pthScore2() {
-        return Paths.line(flowerHivePose, scorePose).linear(flowerHivePose, scorePose);
+return Paths.line(GDflowerPose, scorePose).linear(GDflowerPose, scorePose);
     }
 
     public Path pthhive() {
-        return Paths.line(scorePose,flowerHivePose).linear(scorePose,flowerHivePose);
+        return Paths.line(scorePose,Garden).linear(scorePose,Garden);
     }
     public  Path pthscore3(){
-        return Paths.line(flowerHivePose,scorePose).linear(flowerHivePose,scorePose);
+        return Paths.line(Garden,scorePose).linear(Garden,scorePose);
     }
     public Path pthPark() {
-        return Paths.line(scorePose, parkPose).linear(scorePose, parkPose);
+        return Paths.line(scorePose, GDparkPose).linear(scorePose, GDparkPose);
 
     }
 
@@ -77,7 +85,7 @@ public class LZ_2cycle_Park extends OpMode {
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(startPose);
+        robot.driveTrain.cmdOpmodestartPose(LZstartPose);
 
     }
 
