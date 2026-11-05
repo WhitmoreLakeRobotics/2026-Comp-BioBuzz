@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 // Starts next to on the flower on the LZ end goes a short distance up and go to score
 // flower then parks on the LZ corner of loading zone
 @Disabled
-@Autonomous(name = "LZ_Flwr_Inpark", group = "")
-public class LZ_Flwr_Park extends OpMode {
+@Autonomous(name = "LZ_2cycle_Inpark", group = "")
+public class LZ_2cycle_Park extends OpMode {
 
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
@@ -32,6 +32,7 @@ public class LZ_Flwr_Park extends OpMode {
     public static Pose parkPose = pf.of(17, 112, 295);
     public static Pose flowerHivePose = pf.of(56, 128, 160);
 
+    public static Pose Pickupgarden = pf.of(9, 10, 270);
     public Path pthScore1() {
         return Paths.line(startPose, scorePose).linear(startPose, scorePose);
 
@@ -45,16 +46,24 @@ public class LZ_Flwr_Park extends OpMode {
         return Paths.line(flowerHivePose, scorePose).linear(flowerHivePose, scorePose);
     }
 
+    public Path pthhive() {
+        return Paths.line(scorePose,flowerHivePose).linear(scorePose,flowerHivePose);
+    }
+    public  Path pthscore3(){
+        return Paths.line(flowerHivePose,scorePose).linear(flowerHivePose,scorePose);
+    }
     public Path pthPark() {
         return Paths.line(scorePose, parkPose).linear(scorePose, parkPose);
 
     }
+
 
     protected Command cmdLZcycle1() {
         return sequential(
                 robot.driveTrain.cmdAtFollow(pthScore1()),
                 robot.driveTrain.cmdAtFollow(pthFlower()),
                 robot.driveTrain.cmdAtFollow(pthScore2()),
+                robot.driveTrain.cmdAtFollow(pthhive()),
                 robot.driveTrain.cmdAtFollow(pthPark())
         );
     }
