@@ -125,7 +125,7 @@ public class TripleThreat extends BaseHardware {
                     blocker.cmdOpen(); // MJD
                     stateTimer.reset(); // MJD
                     tripleThreatState = TripleThreatState.OPENING; // MJD
-                } 
+                }
                 /* MJD: old version, waited for feeder RPM and aborted on timeout
                 if (!WAIT_FOR_FEEDER_SPEED || feeder.isFeederAtSpeedForward()) {
                     blocker.cmdOpen();
