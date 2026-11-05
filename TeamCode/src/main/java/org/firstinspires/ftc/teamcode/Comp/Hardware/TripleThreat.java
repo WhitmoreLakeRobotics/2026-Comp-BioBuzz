@@ -18,9 +18,10 @@ public class TripleThreat extends BaseHardware {
     private final Launcher launcher;
     private final Feeder feeder;
     private final PollenBlocker blocker;
+    private final Intake intake;
 
     // ---------------- TUNABLE CONSTANTS ----------------
-    public static double SPINUP_TIMEOUT_SEC = 3.0;     // give up waiting for launcher speed
+    public static double SPINUP_TIMEOUT_SEC = 1.5;     // give up waiting for launcher speed
     public static double FEEDER_TIMEOUT_SEC = 1.5;     // give up waiting for feeder speed
     public static double BLOCKER_OPEN_SEC = 0.30;      // servo travel time before we call it FIRING (tune!)
     public static boolean WAIT_FOR_FEEDER_SPEED = true; // false = open the blocker as soon as the feeder is commanded
@@ -31,10 +32,11 @@ public class TripleThreat extends BaseHardware {
     private final ElapsedTime stateTimer = new ElapsedTime();
     private boolean lastShotAborted = false;
 
-    public TripleThreat(Launcher launcher, Feeder feeder, PollenBlocker blocker) {
+    public TripleThreat(Launcher launcher, Feeder feeder, PollenBlocker blocker, Intake intake) {
         this.launcher = launcher;
         this.feeder = feeder;
         this.blocker = blocker;
+        this.intake = intake;
     }
 
     // ---------------- LIFECYCLE ----------------
@@ -113,6 +115,7 @@ public class TripleThreat extends BaseHardware {
             case SPINNING_UP:
                 if (launcher.isLauncherAtSpeed()) {
                     feeder.cmdFeederForward();
+                    intake.cmdIntakeForward();
                     stateTimer.reset();
                     tripleThreatState = TripleThreatState.STARTING_FEEDER;
                 } else if (stateTimer.seconds() > SPINUP_TIMEOUT_SEC) {

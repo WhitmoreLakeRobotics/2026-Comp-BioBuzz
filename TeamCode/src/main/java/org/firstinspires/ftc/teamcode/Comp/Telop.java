@@ -73,10 +73,10 @@ public class Telop extends OpMode {
 
     private Command DriveToCommand = null;
 
-    private static final Pose poseA = new Pose (30,115, Math.toRadians(315)); //right side of the red hive relative to the driveteam
-    private static final Pose poseB = new Pose (88.3,113.3, Math.toRadians(45)); // left side of the red hive on the right side relative to the driveteam
-    private static final Pose poseY = new Pose (23.2,21, Math.toRadians(40)); // left side of the red hive on the left side relative to the driveteam
-    private static final Pose poseX = new Pose (86.4,20, Math.toRadians(135)); // right side of the red hive on the left side relative to the driveteam
+    private static final Pose poseA = new Pose (30,131, Math.toRadians(120)); //right side of the red hive relative to the driveteam
+    private static final Pose poseB = new Pose (88.3,127, Math.toRadians(50)); // left side of the red hive on the right side relative to the driveteam
+    private static final Pose poseY = new Pose (29,15, Math.toRadians(230)); // left side of the red hive on the left side relative to the driveteam
+    private static final Pose poseX = new Pose (86.4,15, Math.toRadians(310)); // right side of the red hive on the left side relative to the driveteam
     private static final double InLaunchPosition = 5.0;
 
     private boolean InLaunchPosition(){
@@ -112,7 +112,7 @@ public class Telop extends OpMode {
         // CHANGED: autonomousEndPose is null if TeleOp runs without Auto first, so use a fallback.
         Pose startPose = OpModeStorage.autonomousEndPose;
         if (startPose == null) {
-            startPose = new Pose(0, 0, 0);   // TODO: set a real default start pose
+            startPose = new Pose(8, 8, 8);   // TODO: set a real default start pose
         }
         robot.driveTrain.cmdOpmodestartPose(startPose);
     }
@@ -153,10 +153,10 @@ public class Telop extends OpMode {
 
 
 
-        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(poseA,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(poseB,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(poseY,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(poseX,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(poseY,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(poseX,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(poseA,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(poseB,true); bAutoDrive = true;}
 
         if (bAutoDrive) {
             if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){

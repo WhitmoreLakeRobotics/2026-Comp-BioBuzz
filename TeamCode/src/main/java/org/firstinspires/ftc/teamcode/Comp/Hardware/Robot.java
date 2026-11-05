@@ -27,7 +27,7 @@ public class Robot extends BaseHardware {
     public PollenBlocker pollenBlocker = new PollenBlocker();
     public Feeder feeder = new Feeder();
     // CHANGED: runs the launch sequence. Declared AFTER the parts it uses.
-    public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker);
+    public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
 
 

@@ -26,7 +26,7 @@ public class Launcher extends BaseHardware {
     public static double OFF_RPM_THRESHOLD = 50;       // |RPM| below this counts as stopped
 
     // ---------------- PID CONSTANTS ----------------
-    public static double LAUNCHER_KP = 0.002; //was 0.00135
+    public static double LAUNCHER_KP = 0.0025; //was 0.00135
     public static double LAUNCHER_KI = 0.00000005;            // still unused
     public static double LAUNCHER_KD = 0.0000002;
     public static double LAUNCHER_KF = 0.0003426606575;     // feedforward per RPM was 0.0004166672
