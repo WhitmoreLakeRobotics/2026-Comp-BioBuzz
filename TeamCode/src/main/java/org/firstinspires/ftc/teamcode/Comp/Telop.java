@@ -74,7 +74,7 @@ public class Telop extends OpMode {
     private Command DriveToCommand = null;
 
     private static final Pose poseA = new Pose (30,115, Math.toRadians(315)); //right side of the red hive relative to the driveteam
-    private static final Pose poseB = new Pose (88.3,113.3, Math.toRadians(210)); // left side of the red hive on the right side relative to the driveteam
+    private static final Pose poseB = new Pose (88.3,113.3, Math.toRadians(45)); // left side of the red hive on the right side relative to the driveteam
     private static final Pose poseY = new Pose (23.2,21, Math.toRadians(40)); // left side of the red hive on the left side relative to the driveteam
     private static final Pose poseX = new Pose (86.4,20, Math.toRadians(135)); // right side of the red hive on the left side relative to the driveteam
     private static final double InLaunchPosition = 5.0;
