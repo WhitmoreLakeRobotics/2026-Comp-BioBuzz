@@ -60,7 +60,7 @@ public class Telop extends OpMode {
     private int tHeading = 0;
     private boolean bAutoTurn = false;
 
-    private boolean shootAborted = false;
+    // private boolean shootAborted = false;  
     private boolean bAutoDrive = false;
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
@@ -127,6 +127,10 @@ public class Telop extends OpMode {
     @Override
     public void start() {
         robot.start();
+        gp1_prev_a = gamepad1.a;
+        gp1_prev_b = gamepad1.b;
+        gp1_prev_x = gamepad1.x;
+        gp1_prev_y = gamepad1.y;
 
     }
 
@@ -359,57 +363,68 @@ public class Telop extends OpMode {
         // the launcher, waits for speed, starts the feeder, then opens the blocker and keeps firing.
         // Release it: the blocker closes and the feeder stops (the launcher keeps spinning for the
         // next volley; x stops it).
-        boolean shootHeld = gamepad2.right_trigger_pressed;
+        // old shoot block commented out (cmdCeaseFire ran every loop while held, which cancelled the sequence)
+        boolean shootHeld = gamepad2.right_trigger_pressed; // MJD
 
-        if (shootHeld) {
-            if(!shootAborted){
-                robot.tripleThreat.cmdShoot();
-            }
-            if(robot.tripleThreat.didLastShotAbort()){
-                shootAborted = true;
-            }
-            else{
-                shootAborted = false;
-            }
-            if(gp2_prev_right_trigger){
-                robot.tripleThreat.cmdCeaseFire();
-            }
-            gp2_prev_right_trigger = shootHeld;
-            /* old latch version, replaced by the TripleThreat state machine:
-            robot.launcher.cmdLauncherForward();
+        if (CommonLogic.oneShot(shootHeld, gp2_prev_right_trigger)) { // MJD
+            robot.tripleThreat.cmdShoot();          // once, when the trigger is first pressed // MJD
+        } else if (CommonLogic.oneShotRelease(shootHeld, gp2_prev_right_trigger)) { // MJD
+            robot.tripleThreat.cmdCeaseFire();      // once, when it is released // MJD
+        } // MJD
+        gp2_prev_right_trigger = shootHeld; // MJD
 
-            // CHANGED: the at-speed check only STARTS the volley. After that, dips in RPM
-            // (a ball loading the flywheel) no longer close the blocker.
-            if (!volleyActive && robot.launcher.isLauncherAtSpeed()) {
-                volleyActive = true;
-            }
+//        boolean shootHeld = gamepad2.right_trigger_pressed;
 
-            if(volleyActive){
-                robot.pollenBlocker.cmdOpen();
-                robot.feeder.cmdFeederForward();
+//        if (shootHeld) {
+//            if(!shootAborted){
+//                robot.tripleThreat.cmdShoot();
+//            }
+//            if(robot.tripleThreat.didLastShotAbort()){
+//                shootAborted = true;
+//            }
+//            else{
+//                shootAborted = false;
+//            }
+//            if(gp2_prev_right_trigger){
+//                robot.tripleThreat.cmdCeaseFire();
+//            }
+//            gp2_prev_right_trigger = shootHeld;
+//            /* old latch version, replaced by the TripleThreat state machine:
+//            robot.launcher.cmdLauncherForward();
 
+//            // CHANGED: the at-speed check only STARTS the volley. After that, dips in RPM
+//            // (a ball loading the flywheel) no longer close the blocker.
+//            if (!volleyActive && robot.launcher.isLauncherAtSpeed()) {
+//                volleyActive = true;
+//            }
 
-            }else{
-                robot.pollenBlocker.cmdBlock();
-                robot.feeder.cmdFeederStop();
-
-            }
-            */
-
-
-
-        } else if (gp2_prev_right_trigger) {
-            robot.tripleThreat.cmdCeaseFire();
-            //volleyActive = false;
-            //robot.pollenBlocker.cmdBlock();
-            //robot.feeder.cmdFeederStop();
-        }
-        gp2_prev_right_trigger = shootHeld;
+//            if(volleyActive){
+//                robot.pollenBlocker.cmdOpen();
+//                robot.feeder.cmdFeederForward();
 
 
+//            }else{
+//                robot.pollenBlocker.cmdBlock();
+//                robot.feeder.cmdFeederStop();
+
+//            }
+//            */
 
 
 
+//        } else if (gp2_prev_right_trigger) {
+//            robot.tripleThreat.cmdCeaseFire();
+//            //volleyActive = false;
+//            //robot.pollenBlocker.cmdBlock();
+//            //robot.feeder.cmdFeederStop();
+//        }
+//        gp2_prev_right_trigger = shootHeld;
+
+
+
+
+
+        robot.lighting.cmdInLaunchPosition(InLaunchPosition());
         Scheduler.execute();
         // robot.loop() -> driveTrain.loop() -> follower.update(), which sends
         // the power to the motors. Must come AFTER cmdTeleOp.
@@ -428,6 +443,14 @@ public class Telop extends OpMode {
             telemetry.addData("Launcher at speed", robot.launcher.isLauncherAtSpeed());
             telemetry.addData("Feeder at speed", robot.feeder.isFeederAtSpeed());
             telemetry.addData("Blocker open", robot.pollenBlocker.isOpen());
+            telemetry.addData("bAutoDrive", bAutoDrive);
+            telemetry.addData("Hold cmd scheduled", DriveToCommand != null && DriveToCommand.isScheduled());
+            telemetry.addData("Follower busy", robot.driveTrain.isBusy());
+            telemetry.addData("Follower mode", robot.driveTrain.getModeText());
+            if (lastTarget != null) {
+                telemetry.addData("Dist to target (in)", "%.1f",
+                        Math.hypot(p.x() - lastTarget.x(), p.y() - lastTarget.y()));
+            }
             //telemetry.addData("Volley active", volleyActive);   // CHANGED: replaced by "TripleThreat State" from the TripleThreat class
 
 
