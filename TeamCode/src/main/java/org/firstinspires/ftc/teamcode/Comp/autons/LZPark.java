@@ -31,9 +31,11 @@ public class LZPark extends OpMode {
         private final Pose path1 = Pf.of(14, 113, 0);
 
         public Path cool_path() {
-            return line(path1Start, path1).linear(path1Start, path1);
+            return line(AutonBase.LZstartPose, AutonBase.LZscorePose);
         }
-
+        public Path pthPark() {
+            return line(AutonBase.LZscorePose, AutonBase.LZparkPose)-
+        }
     protected Command startToScore() {
         return sequential(
                 robot.driveTrain.cmdAtFollow(cool_path())
