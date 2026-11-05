@@ -12,9 +12,9 @@ public class Intake extends BaseHardware {
     private DcMotorEx NTKM;
 
     public static double INTAKE_POWER = -1.0;
-    public static double REVERSE_POWER = 0.45;
-    public static double AT_SPEED_INTAKE_RPM = 3000;
-    public static double AT_SPEED_REVERSE_RPM = 800;
+    public static double REVERSE_POWER = 0.8;
+    public static double AT_SPEED_INTAKE_RPM = 4000;
+    public static double AT_SPEED_REVERSE_RPM = 2000;
     public static double AT_SPEED_HOLD_SEC = 0.15;
     public static double OFF_RPM_THRESHOLD = 50;
 

@@ -62,6 +62,7 @@ public class Telop extends OpMode {
 
     // private boolean shootAborted = false;
     private boolean bAutoDrive = false;
+    private boolean poseDriveCalled = false; // MJD: a drive-to-pose button was pressed and we have not left that spot
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
     private double driveSpeed = robot.driveTrain.NORMALSPEED;
@@ -96,6 +97,7 @@ public class Telop extends OpMode {
         }
             DriveToCommand = robot.driveTrain.cmdHoldPos(target);
             lastTarget = target;
+            poseDriveCalled = true; // MJD
             Scheduler.schedule(DriveToCommand);
             if (SpinLauncher) {
                 robot.launcher.cmdLauncherForward();
@@ -424,7 +426,13 @@ public class Telop extends OpMode {
 
 
 
-        robot.lighting.cmdInLaunchPosition(InLaunchPosition());
+        boolean inLaunchPos = InLaunchPosition(); // MJD
+        if (!bAutoDrive && !inLaunchPos) { // MJD: driver took over and left the spot, back to the normal speed
+            poseDriveCalled = false; // MJD
+        } // MJD
+        robot.launcher.setPoseSpeedMode(poseDriveCalled && inLaunchPos); // MJD: pose speed only when called AND light is green
+        //robot.lighting.cmdInLaunchPosition(InLaunchPosition());   // MJD: old
+        robot.lighting.cmdInLaunchPosition(inLaunchPos); // MJD
         Scheduler.execute();
         // robot.loop() -> driveTrain.loop() -> follower.update(), which sends
         // the power to the motors. Must come AFTER cmdTeleOp.
@@ -443,6 +451,7 @@ public class Telop extends OpMode {
             telemetry.addData("Launcher at speed", robot.launcher.isLauncherAtSpeed());
             telemetry.addData("Feeder at speed", robot.feeder.isFeederAtSpeed());
             telemetry.addData("Blocker open", robot.pollenBlocker.isOpen());
+            telemetry.addData("Pose launch speed on", poseDriveCalled && InLaunchPosition()); // MJD
             telemetry.addData("bAutoDrive", bAutoDrive);
             telemetry.addData("Hold cmd scheduled", DriveToCommand != null && DriveToCommand.isScheduled());
             telemetry.addData("Follower busy", robot.driveTrain.isBusy());

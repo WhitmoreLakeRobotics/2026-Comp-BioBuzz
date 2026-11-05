@@ -20,6 +20,7 @@ public class Launcher extends BaseHardware {
 
     // ---------------- TUNABLE CONSTANTS ----------------
     public static double LAUNCHER_RPM = 1700;
+    public static double POSE_LAUNCHER_RPM = 1850;     // MJD: speed used when a drive-to-pose was called and the light is green (tune!)
     public static int RPM_OFFSET = 0;                  // added to LAUNCHER_RPM (trim from Panels)
     public static double RPM_TOLERANCE = 50;           // "at speed" window around the target RPM
     public static double AT_SPEED_HOLD_SEC = 0.15;     // RPM must stay in tolerance this long
@@ -40,6 +41,7 @@ public class Launcher extends BaseHardware {
     // ---------------- STATE ----------------
     private LauncherState launcherState = LauncherState.OFF;
     private double targetRPM = 0;
+    private boolean poseSpeedMode = false; // MJD: true = use POSE_LAUNCHER_RPM
     private final ElapsedTime atSpeedTimer = new ElapsedTime();
 
     // ---------------- PID WORKING VALUES ----------------
@@ -92,6 +94,7 @@ public class Launcher extends BaseHardware {
 
     private void resetState() {
         targetRPM = 0;
+        poseSpeedMode = false; // MJD
         integral = 0;
         lastError = 0;
         launcherState = LauncherState.OFF;
@@ -103,7 +106,8 @@ public class Launcher extends BaseHardware {
     public void cmdLauncherForward() {
 
         // Only one direction, so retargeting while spinning (or spinning down) is safe.
-        targetRPM = LAUNCHER_RPM + RPM_OFFSET;
+        //targetRPM = LAUNCHER_RPM + RPM_OFFSET;   // MJD: old, always the normal speed
+        targetRPM = currentSpeedRPM(); // MJD
 
         if (launcherState == LauncherState.OFF || launcherState == LauncherState.SPINNING_DOWN) {
             atSpeedTimer.reset();
@@ -111,6 +115,23 @@ public class Launcher extends BaseHardware {
         }
         // SPINNING_UP / AT_SPEED: keep the state so a held button doesn't reset the debounce.
     }
+
+    // MJD: the speed the launcher should run at right now (normal, or the drive-to-pose speed)
+    private double currentSpeedRPM() { // MJD
+        return (poseSpeedMode ? POSE_LAUNCHER_RPM : LAUNCHER_RPM) + RPM_OFFSET; // MJD
+    } // MJD
+
+    // MJD: switch between the normal speed and the drive-to-pose speed. If the launcher is already
+    // running it retargets right away; loop() then drops back to SPINNING_UP until it settles.
+    public void setPoseSpeedMode(boolean on) { // MJD
+        if (poseSpeedMode == on) { // MJD
+            return; // MJD
+        } // MJD
+        poseSpeedMode = on; // MJD
+        if (targetRPM != 0) { // MJD
+            targetRPM = currentSpeedRPM(); // MJD
+        } // MJD
+    } // MJD
 
     public void cmdLauncherStop() {
 
