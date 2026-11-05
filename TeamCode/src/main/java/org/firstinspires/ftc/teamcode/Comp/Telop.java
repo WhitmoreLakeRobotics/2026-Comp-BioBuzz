@@ -60,7 +60,7 @@ public class Telop extends OpMode {
     private int tHeading = 0;
     private boolean bAutoTurn = false;
 
-    // private boolean shootAborted = false;  
+    // private boolean shootAborted = false;
     private boolean bAutoDrive = false;
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
