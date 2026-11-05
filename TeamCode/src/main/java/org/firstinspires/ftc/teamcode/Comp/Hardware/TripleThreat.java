@@ -24,6 +24,7 @@ public class TripleThreat extends BaseHardware {
     public static double FEEDER_TIMEOUT_SEC = 1.5;     // give up waiting for feeder speed
     public static double BLOCKER_OPEN_SEC = 0.30;      // servo travel time before we call it FIRING (tune!)
     public static boolean WAIT_FOR_FEEDER_SPEED = true; // false = open the blocker as soon as the feeder is commanded
+    public static double BLOCKER_DELAY_AFTER_FEEDER_SEC = 0.5; // MJD: open the blocker this long after the feeder starts
 
     // ---------------- STATE ----------------
     private TripleThreatState tripleThreatState = TripleThreatState.IDLE;
@@ -120,6 +121,12 @@ public class TripleThreat extends BaseHardware {
                 break;
 
             case STARTING_FEEDER:
+                if (stateTimer.seconds() >= BLOCKER_DELAY_AFTER_FEEDER_SEC) { // MJD
+                    blocker.cmdOpen(); // MJD
+                    stateTimer.reset(); // MJD
+                    tripleThreatState = TripleThreatState.OPENING; // MJD
+                }
+                /* MJD: old version, waited for feeder RPM and aborted on timeout
                 if (!WAIT_FOR_FEEDER_SPEED || feeder.isFeederAtSpeedForward()) {
                     blocker.cmdOpen();
                     stateTimer.reset();
@@ -127,6 +134,7 @@ public class TripleThreat extends BaseHardware {
                 } else if (stateTimer.seconds() > FEEDER_TIMEOUT_SEC) {
                     abort();
                 }
+                */
                 break;
 
             case OPENING:
