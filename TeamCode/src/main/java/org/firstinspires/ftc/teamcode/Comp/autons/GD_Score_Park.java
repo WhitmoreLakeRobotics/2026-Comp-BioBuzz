@@ -48,7 +48,7 @@ public class GD_Score_Park extends OpMode {
     protected Command cmdScorePark() {
         return sequential(
                 robot.driveTrain.cmdAtFollow(pth1Score()),
-                robot.cmdShootSequence(),
+                robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
                 robot.driveTrain.cmdAtFollow(pthPark())
         );
 
@@ -81,6 +81,7 @@ public class GD_Score_Park extends OpMode {
     public void start() {
         robot.start();
         robot.launcher.cmdLauncherForward();
+        robot.intake.cmdIntakeForward();
         auto = cmdScorePark();
         schedule(auto);
 

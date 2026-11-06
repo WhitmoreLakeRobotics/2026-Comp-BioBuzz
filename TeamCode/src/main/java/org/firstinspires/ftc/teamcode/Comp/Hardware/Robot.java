@@ -163,5 +163,14 @@ public class Robot extends BaseHardware {
                waitMs(4000),instant(() -> intake.cmdIntakeStop()));
     }
 
-    
+    /** Spin up -> feed -> unblock, fire for ms, then feeder off and blocker closed.
+     *  Finishes only after the volley. Launcher and intake are left running. */
+    public Command cmdLaunchVolley(double ms) {
+        return sequential(
+                instant(() -> tripleThreat.cmdShoot()),
+                waitUntil(() -> tripleThreat.isFiring() || tripleThreat.isIdle()),
+                waitMs(ms),                                   // timer starts once FIRING
+                instant(() -> tripleThreat.cmdCeaseFire())
+        );
+    }
 }
