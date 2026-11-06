@@ -112,7 +112,7 @@ public class Telop extends OpMode {
         robot.telemetry = telemetry;
         robot.init();
         // CHANGED: autonomousEndPose is null if TeleOp runs without Auto first, so use a fallback.
-        Pose startPose = OpModeStorage.autonomousEndPose;
+        Pose startPose = OpModeStorage.EndPose;
         if (startPose == null) {
             startPose = new Pose(8, 8, 8);   // TODO: set a real default start pose
         }

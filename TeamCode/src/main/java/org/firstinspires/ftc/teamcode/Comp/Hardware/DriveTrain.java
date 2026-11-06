@@ -82,16 +82,16 @@ follower.update();
         //these are needed to draw the path on the field in Panels.
         recordTrail();
         drawField();
-
+        if (follower != null) {
+            OpModeStorage.EndPose = follower.pose();
+        }
 
     }
 
 
     @Override
     public void stop() {
-        if (follower != null) {
-            OpModeStorage.autonomousEndPose = follower.pose();
-        }
+
     }
 
     public void cmdTeleOp(double Left_Y, double Left_X, double Right_X, double Current_Speed) {
@@ -154,6 +154,8 @@ follower.update();
     }
 
     public void resetDriveHeading(){
+        //*************** naj this should only occur when the robot is in the left bottom corner then the command should be
+        // ********   follower.setPose(new Pose(10.5,10.5,0));
         headingOffset = follower.pose().heading();
 
 
