@@ -193,6 +193,11 @@ public class Intake extends BaseHardware {
         return intakeState == IntakeState.OFF;
     }
 
+    // MJD: true if the intake is running forward or is about to (negative power = forward)
+    public boolean isIntakeForward() { // MJD
+        return targetPower < 0 || pendingPower < 0; // MJD
+    } // MJD
+
     public double getMotorRPM() {
         return (NTKM.getVelocity() / TICKS_PER_REV) * 60.0;
     }

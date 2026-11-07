@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.Comp.autons;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDflowerPose;
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDparkPose;
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.Garden;
+
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDparkPose;;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDscorePose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GardenPose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZparkPose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.Garden;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.OpGDFlowerPose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.GD1cycle_Park.scorePose;
 
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -47,21 +49,21 @@ public class LZ_2cycle_Park extends OpMode {
     }
 
     public Path pthFlower() {
-        return Paths.line(scorePose, GDflowerPose).linear(scorePose, GDflowerPose);
+        return Paths.line(LZscorePose, OpGDFlowerPose).linear(LZscorePose, OpGDFlowerPose);
     }
 
     public Path pthScore2() {
-return Paths.line(GDflowerPose, scorePose).linear(GDflowerPose, scorePose);
+        return Paths.line(OpGDFlowerPose, GDscorePose).linear(OpGDFlowerPose, GDscorePose);
     }
 
     public Path pthhive() {
-        return Paths.line(scorePose,Garden).linear(scorePose,Garden);
+        return Paths.line(GDscorePose,GardenPose).linear(GDscorePose,GardenPose);
     }
     public  Path pthscore3(){
-        return Paths.line(Garden,scorePose).linear(Garden,scorePose);
+        return Paths.line(GardenPose,GDscorePose).linear(GardenPose,GDscorePose);
     }
     public Path pthPark() {
-        return Paths.line(scorePose, GDparkPose).linear(scorePose, GDparkPose);
+        return Paths.line(GDscorePose, LZparkPose).linear(GDscorePose, LZparkPose);
 
     }
 

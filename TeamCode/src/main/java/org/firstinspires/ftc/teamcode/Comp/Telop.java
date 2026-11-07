@@ -63,6 +63,8 @@ private TelemetryManager telemetryM;
 
     // private boolean shootAborted = false;
     private boolean bAutoDrive = false;
+    private boolean intakeReversePrev = false; // MJD: reverse button state last loop
+    private boolean intakeWasForward = false; // MJD: was the intake going forward when reverse was pressed
     private boolean poseDriveCalled = false; // MJD: a drive-to-pose button was pressed and we have not left that spot
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
@@ -304,11 +306,28 @@ private TelemetryManager telemetryM;
 
         }
 
-        if ((gamepad1.y)) {
-            robot.intake.cmdIntakeReverse();
-            //robot.transitionR.cmdTumble();
+//        if ((gamepad1.y)) {   // MJD: old, reverse latched on after one press
+//            robot.intake.cmdIntakeReverse();
+//            //robot.transitionR.cmdTumble();
+//
+//        }
 
-        }
+        // MJD: reverse only while the button is held (gamepad 2 Y). On release the intake goes back to
+        // what it was doing (forward if it was forward, otherwise stopped).
+        boolean reverseHeld = gamepad2.y; // MJD
+        if (CommonLogic.oneShot(reverseHeld, intakeReversePrev)) { // MJD
+            intakeWasForward = robot.intake.isIntakeForward(); // MJD
+        } // MJD
+        if (reverseHeld) { // MJD
+            robot.intake.cmdIntakeReverse(); // MJD
+        } else if (CommonLogic.oneShotRelease(reverseHeld, intakeReversePrev)) { // MJD
+            if (intakeWasForward) { // MJD
+                robot.intake.cmdIntakeForward(); // MJD
+            } else { // MJD
+                robot.intake.cmdIntakeStop(); // MJD
+            } // MJD
+        } // MJD
+        intakeReversePrev = reverseHeld; // MJD
 
         // CHANGED: x is now a full stop: launcher off, feeder off, blocker closed,
         // and any shot in progress is cancelled. (Before it left the blocker where it was.)

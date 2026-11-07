@@ -26,7 +26,7 @@ public class AutonBase extends Object {
 
     public static Pose HiveflowerPose = Pf.of(35, 135, 250);
     public static Pose GDFlowerPose = Pf.of(10, 35, 160);
-
+//op=opponents
     public static Pose GardenPose = Pf.of(9, 10, 270);
     public static Pose OpGDFlowerPose = Pf.of(130, 105, 73);
     public static Pose OpHiveFlowerPose = Pf.of(106, 13, 270);
