@@ -4,8 +4,13 @@ import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZparkPose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
+
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
@@ -27,24 +32,13 @@ public class LZPark extends OpMode {
         private final PoseFactory Pf = PoseFactory.degrees();
 
 
-        private final Pose path1Start = Pf .of (8, 133, 270);
-        private final Pose path1 = Pf.of(14, 113, 0);
 
-        public Path pthCool() {
-            return line(AutonBase.LZstartPose, AutonBase.LZscorePose);
-        }
-        public Path pthPark() {
-            return line(AutonBase.LZscorePose, AutonBase.LZparkPose);
-        }
-    protected Command startToScore() {
-        return sequential(
-                robot.driveTrain.cmdAtFollow(pthCool())
+        private final Pose point1Control1 = Pf.of(45, 97, 0);
 
-        );
+    public Path pthpark1() {
+        return Paths.curve(LZstartPose,point1Control1, LZparkPose).linear(LZstartPose, LZparkPose);
 
     }
-
-
 private Command auto;
 
     @Override
@@ -54,8 +48,15 @@ private Command auto;
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(path1Start);
+        robot.driveTrain.cmdOpmodestartPose(LZstartPose);
 
+    }
+    protected Command cmdLZpark() {
+        return sequential(
+                robot.driveTrain.cmdAtFollow(pthpark1())
+
+
+        );
     }
 
 
@@ -69,7 +70,7 @@ private Command auto;
     @Override
     public void start() {
         robot.start();
-        auto = startToScore();
+        auto = cmdLZpark();
         schedule(auto);
 
 
