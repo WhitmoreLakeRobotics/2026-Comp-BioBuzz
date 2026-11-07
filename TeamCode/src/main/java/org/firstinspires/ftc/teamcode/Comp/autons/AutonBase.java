@@ -5,7 +5,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 
 
-public class AutonBase extends Object {
+public class AutonBase {
 
 
     public static Follower follower;
