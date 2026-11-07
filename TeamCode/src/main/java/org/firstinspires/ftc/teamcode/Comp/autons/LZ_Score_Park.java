@@ -43,6 +43,7 @@ public class LZ_Score_Park extends OpMode {
 */
     public static Pose CPparkpath = pf.of(24, 129, 270);
 
+public static Pose actualyScore=pf.of(37,110,130);
 
     public Path pth1Forward() {
         return Paths.line(AutonBase.LZstartPose, AutonBase.LZscorePose).constant(AutonBase.LZscorePose);
@@ -50,10 +51,12 @@ public class LZ_Score_Park extends OpMode {
     public Path pth1Score() {
         return Paths.line(AutonBase.LZscorePose, ScorePoses.ScorePoseLT()).constant(ScorePoses.ScorePoseLT());
     }
-
+    public Path pth2score() {
+        return Paths.line(ScorePoses.ScorePoseLT(),actualyScore).constant(actualyScore);
+    }
 
     public Path pthPark() {
-        return Paths.line(ScorePoses.ScorePoseLT(),AutonBase.LZparkPose).constant(AutonBase.LZparkPose);
+        return Paths.line(actualyScore,AutonBase.LZparkPose).constant(AutonBase.LZparkPose);
     }
 
     protected Command cmdScorePark() {
@@ -68,6 +71,7 @@ public class LZ_Score_Park extends OpMode {
         return sequential( // MJD
                 robot.driveTrain.cmdAtFollow(pth1Forward()),
                 robot.driveTrain.cmdAtFollow(pth1Score()),
+                robot.driveTrain.cmdAtFollow(pth2score()),
                 robot.cmdLaunchSpinup(),
                 waitMs(10000),
                 instant(() -> spinTimer.reset()), // MJD
