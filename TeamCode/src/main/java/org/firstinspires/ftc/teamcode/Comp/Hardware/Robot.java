@@ -168,6 +168,7 @@ public class Robot extends BaseHardware {
     public Command cmdLaunchVolley(double ms) {
         return sequential(
                 instant(() -> tripleThreat.cmdShoot()),
+                instant(() -> tripleThreat.cmdShoot()), //need a double tap
                 waitUntil(() -> tripleThreat.isFiring() || tripleThreat.isIdle()),
                 waitMs(ms),                                   // timer starts once FIRING
                 instant(() -> tripleThreat.cmdCeaseFire())
