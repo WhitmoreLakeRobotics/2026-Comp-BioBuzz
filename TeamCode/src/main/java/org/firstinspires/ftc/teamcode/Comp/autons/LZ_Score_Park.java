@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Comp.autons;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.instant; // MJD
+import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
@@ -47,12 +48,12 @@ public class LZ_Score_Park extends OpMode {
         return Paths.line(AutonBase.LZstartPose, AutonBase.LZscorePose).constant(AutonBase.LZscorePose);
     }
     public Path pth1Score() {
-        return Paths.line(AutonBase.LZscorePose, ScorePoses.ScorePoseX()).constant(ScorePoses.ScorePoseX());
+        return Paths.line(AutonBase.LZscorePose, ScorePoses.ScorePoseLT()).constant(ScorePoses.ScorePoseLT());
     }
 
 
     public Path pthPark() {
-        return Paths.line(ScorePoses.ScorePoseX(),AutonBase.LZparkPose);
+        return Paths.line(ScorePoses.ScorePoseLT(),AutonBase.LZparkPose).constant(AutonBase.LZparkPose);
     }
 
     protected Command cmdScorePark() {
@@ -66,7 +67,9 @@ public class LZ_Score_Park extends OpMode {
         //);
         return sequential( // MJD
                 robot.driveTrain.cmdAtFollow(pth1Forward()),
-                robot.driveTrain.cmdAtFollow(pth1Score()), // MJD
+                robot.driveTrain.cmdAtFollow(pth1Score()),
+                robot.cmdLaunchSpinup(),
+                waitMs(10000),
                 instant(() -> spinTimer.reset()), // MJD
                 waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
                 robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
@@ -101,7 +104,6 @@ public class LZ_Score_Park extends OpMode {
     @Override
     public void start() {
         robot.start();
-        robot.launcher.cmdLauncherForward();
         robot.intake.cmdIntakeForward();
         auto = cmdScorePark();
         schedule(auto);

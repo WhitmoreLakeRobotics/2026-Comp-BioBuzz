@@ -174,4 +174,12 @@ public class Robot extends BaseHardware {
                 instant(() -> tripleThreat.cmdCeaseFire())
         );
     }
+
+    // spinup launcher
+     public Command cmdLaunchSpinup() {
+         return sequential(
+                 instant(() -> launcher.cmdLauncherForward()));
+     }
+
+
 }
