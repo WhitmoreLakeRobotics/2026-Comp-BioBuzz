@@ -29,11 +29,11 @@ public class LZPark extends OpMode {
 
 
 
-        private final PoseFactory Pf = PoseFactory.degrees();
+    private final PoseFactory Pf = PoseFactory.degrees();
 
 
 
-        private final Pose point1Control1 = Pf.of(45, 97, 0);
+    private final Pose point1Control1 = Pf.of(45, 97, 0);
 
     public Path pthpark1() {
         return Paths.curve(LZstartPose,point1Control1, LZparkPose).linear(LZstartPose, LZparkPose);
