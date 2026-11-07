@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Comp;
 
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -15,9 +16,9 @@ import com.pedropathing.ivy.Scheduler;
 
 
 // CHANGED: renamed so it doesn't clash with the Scrimmage TeleOp (two OpModes can't share a name).
-@TeleOp(name = "Comp TeleOp")
+@TeleOp(name = "TeleOp")
 public class Telop extends OpMode {
-
+private TelemetryManager telemetryM;
     private static final String TAGTeleop = "8492-Teleop";
     Robot robot = new Robot();
     private boolean debug = true;  // if debug, show telemetry with values you're interested in
@@ -111,8 +112,10 @@ public class Telop extends OpMode {
         robot.hardwareMap = hardwareMap;
         robot.telemetry = telemetry;
         robot.init();
+
         // CHANGED: autonomousEndPose is null if TeleOp runs without Auto first, so use a fallback.
         Pose startPose = OpModeStorage.EndPose;
+       // telemetryM.addData("startPose in tele init", startPose);
         if (startPose == null) {
             startPose = new Pose(8, 8, 8);   // TODO: set a real default start pose
         }

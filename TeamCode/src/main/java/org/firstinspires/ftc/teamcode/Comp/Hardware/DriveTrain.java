@@ -155,8 +155,8 @@ follower.update();
 
     public void resetDriveHeading(){
         //*************** naj this should only occur when the robot is in the left bottom corner then the command should be
-        // ********   follower.setPose(new Pose(10.5,10.5,0));
-        headingOffset = follower.pose().heading();
+          follower.setPose(new Pose(10.5,10.5,0));
+       // headingOffset = follower.pose().heading();
 
 
     }
