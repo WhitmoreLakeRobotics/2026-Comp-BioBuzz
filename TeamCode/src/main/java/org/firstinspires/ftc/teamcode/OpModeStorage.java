@@ -8,6 +8,6 @@ import com.pedropathing.math.Pose;
  * so TeleOp can start from where autonomous left off.
  */
 public class OpModeStorage {
-    public static Pose EndPose = new Pose(9, 9, 0);  // nj changed default start to center of robot
+    public static Pose EndPose = new Pose(8, 9, 0);  // nj changed default start to center of robot
     public static Pose autonomousstartPose = new Pose(0, 0, 0);
 }
