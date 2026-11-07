@@ -83,7 +83,7 @@ private TelemetryManager telemetryM;
 
     private boolean InLaunchPosition(){
         Pose p = robot.driveTrain.getPose();
-        for(Pose target: new Pose[]{ScorePoses.ScorePoseA(), ScorePoses.ScorePoseB(), ScorePoses.ScorePoseY(), ScorePoses.ScorePoseX()}){
+        for(Pose target: new Pose[]{ScorePoses.ScorePoseLB(), ScorePoses.ScorePoseRB(), ScorePoses.ScorePoseLT(), ScorePoses.ScorePoseRT()}){
             if(Math.hypot(p.x() - target.x(), p.y() - target.y()) <= InLaunchPosition){
                 return true;
             }
@@ -158,10 +158,10 @@ private TelemetryManager telemetryM;
 
 
 
-        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(ScorePoses.ScorePoseY(),true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(ScorePoses.ScorePoseX(),true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(ScorePoses.ScorePoseA(),true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(ScorePoses.ScorePoseB(),true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(ScorePoses.ScorePoseLB(),true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(ScorePoses.ScorePoseRB(),true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(ScorePoses.ScorePoseRT(),true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(ScorePoses.ScorePoseLT(),true); bAutoDrive = true;}
 
         if (bAutoDrive) {
             if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){

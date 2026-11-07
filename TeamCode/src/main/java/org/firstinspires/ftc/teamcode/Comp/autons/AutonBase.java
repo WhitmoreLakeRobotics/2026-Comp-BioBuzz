@@ -17,7 +17,7 @@ public class AutonBase {
     // 7.5 from the launcher edge and 10.25 from the front of the intake.
     // PP actually sets to 0,0 off the field. the far wall is not 144, but 141.5 so don't measure from far wall
     public static Pose GDstartPose = Pf.of(55.25, 12.25, 270);
-    public static Pose GDscorePose = Pf.of(55, 14, 270);
+    public static Pose GDscorePose = Pf.of(55, 16, 270);
     public static Pose GDparkPose = Pf.of(13, 92, 0);
 
     public static Pose LZstartPose = Pf.of(59, 133.25, 90);

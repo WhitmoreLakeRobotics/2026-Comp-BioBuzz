@@ -8,22 +8,22 @@ import com.pedropathing.math.Pose;
 public class ScorePoses  {
     private static final PoseFactory pf = PoseFactory.degrees();
 
-    public static double A_X = 30,A_Y = 31, A_Heading = 120;
-    public static double B_X = 88.3, B_Y = 127, B_Heading= 50;
-    public static double Y_X = 29, Y_Y = 15, Y_Heading = 230;
-    public static double X_X = 86.4, X_Y = 15, X_Heading = 310;
+    public static double LT_X = 31,LT_Y = 130, LT_Heading = 120;
+    public static double RT_X = 85, RT_Y = 128, RT_Heading= 60; // y was 124
+    public static double LB_X = 29, LB_Y = 17, LB_Heading = 238; //y was 15
+    public static double RB_X = 76, RB_Y = 15, RB_Heading = 290; // x was 71
 
-    public static Pose ScorePoseA(){
-        return pf.of(A_X, A_Y,A_Heading);
+    public static Pose ScorePoseLT(){
+        return pf.of(LT_X, LT_Y,LT_Heading);
     }
-    public static Pose ScorePoseB(){
-        return pf.of(B_X, B_Y,B_Heading);
+    public static Pose ScorePoseRT(){
+        return pf.of(RT_X, RT_Y,RT_Heading);
     }
-    public static Pose ScorePoseY(){
-        return pf.of(Y_X, Y_Y,Y_Heading);
+    public static Pose ScorePoseLB(){
+        return pf.of(LB_X, LB_Y,LB_Heading);
     }
-    public static Pose ScorePoseX(){
-        return pf.of(X_X, X_Y,X_Heading);
+    public static Pose ScorePoseRB(){
+        return pf.of(RB_X, RB_Y,RB_Heading);
     }
 
 }
