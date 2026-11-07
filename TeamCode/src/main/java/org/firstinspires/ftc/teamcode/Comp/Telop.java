@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Common.CommonLogic;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
+import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 import org.firstinspires.ftc.teamcode.OpModeStorage;
 
 import com.pedropathing.ivy.Command;
@@ -35,6 +36,7 @@ private TelemetryManager telemetryM;
     private boolean gp1_prev_dpad_right = false;
     private boolean gp1_prev_back = false;
     private boolean gp1_prev_start = false;
+    private boolean gp1_prev_right_trigger = false;
     // CHANGED: the shoot trigger moved to gamepad 2, so this flag is no longer used.
     //private boolean gp1_prev_right_trigger = false;
 
@@ -77,15 +79,11 @@ private TelemetryManager telemetryM;
 
     private Command DriveToCommand = null;
     public static final PoseFactory Pf = PoseFactory.degrees();
-    private static final Pose ScorPoseA = Pf.of(30,131, Math.toRadians(120)); //right side of the red hive relative to the driveteam
-    private static final Pose scorePoseB =  Pf.of(88.3,127, Math.toRadians(50)); // left side of the red hive on the right side relative to the driveteam
-    private static final Pose scorePoseY =  Pf.of(29,15, Math.toRadians(230)); // left side of the red hive on the left side relative to the driveteam
-    private static final Pose scorePoseX =  Pf.of(86.4,15, Math.toRadians(310)); // right side of the red hive on the left side relative to the driveteam
     private static final double InLaunchPosition = 5.0;
 
     private boolean InLaunchPosition(){
         Pose p = robot.driveTrain.getPose();
-        for(Pose target: new Pose[]{ScorPoseA, scorePoseB, scorePoseY, scorePoseX}){
+        for(Pose target: new Pose[]{ScorePoses.ScorePoseA(), ScorePoses.ScorePoseB(), ScorePoses.ScorePoseY(), ScorePoses.ScorePoseX()}){
             if(Math.hypot(p.x() - target.x(), p.y() - target.y()) <= InLaunchPosition){
                 return true;
             }
@@ -160,10 +158,10 @@ private TelemetryManager telemetryM;
 
 
 
-        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(scorePoseY,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(scorePoseX,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(ScorPoseA,true); bAutoDrive = true;}
-        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(scorePoseB,true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.a,gp1_prev_a)){goHold(ScorePoses.ScorePoseY(),true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.b,gp1_prev_b)){goHold(ScorePoses.ScorePoseX(),true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(ScorePoses.ScorePoseA(),true); bAutoDrive = true;}
+        if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(ScorePoses.ScorePoseB(),true); bAutoDrive = true;}
 
         if (bAutoDrive) {
             if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){
@@ -227,26 +225,18 @@ private TelemetryManager telemetryM;
         //           blocker and feeder on isLauncherAtSpeed().
         // DONE (3): the Launcher and Feeder classes print their own states; the debug block adds the at-speed flags.
         // CHANGED: the shoot block moved to gamepad 2. The old gamepad 1 version is kept here, commented out.
-        /*
-        boolean shootHeld = gamepad1.right_trigger_pressed;
 
-        if (shootHeld) {
-            //robot.launcher.cmdLauncherForward();
-            robot.launcher.cmdLauncherForward();
-          if(robot.launcher.isLauncherAtSpeed()){
-              //robot.transitionR.cmdSpinng();
-              robot.pollenBlocker.cmdOpen();
-              robot.feeder.cmdFeederForward();
+      boolean shootHeld1 = gamepad1.right_trigger_pressed; // MJD
 
-
-          }else{
-              //robot.transitionR.cmdStop();
-              robot.pollenBlocker.cmdBlock();
-              robot.feeder.cmdFeederStop();
-
-          }
+        if (CommonLogic.oneShot(shootHeld1, gp1_prev_right_trigger)) { // MJD
+            robot.tripleThreat.cmdShoot();          // once, when the trigger is first pressed // MJD
+        } else if (CommonLogic.oneShotRelease(shootHeld1, gp1_prev_right_trigger)) { // MJD
+            robot.tripleThreat.cmdCeaseFire();      // once, when it is released // MJD
+        } // MJD
+        gp1_prev_right_trigger = shootHeld1; // MJD
 
 
+/*
 
         } else if (gp1_prev_right_trigger) {
             robot.pollenBlocker.cmdBlock();
