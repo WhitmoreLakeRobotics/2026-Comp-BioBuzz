@@ -181,5 +181,11 @@ public class Robot extends BaseHardware {
                  instant(() -> launcher.cmdLauncherForward()));
      }
 
+    //stops intake and launcher
+    public Command cmdTripleThreatStop(){
+        return instant(() -> tripleThreat.cmdTripleThreatStop()).requiring(this);
+    }
+
+
 
 }

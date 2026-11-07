@@ -64,7 +64,8 @@ public class GD_Score_Park extends OpMode {
                 instant(() -> spinTimer.reset()), // MJD
                 waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
                 robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
-                robot.driveTrain.cmdAtFollow(pthPark())
+                robot.driveTrain.cmdAtFollow(pthPark()),
+                robot.cmdTripleThreatStop()
         );
 
     }
