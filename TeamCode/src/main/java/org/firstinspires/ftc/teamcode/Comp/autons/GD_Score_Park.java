@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.instant; // MJD
+import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -13,6 +15,7 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 
@@ -23,6 +26,8 @@ public class GD_Score_Park extends OpMode {
 
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
+    private final ElapsedTime spinTimer = new ElapsedTime(); // MJD
+    private static final double SPINUP_WAIT_MAX_SEC = 4.0; // MJD: longest we wait for the launcher before firing anyway
 
 
 
@@ -46,8 +51,18 @@ public class GD_Score_Park extends OpMode {
     }
 
     protected Command cmdScorePark() {
-        return sequential(
-                robot.driveTrain.cmdAtFollow(pth1Score()),
+        // MJD: the score path is only ~2 in long, so the volley used to start right after PLAY, before the
+        // launcher was up to speed. TripleThreat then timed out (1.5 s), aborted, and nothing fired.
+        // Now we wait here (up to SPINUP_WAIT_MAX_SEC) for the launcher to reach speed first.
+        //return sequential(
+        //        robot.driveTrain.cmdAtFollow(pth1Score()),
+        //        robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
+        //        robot.driveTrain.cmdAtFollow(pthPark())
+        //);
+        return sequential( // MJD
+                robot.driveTrain.cmdAtFollow(pth1Score()), // MJD
+                instant(() -> spinTimer.reset()), // MJD
+                waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
                 robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
                 robot.driveTrain.cmdAtFollow(pthPark())
         );
