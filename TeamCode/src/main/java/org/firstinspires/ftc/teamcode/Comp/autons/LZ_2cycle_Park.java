@@ -56,7 +56,7 @@ public class LZ_2cycle_Park extends OpMode {
         return Paths.line(OpGDFlowerPose, GDscorePose).linear(OpGDFlowerPose, GDscorePose);
     }
 
-    public Path pthhive() {
+    public Path pthgarden() {
         return Paths.line(GDscorePose,GardenPose).linear(GDscorePose,GardenPose);
     }
     public  Path pthscore3(){
@@ -71,9 +71,15 @@ public class LZ_2cycle_Park extends OpMode {
     protected Command cmdLZcycle1() {
         return sequential(
                 robot.driveTrain.cmdAtFollow(pthScore1()),
+                robot.cmdShootSequence(),
                 robot.driveTrain.cmdAtFollow(pthFlower()),
+                //flower extracter ?
                 robot.driveTrain.cmdAtFollow(pthScore2()),
-                robot.driveTrain.cmdAtFollow(pthhive()),
+                robot.cmdShootSequence(),
+                robot.driveTrain.cmdAtFollow(pthgarden()),
+                robot.cmdIntakeatSpeed(),
+                robot.driveTrain.cmdAtFollow(pthscore3()),
+                robot.cmdShootSequence(),
                 robot.driveTrain.cmdAtFollow(pthPark())
         );
     }
