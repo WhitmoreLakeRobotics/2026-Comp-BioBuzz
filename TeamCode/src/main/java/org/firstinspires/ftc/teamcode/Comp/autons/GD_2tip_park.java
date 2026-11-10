@@ -41,8 +41,8 @@ public class GD_2tip_park extends OpMode {
     */
     public static Pose CPparkpath = pf.of(24, 39, 0);
   //  public static Pose GDpickup = pf.of(10.6,7.7,180);
-    public static Pose GDcp = pf.of (31.75, 24.82, 135);
-    public static Pose Backup = pf.of (21.9, 21.7, 175);
+    public static Pose GDcp = pf.of (11.71, 50.27, 270);
+    public static Pose Backup = pf.of (14, 25.3, 270);
     public static Pose park = pf.of (14.2, 115, 225);
 
 

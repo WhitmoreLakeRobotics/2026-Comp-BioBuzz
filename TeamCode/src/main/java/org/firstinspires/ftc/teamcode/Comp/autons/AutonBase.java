@@ -19,7 +19,7 @@ public class AutonBase {
     public static Pose GDstartPose = Pf.of(55.25, 12.25, 270);
     public static Pose GDscorePose = Pf.of(55, 16, 270);
     public static Pose GDparkPose = Pf.of(13, 92, 0);
-    public static Pose GDpickup = Pf.of(10.6,7.7,180); // pickup from the garden
+    public static Pose GDpickup = Pf.of(8,8.3,270); // pickup from the garden
 
     public static Pose LZstartPose = Pf.of(59, 133.25, 90);
     public static Pose LZscorePose = Pf.of(55, 120, 90);
