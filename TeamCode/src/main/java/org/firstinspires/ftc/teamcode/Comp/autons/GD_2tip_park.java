@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 
+@Autonomous (name = "GD_2tip_park", group = "")
 public class GD_2tip_park extends OpMode {
 
 
