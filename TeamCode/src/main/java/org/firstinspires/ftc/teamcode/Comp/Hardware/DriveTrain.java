@@ -46,6 +46,7 @@ public class DriveTrain extends BaseHardware {
     private static final double ROBOT_RADIUS  = 9.0;   // inches, ~18" robot
 
     private double headingOffset = 0;
+    public double TURN_MULT = 1.5; // MJD: 1.0 = old turn speed; raise for faster turning (result is capped at 1.0)
 
 
     @Override
@@ -98,7 +99,8 @@ follower.update();
         //Current_Speed is to make adjustments to the speed if button pushed for slow or fast.
         LeftJoystick_x = Left_X * Current_Speed;
         LeftJoystick_y = Left_Y * Current_Speed;
-        RightJoystick_x = Right_X * Current_Speed;
+        //RightJoystick_x = Right_X * Current_Speed;
+        RightJoystick_x = Math.max(-1.0, Math.min(1.0, Right_X * Current_Speed * TURN_MULT)); // MJD faster manual turning
 
         doTeleop();
     }
