@@ -292,6 +292,7 @@ private TelemetryManager telemetryM;
 
         if ((gamepad2.a)) {
             robot.intake.cmdIntakeStop();
+
             //robot.transitionR.cmdStop();
 
         }
@@ -313,7 +314,8 @@ private TelemetryManager telemetryM;
             robot.feeder.cmdFeederBackward();
         } else if (CommonLogic.oneShotRelease(reverseHeld, intakeReversePrev)) { // MJD
             if (intakeWasForward) { // MJD
-                robot.intake.cmdIntakeForward(); // MJD
+                robot.intake.cmdIntakeForward();// MJD
+                robot.feeder.cmdFeederStop();
             } else { // MJD
                 robot.intake.cmdIntakeStop(); // MJD
                 robot.feeder.cmdFeederStop();

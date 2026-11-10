@@ -19,7 +19,7 @@ public class Feeder extends BaseHardware {
     private VoltageSensor battery;
 
     // ---------------- TUNABLE CONSTANTS ----------------
-    public static double FEEDER_FORWARD_RPM = 4000;
+    public static double FEEDER_FORWARD_RPM = 5400;
     public static double FEEDER_BACKWARD_RPM = -500;   // default until a real value is chosen
     public static double RPM_TOLERANCE = 250;           // "at speed" window around the target RPM
     public static double AT_SPEED_HOLD_SEC = 0.15;     // RPM must stay in tolerance this long
