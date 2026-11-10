@@ -304,20 +304,24 @@ private TelemetryManager telemetryM;
 
         // MJD: reverse only while the button is held (gamepad 2 Y). On release the intake goes back to
         // what it was doing (forward if it was forward, otherwise stopped).
-        boolean reverseHeld = gamepad2.y; // MJD
+        boolean reverseHeld = gamepad2.y;// MJD
         if (CommonLogic.oneShot(reverseHeld, intakeReversePrev)) { // MJD
             intakeWasForward = robot.intake.isIntakeForward(); // MJD
         } // MJD
         if (reverseHeld) { // MJD
             robot.intake.cmdIntakeReverse(); // MJD
+            robot.feeder.cmdFeederBackward();
         } else if (CommonLogic.oneShotRelease(reverseHeld, intakeReversePrev)) { // MJD
             if (intakeWasForward) { // MJD
                 robot.intake.cmdIntakeForward(); // MJD
             } else { // MJD
                 robot.intake.cmdIntakeStop(); // MJD
+                robot.feeder.cmdFeederStop();
             } // MJD
         } // MJD
         intakeReversePrev = reverseHeld; // MJD
+
+
 
         // CHANGED: x is now a full stop: launcher off, feeder off, blocker closed,
         // and any shot in progress is cancelled. (Before it left the blocker where it was.)
@@ -341,13 +345,7 @@ private TelemetryManager telemetryM;
 
         // CHANGED: feeder backward while held (the TODO "map a button to cmdFeederBackward").
         if (gamepad2.dpad_left) {
-            if (robot.tripleThreat.isIdle()) {
-                robot.feeder.cmdFeederBackward();
-            }
-        } else if (gp2_prev_dpad_left && robot.tripleThreat.isIdle()) {
-            robot.feeder.cmdFeederStop();   // just released
         }
-        gp2_prev_dpad_left = gamepad2.dpad_left;
 
         if (gamepad2.dpad_right) {
 
