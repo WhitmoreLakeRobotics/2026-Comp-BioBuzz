@@ -80,7 +80,10 @@ public class LZ_2cycle_Park extends OpMode {
                 robot.cmdIntakeatSpeed(),
                 robot.driveTrain.cmdAtFollow(pthscore3()),
                 robot.cmdShootSequence(),
-                robot.driveTrain.cmdAtFollow(pthPark())
+                robot.driveTrain.cmdAtFollow(pthPark()),
+                robot.cmdTripleThreatStop(),
+                robot.driveTrain.cmdHoldPos(LZparkPose)
+
         );
     }
 

@@ -55,7 +55,9 @@ public class GD1cycle_Park extends OpMode {
                 robot.driveTrain.cmdAtFollow(Launchp2()),
                 robot.cmdShootSequence(),
                 robot.driveTrain.cmdAtFollow(DrivetoPark()),
-                robot.cmdTripleThreatStop()
+                robot.cmdTripleThreatStop(),
+                robot.driveTrain.cmdHoldPos(Park)
+
 
         );
 
