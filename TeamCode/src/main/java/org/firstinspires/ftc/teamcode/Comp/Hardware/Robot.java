@@ -26,6 +26,7 @@ public class Robot extends BaseHardware {
     //public TransitionR transitionR = new TransitionR();
     public PollenBlocker pollenBlocker = new PollenBlocker();
     public Feeder feeder = new Feeder();
+    public Flower_Ramp Ramp = new Flower_Ramp();
     // CHANGED: runs the launch sequence. Declared AFTER the parts it uses.
     public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
@@ -73,6 +74,11 @@ public class Robot extends BaseHardware {
         feeder.telemetry = this.telemetry;
         feeder.init();
 
+        //Ramp
+        Ramp.hardwareMap = this.hardwareMap;
+        Ramp.telemetry = this.telemetry;
+        Ramp.init();
+
         //TripleThreat (launch sequence)
         tripleThreat.hardwareMap = this.hardwareMap;
         tripleThreat.telemetry = this.telemetry;
@@ -89,6 +95,7 @@ public class Robot extends BaseHardware {
         driveTrain.init_loop();
         intake.init_loop();
         launcher.init_loop();
+        Ramp.init_loop();
         //transitionR.init_loop();
         pollenBlocker.init_loop();
         feeder.init_loop();
@@ -101,6 +108,7 @@ public class Robot extends BaseHardware {
         driveTrain.start();
         intake.start();
         launcher.start();
+        Ramp.start();
         //transitionR.start();
         pollenBlocker.start();
         feeder.start();
@@ -112,6 +120,7 @@ public class Robot extends BaseHardware {
     public void loop() {
         driveTrain.loop();
         intake.loop();
+        Ramp.loop();
         // CHANGED: TripleThreat runs before the parts it commands, so its commands take effect this loop.
         tripleThreat.loop();
         launcher.loop();
@@ -130,6 +139,7 @@ public class Robot extends BaseHardware {
     @Override
     public void stop() {
         tripleThreat.stop();
+        Ramp.stop();
         launcher.stop();
         feeder.stop();
         intake.stop();

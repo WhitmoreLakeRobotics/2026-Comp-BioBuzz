@@ -354,7 +354,12 @@ private TelemetryManager telemetryM;
         }
 
         if ((gamepad2.dpad_up)){
+            //robot.Flower_Ramp.cmdDown
 
+
+        }
+        if ((gamepad2.dpad_down)){
+            //robot.Flower_Ramp.cmdUp
         }
 
         // CHANGED: manual blocker override. It only acts while the trigger is held (open) and
