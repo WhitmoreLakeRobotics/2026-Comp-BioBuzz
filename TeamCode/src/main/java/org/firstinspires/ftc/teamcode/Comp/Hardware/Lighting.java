@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.Servo;
-@Disabled
+
 @Configurable
 public class Lighting extends BaseHardware{
 
@@ -15,7 +15,11 @@ public class Lighting extends BaseHardware{
     private static double Green = 0.5;
     private double currentColor = Off;
     //private double Red = 27.7;   // MJD: old value, servo positions must be 0.0 to 1.0
-    private double Red = 0.277; // MJD
+    private double Red = 0.277;// MJD
+    private double Blue = 0.6111;
+    private double Yellow = 0.388;
+    private double Orange = 0.333;
+    private double Purple = 0.722;
 
     @Override
     public void init(){
@@ -49,6 +53,8 @@ public class Lighting extends BaseHardware{
         }
 
     }
+
+
 
     public void cmdInLaunchPosition(boolean InPosition){
         setColor(InPosition ?Green:Red);

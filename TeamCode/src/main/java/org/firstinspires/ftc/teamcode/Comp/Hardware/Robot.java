@@ -183,7 +183,12 @@ public class Robot extends BaseHardware {
 
     //stops intake and launcher
     public Command cmdTripleThreatStop(){
-        return instant(() -> tripleThreat.cmdTripleThreatStop()).requiring(this);
+        return sequential(
+               instant(() -> launcher.cmdLauncherStop()),
+               instant(() -> feeder.cmdFeederStop()),
+               instant(() -> pollenBlocker.cmdBlock()),
+               instant(() -> intake.cmdIntakeStop())
+        );
     }
 
 
