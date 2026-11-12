@@ -30,6 +30,7 @@ public class Robot extends BaseHardware {
     // CHANGED: runs the launch sequence. Declared AFTER the parts it uses.
     public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
+    public Limelight limelight = new Limelight();
 
 
     /**
@@ -88,6 +89,11 @@ public class Robot extends BaseHardware {
         lighting.hardwareMap = this.hardwareMap;
         lighting.telemetry = this.telemetry;
         lighting.init();
+
+        //Limelight
+        limelight.hardwareMap = this.hardwareMap;
+        limelight.telemetry = this.telemetry;
+        limelight.init();
     }
 
     @Override
@@ -101,6 +107,7 @@ public class Robot extends BaseHardware {
         feeder.init_loop();
         tripleThreat.init_loop();
         lighting.init_loop();
+        limelight.init_loop();
     }
 
     @Override
@@ -114,6 +121,7 @@ public class Robot extends BaseHardware {
         feeder.start();
         tripleThreat.start();
         lighting.start();
+        limelight.start();
     }
 
     @Override
@@ -128,6 +136,7 @@ public class Robot extends BaseHardware {
         pollenBlocker.loop();
         feeder.loop();
         lighting.loop();
+        limelight.loop();
     }
 
     /**
@@ -147,6 +156,7 @@ public class Robot extends BaseHardware {
         pollenBlocker.stop();
         driveTrain.stop();
         lighting.stop();
+        limelight.stop();
     }
 
     // ---------------- IVY COMMANDS (for Pedro auto paths) ----------------
