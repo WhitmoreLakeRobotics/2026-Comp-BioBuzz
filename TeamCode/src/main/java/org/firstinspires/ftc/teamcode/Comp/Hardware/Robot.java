@@ -31,6 +31,7 @@ public class Robot extends BaseHardware {
     public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
     public Limelight limelight = new Limelight();
+    public Flower_Ramp flower_ramp = new Flower_Ramp();
 
 
     /**
@@ -94,6 +95,12 @@ public class Robot extends BaseHardware {
         limelight.hardwareMap = this.hardwareMap;
         limelight.telemetry = this.telemetry;
         limelight.init();
+
+        //Flower_ramp
+        flower_ramp.hardwareMap = this.hardwareMap;
+        flower_ramp.telemetry = this.telemetry;
+        flower_ramp.init();
+
     }
 
     @Override
@@ -108,6 +115,7 @@ public class Robot extends BaseHardware {
         tripleThreat.init_loop();
         lighting.init_loop();
         limelight.init_loop();
+        flower_ramp.init_loop();
     }
 
     @Override
@@ -122,6 +130,7 @@ public class Robot extends BaseHardware {
         tripleThreat.start();
         lighting.start();
         limelight.start();
+        flower_ramp.start();
     }
 
     @Override
@@ -138,6 +147,7 @@ public class Robot extends BaseHardware {
         lighting.loop();
         limelight.setRobotPose(driveTrain.getPose()); // MJD: so the hive tag can be placed on the field
         limelight.loop();
+        flower_ramp.loop();
     }
 
     /**
@@ -158,6 +168,7 @@ public class Robot extends BaseHardware {
         driveTrain.stop();
         lighting.stop();
         limelight.stop();
+        flower_ramp.stop();
     }
 
     // ---------------- IVY COMMANDS (for Pedro auto paths) ----------------
