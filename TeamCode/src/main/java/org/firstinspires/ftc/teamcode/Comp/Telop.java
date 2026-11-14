@@ -281,6 +281,12 @@ private TelemetryManager telemetryM;
 
         }
 
+       if ((gamepad1.left_bumper)) {
+           intakeReversePrev = true;
+
+       }
+
+
 
         //gamepad2
 
@@ -354,12 +360,12 @@ private TelemetryManager telemetryM;
         }
 
         if ((gamepad2.dpad_up)){
-            //robot.Flower_Ramp.cmdDown
+            robot.flower_ramp.cmdUp();
 
 
         }
         if ((gamepad2.dpad_down)){
-            //robot.Flower_Ramp.cmdUp
+            robot.flower_ramp.cmdDown();
         }
 
         // CHANGED: manual blocker override. It only acts while the trigger is held (open) and
