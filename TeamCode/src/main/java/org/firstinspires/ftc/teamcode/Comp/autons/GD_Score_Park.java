@@ -66,7 +66,8 @@ public class GD_Score_Park extends OpMode {
                 robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
                 robot.driveTrain.cmdAtFollow(pthPark()),
                 robot.cmdTripleThreatStop(),
-                robot.driveTrain.cmdHoldPos(AutonBase.GDparkPose)
+                robot.driveTrain.cmdHoldPos(AutonBase.GDparkPose),
+                robot.cmdStopIntakeFeeder()
         );
 
     }

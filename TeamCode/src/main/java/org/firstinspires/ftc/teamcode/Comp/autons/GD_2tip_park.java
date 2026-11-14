@@ -94,7 +94,8 @@ public class GD_2tip_park extends OpMode {
                 robot.cmdLaunchVolley(4000),
                 robot.driveTrain.cmdAtFollow(prkPth()),
                 robot.cmdTripleThreatStop(),
-                robot.driveTrain.cmdHoldPos(park)
+                robot.driveTrain.cmdHoldPos(park),
+                robot.cmdStopIntakeFeeder()
         );
 
     }

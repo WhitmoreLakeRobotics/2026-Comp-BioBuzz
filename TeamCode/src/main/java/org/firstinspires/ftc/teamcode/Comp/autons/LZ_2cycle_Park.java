@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 
@@ -72,17 +73,21 @@ public class LZ_2cycle_Park extends OpMode {
         return sequential(
                 robot.driveTrain.cmdAtFollow(pthScore1()),
                 robot.cmdShootSequence(),
+                waitMs(4000),                              // keep firing; time how long your volley take
                 robot.driveTrain.cmdAtFollow(pthFlower()),
                 //flower extracter ?
                 robot.driveTrain.cmdAtFollow(pthScore2()),
                 robot.cmdShootSequence(),
+                waitMs(4000),                              // keep firing; time how long your volley take
                 robot.driveTrain.cmdAtFollow(pthgarden()),
                 robot.cmdIntakeatSpeed(),
                 robot.driveTrain.cmdAtFollow(pthscore3()),
                 robot.cmdShootSequence(),
+                waitMs(4000),                              // keep firing; time how long your volley take
                 robot.driveTrain.cmdAtFollow(pthPark()),
                 robot.cmdTripleThreatStop(),
-                robot.driveTrain.cmdHoldPos(LZparkPose)
+                robot.driveTrain.cmdHoldPos(LZparkPose),
+                robot.cmdStopIntakeFeeder()
 
         );
     }

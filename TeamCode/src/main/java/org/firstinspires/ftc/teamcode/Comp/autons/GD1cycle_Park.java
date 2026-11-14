@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -50,16 +51,21 @@ public class GD1cycle_Park extends OpMode {
         return sequential(
                 robot.driveTrain.cmdAtFollow(Launchp1()),
                 robot.cmdShootSequence(),
+                waitMs(4000),                              // keep firing; time how long your volley take
                 robot.driveTrain.cmdAtFollow(Pickup()),
                 robot.cmdIntakeatSpeed(),
                 robot.driveTrain.cmdAtFollow(Launchp2()),
                 robot.cmdShootSequence(),
+                waitMs(4000),                              // keep firing; time how long your volley take
                 robot.driveTrain.cmdAtFollow(DrivetoPark()),
                 robot.cmdTripleThreatStop(),
-                robot.driveTrain.cmdHoldPos(Park)
+                robot.driveTrain.cmdHoldPos(Park),
+                robot.cmdStopIntakeFeeder()
 
 
         );
+
+
 
     }
 
