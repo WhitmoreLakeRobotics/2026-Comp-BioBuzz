@@ -120,7 +120,9 @@ public class Limelight extends BaseHardware{
         //  status = Limey.getStatus();
         result = Limey.getLatestResult();
 
-        if(result.isValid()) {
+        //if(result.isValid()) {   // MJD: old, crashed when result was null
+        // MJD: result can be null, and a valid result can still have no tags in the list
+        if (result != null && result.isValid() && result.getFiducialResults() != null && !result.getFiducialResults().isEmpty()) { // MJD
             AprilTagID = result.getFiducialResults().get(0).getFiducialId();
             ty = result.getFiducialResults().get(0).getTargetYDegrees();
             tx = result.getFiducialResults().get(0).getTargetXDegrees();
@@ -210,7 +212,9 @@ public class Limelight extends BaseHardware{
 
 
     public void stop(){
-
+        if (Limey != null) { // MJD: release the camera when the OpMode ends
+            Limey.stop(); // MJD
+        } // MJD
     }
 
     public enum Mode{

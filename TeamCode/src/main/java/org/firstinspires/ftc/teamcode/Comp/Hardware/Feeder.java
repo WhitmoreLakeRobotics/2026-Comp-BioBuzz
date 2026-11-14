@@ -19,11 +19,12 @@ public class Feeder extends BaseHardware {
     private VoltageSensor battery;
 
     // ---------------- TUNABLE CONSTANTS ----------------
-    public static double FEEDER_FORWARD_RPM = 5400;
+    public static double FEEDER_FORWARD_RPM = 4000;
     public static double FEEDER_BACKWARD_RPM = -500;   // default until a real value is chosen
     public static double RPM_TOLERANCE = 250;           // "at speed" window around the target RPM
     public static double AT_SPEED_HOLD_SEC = 0.15;     // RPM must stay in tolerance this long
     public static double OFF_RPM_THRESHOLD = 50;       // |RPM| below this counts as stopped
+
 
     // ---------------- PID CONSTANTS ----------------
     public static double FEEDER_KP = 0.00070;
@@ -34,7 +35,7 @@ public class Feeder extends BaseHardware {
     private static final double TICKS_PER_REV = 28;    // motor-shaft encoder; change if geared
     private static final double MIN_POWER = -1.0;
     private static final double MAX_POWER = 1.0;
-    private static final double NOMINAL_VOLTAGE = 12.0;
+    private static final double NOMINAL_VOLTAGE = 10.0;
     private static final String MOTOR_NAME = "TransLM2";   // must match the robot configuration
 
     // ---------------- STATE ----------------
