@@ -73,13 +73,14 @@ public static Pose actualyScore=pf.of(37,110,130);
                 robot.driveTrain.cmdAtFollow(pth1Score()),
                 robot.driveTrain.cmdAtFollow(pth2score()),
                 robot.cmdLaunchSpinup(),
-                waitMs(10000),
+                waitMs(4000),
                 instant(() -> spinTimer.reset()), // MJD
                 waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
                 robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
                 robot.driveTrain.cmdAtFollow(pthPark()),
                 robot.cmdTripleThreatStop(),
-                robot.driveTrain.cmdHoldPos(AutonBase.LZparkPose)
+                robot.driveTrain.cmdHoldPos(AutonBase.LZparkPose),
+                robot.cmdStopIntakeFeeder()
         );
 
     }
