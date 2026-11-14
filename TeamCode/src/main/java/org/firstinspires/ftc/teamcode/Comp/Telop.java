@@ -281,10 +281,10 @@ private TelemetryManager telemetryM;
 
         }
 
-       if ((gamepad1.left_bumper)) {
-           intakeReversePrev = true;
-
-       }
+//       if ((gamepad1.left_bumper)) {   // MJD: old, this faked a "Y released" every loop and stopped the feeder/intake
+//           intakeReversePrev = true;
+//
+//       }
 
 
 
@@ -311,7 +311,8 @@ private TelemetryManager telemetryM;
 
         // MJD: reverse only while the button is held (gamepad 2 Y). On release the intake goes back to
         // what it was doing (forward if it was forward, otherwise stopped).
-        boolean reverseHeld = gamepad2.y;// MJD
+        //boolean reverseHeld = gamepad2.y;// MJD: old, gamepad 2 only
+        boolean reverseHeld = gamepad2.y || gamepad1.left_bumper;// MJD: gamepad 2 Y or gamepad 1 left bumper
         if (CommonLogic.oneShot(reverseHeld, intakeReversePrev)) { // MJD
             intakeWasForward = robot.intake.isIntakeForward(); // MJD
         } // MJD
