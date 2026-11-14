@@ -3,6 +3,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 //import com.qualcomm.hardware.limelightvision;
 //import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.bylazar.configurables.annotations.Configurable; // MJD
+import com.pedropathing.math.Pose; // MJD
+import com.qualcomm.hardware.limelightvision.LLResultTypes; // MJD
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -16,7 +19,32 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import java.util.List;
 
+@Configurable // MJD
 public class Limelight extends BaseHardware{
+
+    // ---------------- HIVE STATE (MJD) ----------------
+    // The hive is judged by where its AprilTag is on the FIELD (camera reading + robot pose).
+    // armHiveBaseline() remembers the hive position at the first launch. After that:
+    //   same spot (within HIVE_MOVE_TOL_IN)  -> UPRIGHT
+    //   moved                                -> TIPPED
+    //   tag not seen / no baseline yet       -> UNKNOWN
+    public enum HiveState { UNKNOWN, UPRIGHT, TIPPED } // MJD
+
+    public static int HIVE_TAG_ID = -1;          // MJD: -1 = use the first tag seen, otherwise only this tag ID
+    public static double HIVE_MOVE_TOL_IN = 3.0; // MJD: tag moved more than this (inches) = tipped
+    public static int HIVE_CONFIRM_FRAMES = 3;   // MJD: a new state must hold this many loops before it counts
+    // MJD: where the camera sits on the robot (MEASURE THESE) and which way it points
+    public static double CAM_FORWARD_IN = 0.0;   // MJD: camera ahead of robot center (negative = behind)
+    public static double CAM_LEFT_IN = 0.0;      // MJD: camera left of robot center (negative = right)
+    public static double CAM_YAW_DEG = 0.0;      // MJD: 0 = camera looks straight ahead, positive = turned left
+
+    private HiveState hiveState = HiveState.UNKNOWN; // MJD
+    private HiveState rawHiveState = HiveState.UNKNOWN; // MJD
+    private int rawHiveFrames = 0; // MJD
+    private double[] hiveBaseline = null; // MJD: field x,y of the hive tag at the first launch
+    private boolean baselinePending = false; // MJD
+    private double[] hiveNow = null; // MJD: latest field x,y of the hive tag
+    private Pose robotPose = null; // MJD
     private ElapsedTime runtime = new ElapsedTime();
     /**
      * The {@link #telemetry} field contains an object in which a user may accumulate data which
@@ -158,7 +186,9 @@ public class Limelight extends BaseHardware{
                 telemetry.addData("Latency", "%.1f ms", result.getTargetingLatency());
             }
         }
+        updateHive(); // MJD
         telemetry.addData("TagDistance (m)", TagDistance); //disable after tuning
+        telemetry.addData("Hive State", hiveState); // MJD
 
         //Always show connection status
         // status  = Limey.getStatus();
@@ -169,6 +199,71 @@ public class Limelight extends BaseHardware{
         // telemetry.update(); // Important! Forces immediate send
 
     }
+
+    // MJD: Robot calls this every loop so the tag can be placed on the field.
+    public void setRobotPose(Pose pose) { // MJD
+        this.robotPose = pose; // MJD
+    } // MJD
+
+    // MJD: remember where the hive is RIGHT NOW (first tag frame after this call). Call it at the first launch.
+    public void armHiveBaseline() { // MJD
+        hiveBaseline = null; // MJD
+        baselinePending = true; // MJD
+    } // MJD
+
+    public HiveState getHiveState() { return hiveState; } // MJD
+    public boolean isHiveUpright() { return hiveState == HiveState.UPRIGHT; } // MJD
+    public boolean isHiveTipped() { return hiveState == HiveState.TIPPED; } // MJD
+    public boolean hasHiveBaseline() { return hiveBaseline != null; } // MJD
+
+    // MJD: camera-space tag position -> field x,y (inches), using the robot pose and camera mount.
+    // Limelight camera space: +X right, +Y down, +Z forward.
+    private double[] tagFieldPosition(Pose3D camPose) { // MJD
+        Position pos = camPose.getPosition().toUnit(DistanceUnit.INCH); // MJD
+        double phi = Math.toRadians(CAM_YAW_DEG); // MJD
+        double fwd = pos.z * Math.cos(phi) + pos.x * Math.sin(phi) + CAM_FORWARD_IN; // MJD
+        double left = pos.z * Math.sin(phi) - pos.x * Math.cos(phi) + CAM_LEFT_IN; // MJD
+        double th = robotPose.heading(); // MJD
+        return new double[]{ // MJD
+                robotPose.x() + fwd * Math.cos(th) - left * Math.sin(th), // MJD
+                robotPose.y() + fwd * Math.sin(th) + left * Math.cos(th)}; // MJD
+    } // MJD
+
+    private void updateHive() { // MJD
+        hiveNow = null; // MJD
+        if (robotPose != null && result != null && result.isValid() && result.getFiducialResults() != null) { // MJD
+            for (LLResultTypes.FiducialResult f : result.getFiducialResults()) { // MJD
+                if (HIVE_TAG_ID < 0 || f.getFiducialId() == HIVE_TAG_ID) { // MJD
+                    hiveNow = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD
+                    break; // MJD
+                } // MJD
+            } // MJD
+        } // MJD
+
+        HiveState raw = HiveState.UNKNOWN; // MJD
+        if (hiveNow != null) { // MJD
+            if (baselinePending) { // MJD
+                hiveBaseline = hiveNow; // MJD
+                baselinePending = false; // MJD
+            } // MJD
+            if (hiveBaseline != null) { // MJD
+                double moved = Math.hypot(hiveNow[0] - hiveBaseline[0], hiveNow[1] - hiveBaseline[1]); // MJD
+                raw = (moved <= HIVE_MOVE_TOL_IN) ? HiveState.UPRIGHT : HiveState.TIPPED; // MJD
+                telemetry.addData("Hive moved (in)", "%.1f", moved); // MJD
+            } // MJD
+        } // MJD
+
+        // a new state has to hold for HIVE_CONFIRM_FRAMES loops before it counts (one noisy frame won't flip it)
+        if (raw == rawHiveState) { // MJD
+            rawHiveFrames++; // MJD
+        } else { // MJD
+            rawHiveState = raw; // MJD
+            rawHiveFrames = 1; // MJD
+        } // MJD
+        if (rawHiveFrames >= HIVE_CONFIRM_FRAMES) { // MJD
+            hiveState = raw; // MJD
+        } // MJD
+    } // MJD
 
     public  double getTy(){
         return  ty;

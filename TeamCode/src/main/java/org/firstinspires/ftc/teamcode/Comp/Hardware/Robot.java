@@ -136,6 +136,7 @@ public class Robot extends BaseHardware {
         pollenBlocker.loop();
         feeder.loop();
         lighting.loop();
+        limelight.setRobotPose(driveTrain.getPose()); // MJD: so the hive tag can be placed on the field
         limelight.loop();
     }
 

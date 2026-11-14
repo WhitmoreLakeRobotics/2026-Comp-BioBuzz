@@ -27,6 +27,7 @@ public class GD_2tip_park extends OpMode {
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
     private final ElapsedTime spinTimer = new ElapsedTime(); // MJD
+    private static final double HIVE_VERIFY_MAX_SEC = 2.0; // MJD: longest we wait to see the hive tip before going on anyway
     private static final double SPINUP_WAIT_MAX_SEC = 4.0; // MJD: longest we wait for the launcher before firing anyway
 
 
@@ -82,10 +83,13 @@ public class GD_2tip_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(pth1Score()), // MJD
                 instant(() -> spinTimer.reset()), // MJD
                 waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
+                instant(() -> robot.limelight.armHiveBaseline()), // MJD: remember where the hive is at the first launch
                 robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
                 robot.cmdCeaseFireSequence(),
                 robot.driveTrain.cmdAtFollow(Grdnpickup()),
                 robot.driveTrain.cmdAtFollow(backup()),
+                instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
+                waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
                 robot.cmdLaunchVolley(4000),
                 robot.driveTrain.cmdAtFollow(prkPth()),
@@ -135,6 +139,7 @@ public class GD_2tip_park extends OpMode {
         Scheduler.execute();
         telemetryM.addData("pose", robot.driveTrain.getPose());
         telemetryM.addData("auto running", auto.isScheduled());
+        telemetryM.addData("hive state", robot.limelight.getHiveState()); // MJD
         telemetryM.update();   // sends to Panels only
 
         // Driver Station: only the few things the drive team needs
