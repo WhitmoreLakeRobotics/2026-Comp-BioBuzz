@@ -26,7 +26,7 @@ public class Robot extends BaseHardware {
     //public TransitionR transitionR = new TransitionR();
     public PollenBlocker pollenBlocker = new PollenBlocker();
     public Feeder feeder = new Feeder();
-    public Flower_Ramp Ramp = new Flower_Ramp();
+    //public Flower_Ramp Ramp = new Flower_Ramp();   // MJD: duplicate of flower_ramp below, both drove the same servo
     // CHANGED: runs the launch sequence. Declared AFTER the parts it uses.
     public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
@@ -77,9 +77,9 @@ public class Robot extends BaseHardware {
         feeder.init();
 
         //Ramp
-        Ramp.hardwareMap = this.hardwareMap;
-        Ramp.telemetry = this.telemetry;
-        Ramp.init();
+        //Ramp.hardwareMap = this.hardwareMap;   // MJD: duplicate removed, flower_ramp is used instead
+        //Ramp.telemetry = this.telemetry;
+        //Ramp.init();
 
         //TripleThreat (launch sequence)
         tripleThreat.hardwareMap = this.hardwareMap;
@@ -108,7 +108,7 @@ public class Robot extends BaseHardware {
         driveTrain.init_loop();
         intake.init_loop();
         launcher.init_loop();
-        Ramp.init_loop();
+        //Ramp.init_loop();   // MJD
         //transitionR.init_loop();
         pollenBlocker.init_loop();
         feeder.init_loop();
@@ -123,7 +123,7 @@ public class Robot extends BaseHardware {
         driveTrain.start();
         intake.start();
         launcher.start();
-        Ramp.start();
+        //Ramp.start();   // MJD
         //transitionR.start();
         pollenBlocker.start();
         feeder.start();
@@ -137,7 +137,7 @@ public class Robot extends BaseHardware {
     public void loop() {
         driveTrain.loop();
         intake.loop();
-        Ramp.loop();
+        //Ramp.loop();   // MJD
         // CHANGED: TripleThreat runs before the parts it commands, so its commands take effect this loop.
         tripleThreat.loop();
         launcher.loop();
@@ -159,7 +159,7 @@ public class Robot extends BaseHardware {
     @Override
     public void stop() {
         tripleThreat.stop();
-        Ramp.stop();
+        //Ramp.stop();   // MJD
         launcher.stop();
         feeder.stop();
         intake.stop();
