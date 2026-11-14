@@ -34,9 +34,9 @@ public class Limelight extends BaseHardware{
     public static double HIVE_MOVE_TOL_IN = 3.0; // MJD: tag moved more than this (inches) = tipped
     public static int HIVE_CONFIRM_FRAMES = 3;   // MJD: a new state must hold this many loops before it counts
     // MJD: where the camera sits on the robot (MEASURE THESE) and which way it points
-    public static double CAM_FORWARD_IN = 0.0;   // MJD: camera ahead of robot center (negative = behind)
-    public static double CAM_LEFT_IN = 0.0;      // MJD: camera left of robot center (negative = right)
-    public static double CAM_YAW_DEG = 0.0;      // MJD: 0 = camera looks straight ahead, positive = turned left
+    public static double CAM_FORWARD_IN = 10.25;   // MJD: camera ahead of robot center (negative = behind)
+    public static double CAM_LEFT_IN = 8.0;      // MJD: camera left of robot center (negative = right)
+    public static double CAM_YAW_DEG = 45;      // MJD: 0 = camera looks straight ahead, positive = turned left
 
     private HiveState hiveState = HiveState.UNKNOWN; // MJD
     private HiveState rawHiveState = HiveState.UNKNOWN; // MJD
