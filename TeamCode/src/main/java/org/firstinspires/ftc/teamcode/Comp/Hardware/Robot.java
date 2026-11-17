@@ -26,10 +26,13 @@ public class Robot extends BaseHardware {
     //public TransitionR transitionR = new TransitionR();
     public PollenBlocker pollenBlocker = new PollenBlocker();
     public Feeder feeder = new Feeder();
-    public Flower_Ramp Ramp = new Flower_Ramp();
+    //public Flower_Ramp Ramp = new Flower_Ramp();   // MJD: duplicate of flower_ramp below, both drove the same servo
     // CHANGED: runs the launch sequence. Declared AFTER the parts it uses.
     public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
+    public Limelight limelight = new Limelight();
+    public Flower_Ramp flower_ramp = new Flower_Ramp();
+    public Sensors sensors = new Sensors();
 
 
     /**
@@ -75,9 +78,9 @@ public class Robot extends BaseHardware {
         feeder.init();
 
         //Ramp
-        Ramp.hardwareMap = this.hardwareMap;
-        Ramp.telemetry = this.telemetry;
-        Ramp.init();
+        //Ramp.hardwareMap = this.hardwareMap;   // MJD: duplicate removed, flower_ramp is used instead
+        //Ramp.telemetry = this.telemetry;
+        //Ramp.init();
 
         //TripleThreat (launch sequence)
         tripleThreat.hardwareMap = this.hardwareMap;
@@ -88,6 +91,22 @@ public class Robot extends BaseHardware {
         lighting.hardwareMap = this.hardwareMap;
         lighting.telemetry = this.telemetry;
         lighting.init();
+
+        //Limelight
+        limelight.hardwareMap = this.hardwareMap;
+        limelight.telemetry = this.telemetry;
+        limelight.init();
+
+        //Flower_ramp
+        flower_ramp.hardwareMap = this.hardwareMap;
+        flower_ramp.telemetry = this.telemetry;
+        flower_ramp.init();
+
+        //Sensors
+        sensors.hardwareMap = this.hardwareMap;
+        sensors.telemetry = this.telemetry;
+        sensors.init();
+
     }
 
     @Override
@@ -95,12 +114,16 @@ public class Robot extends BaseHardware {
         driveTrain.init_loop();
         intake.init_loop();
         launcher.init_loop();
-        Ramp.init_loop();
+        //Ramp.init_loop();   // MJD
         //transitionR.init_loop();
         pollenBlocker.init_loop();
         feeder.init_loop();
         tripleThreat.init_loop();
         lighting.init_loop();
+        limelight.init_loop();
+        flower_ramp.init_loop();
+        sensors.init_loop();
+
     }
 
     @Override
@@ -108,19 +131,22 @@ public class Robot extends BaseHardware {
         driveTrain.start();
         intake.start();
         launcher.start();
-        Ramp.start();
+        //Ramp.start();   // MJD
         //transitionR.start();
         pollenBlocker.start();
         feeder.start();
         tripleThreat.start();
         lighting.start();
+        limelight.start();
+        flower_ramp.start();
+        sensors.start();
     }
 
     @Override
     public void loop() {
         driveTrain.loop();
         intake.loop();
-        Ramp.loop();
+        //Ramp.loop();   // MJD
         // CHANGED: TripleThreat runs before the parts it commands, so its commands take effect this loop.
         tripleThreat.loop();
         launcher.loop();
@@ -128,6 +154,10 @@ public class Robot extends BaseHardware {
         pollenBlocker.loop();
         feeder.loop();
         lighting.loop();
+        limelight.setRobotPose(driveTrain.getPose()); // MJD: so the hive tag can be placed on the field
+        limelight.loop();
+        flower_ramp.loop();
+        sensors.loop();
     }
 
     /**
@@ -139,7 +169,7 @@ public class Robot extends BaseHardware {
     @Override
     public void stop() {
         tripleThreat.stop();
-        Ramp.stop();
+        //Ramp.stop();   // MJD
         launcher.stop();
         feeder.stop();
         intake.stop();
@@ -147,6 +177,9 @@ public class Robot extends BaseHardware {
         pollenBlocker.stop();
         driveTrain.stop();
         lighting.stop();
+        limelight.stop();
+        flower_ramp.stop();
+        sensors.stop();
     }
 
     // ---------------- IVY COMMANDS (for Pedro auto paths) ----------------
@@ -194,10 +227,16 @@ public class Robot extends BaseHardware {
     //stops intake and launcher
     public Command cmdTripleThreatStop(){
         return sequential(
-               instant(() -> launcher.cmdLauncherStop()),
+              // instant(() -> launcher.cmdLauncherStop()),
                instant(() -> feeder.cmdFeederStop()),
-               instant(() -> pollenBlocker.cmdBlock()),
-               instant(() -> intake.cmdIntakeStop())
+               instant(() -> pollenBlocker.cmdBlock())
+              // instant(() -> intake.cmdIntakeStop())
+        );
+    }
+    public Command cmdStopIntakeFeeder(){
+        return sequential(
+                instant(() -> feeder.cmdFeederStop()),
+                instant(() -> intake.cmdIntakeStop())
         );
     }
 

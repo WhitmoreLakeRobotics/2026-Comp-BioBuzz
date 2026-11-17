@@ -78,6 +78,11 @@ public static Pose actualyScore=pf.of(37,110,130);
                 waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),  // tune ms to finish all 4 pollen
                 robot.driveTrain.cmdAtFollow(pthPark())
+                robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
+                robot.driveTrain.cmdAtFollow(pthPark()),
+                robot.cmdTripleThreatStop(),
+                robot.driveTrain.cmdHoldPos(AutonBase.LZparkPose),
+                robot.cmdStopIntakeFeeder()
         );
 
     }
