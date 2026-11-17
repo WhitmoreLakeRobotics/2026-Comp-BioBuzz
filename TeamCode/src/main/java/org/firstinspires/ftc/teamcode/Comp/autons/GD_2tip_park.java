@@ -68,7 +68,7 @@ public class GD_2tip_park extends OpMode {
         return Paths.line(Backup, ScorePoses.ScorePoseLT()).linear(Backup, ScorePoses.ScorePoseLT());
     }
     public Path prkPth(){
-        return Paths.line(ScorePoses.ScorePoseLT(), park).linear(ScorePoses.ScorePoseLT(), park);
+        return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.LZparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.LZparkPose);
     }
 
     protected Command cmdScorePark() {

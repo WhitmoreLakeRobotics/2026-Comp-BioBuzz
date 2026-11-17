@@ -63,6 +63,36 @@ public class Constants {
     // your own values here before you use Pedro for autonomous paths.
     // ---------------------------------------------------------------
 
+
+
+    // 11/17/26
+    public static ForesightConfig foresightConfig = new ForesightConfig(
+            c -> {
+                Controller primaryTranslationalForward = Controller.proportional(0.40711248556091667);
+                Controller secondaryTranslationalForward = Controller.proportional(0.15041718516879699);
+                Controller primaryTranslationalLateral = Controller.proportional(0.7685788744305029);
+                Controller secondaryTranslationalLateral = Controller.proportional(0.2839693572963143);
+
+                c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));
+                c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));
+
+                c.coast.set(Controller.proportionalFeedforward(0.012922332208848083));
+                c.brake.set(Controller.proportionalFeedforward(0.01098398237752087));
+
+                c.headingFeedback.set(Controller.proportional(7.416499058655343));
+                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.060650595949239404, 0.005522696352125739));
+
+                c.linearBrakeCoefficients.set(Matrix.diag(0.12218341722985604, 0.1074975425181319));
+                c.quadraticBrakeCoefficients.set(Matrix.diag(0.0013629796157710308, 0.0011610403458823858));
+
+                c.maxAchievableForwardVelocity.set(74.48219689872923);
+                c.maxAchievableStrafeVelocity.set(60.99791959437759);
+                c.naturalForwardDeceleration.set(27.34310266414546);
+                c.naturalStrafeDeceleration.set(67.60336083934062);
+            }
+    );
+
+
  /*   public static ForesightConfig foresightConfig = new ForesightConfig(
             c -> {
                 Controller primaryTranslationalForward = Controller.proportional(0.3756106647117264);
@@ -145,6 +175,7 @@ public static ForesightConfig foresightConfig = new ForesightConfig(
 );
 
  */
+      /* from 11/16/26
 public static ForesightConfig foresightConfig = new ForesightConfig(
         c -> {
             Controller primaryTranslationalForward = Controller.proportional(0.4834565990950392);
@@ -169,7 +200,7 @@ public static ForesightConfig foresightConfig = new ForesightConfig(
             c.naturalForwardDeceleration.set(30.208211325954217);
             c.naturalStrafeDeceleration.set(69.48635203426072);
         }
-);
+); */
 
     // ---------------------------------------------------------------
     // CHANGED: this used to "return null", which crashed the robot.
