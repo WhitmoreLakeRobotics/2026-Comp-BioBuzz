@@ -9,10 +9,10 @@ public class ScorePoses  {
     private static final PoseFactory pf = PoseFactory.degrees();
 
     public static double LT_X = 31,LT_Y = 130, LT_Heading = 120;
-    public static double RT_X = 85, RT_Y = 128, RT_Heading= 60; // y was 124
+    public static double RT_X = 85, RT_Y = 130, RT_Heading= 60; // y was 124
     public static double LB_X = 29, LB_Y = 17, LB_Heading = 233; //y was 15, h was 238, 230
 
-    public static double RB_X = 76, RB_Y = 13, RB_Heading = 290; // x was 71, y was 15
+    public static double RB_X = 76, RB_Y = 15, RB_Heading = 290; // x was 71, y was 15
 
     public static Pose ScorePoseLT(){
         return pf.of(LT_X, LT_Y,LT_Heading);
