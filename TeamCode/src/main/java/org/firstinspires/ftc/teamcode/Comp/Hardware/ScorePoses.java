@@ -12,7 +12,7 @@ public class ScorePoses  {
     public static double RT_X = 85, RT_Y = 130, RT_Heading = 58; // y was 124
     public static double LB_X = 27, LB_Y = 15, LB_Heading = 233; //y was 15, h was 238, 230
 
-    public static double RB_X = 79, RB_Y = 15, RB_Heading = 296; // x was 71, y was 15
+    public static double RB_X = 83, RB_Y = 15, RB_Heading = 296; // x was 71, y was 15
 
     public static Pose ScorePoseLT(){
         return pf.of(LT_X, LT_Y,LT_Heading);
