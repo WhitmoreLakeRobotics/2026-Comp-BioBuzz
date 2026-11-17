@@ -20,17 +20,17 @@ public class Launcher extends BaseHardware {
 
     // ---------------- TUNABLE CONSTANTS ----------------
     public static double LAUNCHER_RPM = 1725;
-    public static double POSE_LAUNCHER_RPM = 1800;     // MJD: speed used when a drive-to-pose was called and the light is green (tune!)
+    public static double POSE_LAUNCHER_RPM = 1790;     // MJD: speed used when a drive-to-pose was called and the light is green (tune!)
     public static int RPM_OFFSET = 0;                  // added to LAUNCHER_RPM (trim from Panels)
     public static double RPM_TOLERANCE = 100;           // "at speed" window around the target RPM
     public static double AT_SPEED_HOLD_SEC = 0.15;     // RPM must stay in tolerance this long
     public static double OFF_RPM_THRESHOLD = 50;       // |RPM| below this counts as stopped
 
     // ---------------- PID CONSTANTS ----------------
-    public static double LAUNCHER_KP = 0.003375; //was 0.00135
+    public static double LAUNCHER_KP = 0.00354375; //was 0.00135
     public static double LAUNCHER_KI = 0.00000005;            // still unused
-    public static double LAUNCHER_KD = 0.0000003;
-    public static double LAUNCHER_KF = 0.0003426606575;     // feedforward per RPM was 0.0004166672
+    public static double LAUNCHER_KD = 0.0000004;
+    public static double LAUNCHER_KF = 0.0003113303245;  // feedforward per RPM was 0.0004166672, 0.0003426606575
 
     private static final double TICKS_PER_REV = 28;    // motor-shaft encoder; change if geared
     private static final double MIN_POWER = -1.0;

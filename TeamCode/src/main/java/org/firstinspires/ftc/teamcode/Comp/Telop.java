@@ -6,6 +6,7 @@ import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
 import org.firstinspires.ftc.teamcode.Common.CommonLogic;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
@@ -67,6 +68,8 @@ private TelemetryManager telemetryM;
     private boolean bAutoDrive = false;
     private boolean intakeReversePrev = false; // MJD: reverse button state last loop
     private boolean intakeWasForward = false; // MJD: was the intake going forward when reverse was pressed
+    private final ElapsedTime autoDriveTimer = new ElapsedTime(); // MJD: time since the last A/B/X/Y drive-to-pose press
+    private static final double AUTO_DRIVE_BREAKOUT_DELAY_SEC = 1.0; // MJD: sticks are ignored this long after a drive-to-pose press
     private boolean poseDriveCalled = false; // MJD: a drive-to-pose button was pressed and we have not left that spot
 
     // CHANGED: the drive speed the sticks use. dpad left/up/down set it (it stays until changed).
@@ -79,7 +82,7 @@ private TelemetryManager telemetryM;
 
     private Command DriveToCommand = null;
     public static final PoseFactory Pf = PoseFactory.degrees();
-    private static final double InLaunchPosition = 2.5;
+    private static final double InLaunchPosition = 3.5;
 
     private boolean InLaunchPosition(){
         Pose p = robot.driveTrain.getPose();
@@ -99,6 +102,8 @@ private TelemetryManager telemetryM;
             DriveToCommand = robot.driveTrain.cmdHoldPos(target);
             lastTarget = target;
             poseDriveCalled = true; // MJD
+            robot.launcher.setPoseSpeedMode(true); // MJD: go to the pose launch speed the moment the button is pressed
+            autoDriveTimer.reset(); // MJD: start the no-breakout window
             Scheduler.schedule(DriveToCommand);
             if (SpinLauncher) {
                 robot.launcher.cmdLauncherForward();
@@ -164,7 +169,9 @@ private TelemetryManager telemetryM;
         if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(ScorePoses.ScorePoseLT(),true); bAutoDrive = true;}
 
         if (bAutoDrive) {
-            if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){
+            //if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){   // MJD: old, broke out instantly
+            // MJD: sticks only break out once the delay has passed, so you can press A/B/X/Y with the sticks still held
+            if(autoDriveTimer.seconds() >= AUTO_DRIVE_BREAKOUT_DELAY_SEC && ((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0))){ // MJD
                 DriveToCommand.cancel();
              bAutoDrive = false;
             }
@@ -454,7 +461,8 @@ private TelemetryManager telemetryM;
         if (!bAutoDrive && !inLaunchPos) { // MJD: driver took over and left the spot, back to the normal speed
             poseDriveCalled = false; // MJD
         } // MJD
-        robot.launcher.setPoseSpeedMode(poseDriveCalled && inLaunchPos); // MJD: pose speed only when called AND light is green
+        //robot.launcher.setPoseSpeedMode(poseDriveCalled && inLaunchPos); // MJD: old, pose speed only once the light was green
+        robot.launcher.setPoseSpeedMode(poseDriveCalled); // MJD: pose speed from the button press until the driver takes over and leaves the spot
         //robot.lighting.cmdInLaunchPosition(InLaunchPosition());   // MJD: old
         robot.lighting.cmdInLaunchPosition(inLaunchPos); // MJD
         Scheduler.execute();
@@ -475,7 +483,7 @@ private TelemetryManager telemetryM;
             telemetry.addData("Launcher at speed", robot.launcher.isLauncherAtSpeed());
             telemetry.addData("Feeder at speed", robot.feeder.isFeederAtSpeed());
             telemetry.addData("Blocker open", robot.pollenBlocker.isOpen());
-            telemetry.addData("Pose launch speed on", poseDriveCalled && InLaunchPosition()); // MJD
+            telemetry.addData("Pose launch speed on", poseDriveCalled); // MJD
             telemetry.addData("bAutoDrive", bAutoDrive);
             telemetry.addData("Hold cmd scheduled", DriveToCommand != null && DriveToCommand.isScheduled());
             telemetry.addData("Follower busy", robot.driveTrain.isBusy());
