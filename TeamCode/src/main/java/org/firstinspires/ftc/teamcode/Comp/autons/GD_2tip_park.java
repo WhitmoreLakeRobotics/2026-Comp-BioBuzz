@@ -84,7 +84,7 @@ public class GD_2tip_park extends OpMode {
                 instant(() -> spinTimer.reset()), // MJD
                 waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
                 instant(() -> robot.limelight.armHiveBaseline()), // MJD: remember where the hive is at the first launch
-                robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
+                robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),  // tune ms to finish all 4 pollen
                 robot.cmdCeaseFireSequence(),
                 robot.driveTrain.cmdAtFollow(Grdnpickup()),
                 robot.driveTrain.cmdAtFollow(backup()),
