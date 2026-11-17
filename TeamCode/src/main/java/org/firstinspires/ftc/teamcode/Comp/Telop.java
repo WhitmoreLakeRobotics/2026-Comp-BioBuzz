@@ -79,7 +79,7 @@ private TelemetryManager telemetryM;
 
     private Command DriveToCommand = null;
     public static final PoseFactory Pf = PoseFactory.degrees();
-    private static final double InLaunchPosition = 5.0;
+    private static final double InLaunchPosition = 2.5;
 
     private boolean InLaunchPosition(){
         Pose p = robot.driveTrain.getPose();

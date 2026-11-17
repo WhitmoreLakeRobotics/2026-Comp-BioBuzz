@@ -42,6 +42,7 @@ public class AutonBase {
     public static final double LAUNCH_TIMER = 2000.0;
     public static final double PICKUP_MAX_MS = 3000;
 
+
 /* Changed class from Opmode to Object so these are not needed
 
     public void init(){
