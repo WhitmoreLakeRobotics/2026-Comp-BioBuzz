@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Comp.autons;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.instant; // MJD
+import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
@@ -86,7 +87,8 @@ public class GD_2tip_park extends OpMode {
                 instant(() -> robot.limelight.armHiveBaseline()), // MJD: remember where the hive is at the first launch
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),  // tune ms to finish all 4 pollen
                 robot.cmdCeaseFireSequence(),
-                robot.driveTrain.cmdAtFollow(Grdnpickup()),
+               // robot.driveTrain.cmdAtFollow(Grdnpickup()),
+                robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
                 robot.driveTrain.cmdAtFollow(backup()),
                 instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
                 waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD

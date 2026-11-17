@@ -37,7 +37,10 @@ public class AutonBase {
     public static final Pose scorePoseB = Pf.of(88.3,127, 50); // left side of the red hive on the right side relative to the driveteam
     public static final Pose scorePoseY = Pf.of(29, 15, 230); // left side of the red hive on the left side relative to the driveteam
     public static final Pose scorePoseX = Pf.of(86.4, 15, 310); // right side of the red hive on the left side relative to the driveteam
-    public static final double LAUNCH_TIMER = 4000.0;
+
+   //Timer constants
+    public static final double LAUNCH_TIMER = 2000.0;
+    public static final double PICKUP_MAX_MS = 3000;
 
 /* Changed class from Opmode to Object so these are not needed
 
