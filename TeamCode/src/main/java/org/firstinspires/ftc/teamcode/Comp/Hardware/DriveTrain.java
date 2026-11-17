@@ -81,8 +81,8 @@ follower.update();
         panels.addData("DT pathIndex", follower.pathIndex());
         panels.addData("DT pose", follower.pose());
         //these are needed to draw the path on the field in Panels.
-        recordTrail();
-        drawField();
+       // recordTrail(); naj removed this to reduce time in loop
+        //drawField(); naj removed this to reduce time in loop
         if (follower != null) {
             OpModeStorage.EndPose = follower.pose();
         }
