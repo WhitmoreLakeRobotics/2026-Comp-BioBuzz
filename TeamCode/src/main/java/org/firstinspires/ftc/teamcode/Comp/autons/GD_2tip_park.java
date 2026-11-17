@@ -82,12 +82,12 @@ public class GD_2tip_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(pth1Score()), // MJD
                 instant(() -> spinTimer.reset()), // MJD
                 waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC), // MJD
-                robot.cmdLaunchVolley(4000),  // tune ms to finish all 4 pollen
+                robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),  // tune ms to finish all 4 pollen
                 robot.cmdCeaseFireSequence(),
                 robot.driveTrain.cmdAtFollow(Grdnpickup()),
                 robot.driveTrain.cmdAtFollow(backup()),
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
-                robot.cmdLaunchVolley(4000),
+                robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.driveTrain.cmdAtFollow(prkPth()),
                 robot.cmdTripleThreatStop()
         );
