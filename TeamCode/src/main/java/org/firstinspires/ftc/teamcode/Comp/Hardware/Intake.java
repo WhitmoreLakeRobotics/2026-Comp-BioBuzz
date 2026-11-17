@@ -79,6 +79,11 @@ public class Intake extends BaseHardware {
         requestPower(INTAKE_POWER);
     }
 
+    // MJD: forward at a fraction of the normal intake power (0.75 = 75 percent)
+    public void cmdIntakeForwardScaled(double scale) { // MJD
+        requestPower(INTAKE_POWER * scale); // MJD
+    } // MJD
+
     public void cmdIntakeReverse() {
         requestPower(REVERSE_POWER);
     }

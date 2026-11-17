@@ -52,11 +52,13 @@ public class GD1cycle_Park extends OpMode {
                 robot.driveTrain.cmdAtFollow(Launchp1()),
                 robot.cmdShootSequence(),
                 waitMs(4000),                              // keep firing; time how long your volley take
+                robot.cmdCeaseFireSequence(),              // MJD: feeder off and blocker closed before driving away
                 robot.driveTrain.cmdAtFollow(Pickup()),
                 robot.cmdIntakeatSpeed(),
                 robot.driveTrain.cmdAtFollow(Launchp2()),
                 robot.cmdShootSequence(),
                 waitMs(4000),                              // keep firing; time how long your volley take
+                robot.cmdCeaseFireSequence(),              // MJD: feeder off and blocker closed before driving away
                 robot.driveTrain.cmdAtFollow(DrivetoPark()),
                 robot.cmdTripleThreatStop(),
                 robot.driveTrain.cmdHoldPos(Park),

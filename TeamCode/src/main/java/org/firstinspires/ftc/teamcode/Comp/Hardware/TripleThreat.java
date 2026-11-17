@@ -26,6 +26,7 @@ public class TripleThreat extends BaseHardware {
     public static double BLOCKER_OPEN_SEC = 0.30;      // servo travel time before we call it FIRING (tune!)
     public static boolean WAIT_FOR_FEEDER_SPEED = true; // false = open the blocker as soon as the feeder is commanded
     public static double BLOCKER_DELAY_AFTER_FEEDER_SEC = 0.5; // MJD: open the blocker this long after the feeder starts
+    public static double INTAKE_FIRING_SCALE = 0.75;   // MJD: intake runs at this fraction of its normal power while firing
 
     // ---------------- STATE ----------------
     private TripleThreatState tripleThreatState = TripleThreatState.IDLE;
@@ -94,6 +95,9 @@ public class TripleThreat extends BaseHardware {
 
         feeder.cmdFeederStop();
         blocker.cmdBlock();
+        if (intake.isIntakeForward()) { // MJD: volley over, back to full intake speed (only if it is still running)
+            intake.cmdIntakeForward(); // MJD
+        } // MJD
         tripleThreatState = TripleThreatState.IDLE;
     }
 
@@ -115,7 +119,8 @@ public class TripleThreat extends BaseHardware {
             case SPINNING_UP:
                 if (launcher.isLauncherAtSpeed()) {
                     feeder.cmdFeederForward();
-                    intake.cmdIntakeForward();
+                    //intake.cmdIntakeForward();   // MJD: old, full speed
+                    intake.cmdIntakeForwardScaled(INTAKE_FIRING_SCALE); // MJD: slowed to 75 percent while firing
                     stateTimer.reset();
                     tripleThreatState = TripleThreatState.STARTING_FEEDER;
                 } else if (stateTimer.seconds() > SPINUP_TIMEOUT_SEC) {
