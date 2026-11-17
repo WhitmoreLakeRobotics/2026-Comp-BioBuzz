@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.teamcode.Comp.Hardware;
+/*package org.firstinspires.ftc.teamcode.Comp.Hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-
+@Disabled
 @Configurable
 public class Sensors extends BaseHardware{
 
@@ -73,5 +74,6 @@ public class Sensors extends BaseHardware{
         MISSING1
     }
 
-   */
+
 }
+*/

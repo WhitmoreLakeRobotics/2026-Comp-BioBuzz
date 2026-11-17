@@ -118,7 +118,7 @@ public static ForesightConfig foresightConfig = new ForesightConfig(
 );
 
  */
-public static ForesightConfig foresightConfig = new ForesightConfig(
+/*public static ForesightConfig foresightConfig = new ForesightConfig(
         c -> {
             Controller primaryTranslationalForward = Controller.proportional(0.33497783433471384);
             Controller secondaryTranslationalForward = Controller.proportional(0.1237653590140946);
@@ -141,6 +141,33 @@ public static ForesightConfig foresightConfig = new ForesightConfig(
             c.maxAchievableStrafeVelocity.set(64.1067534352002);
             c.naturalForwardDeceleration.set(29.455383995809953);
             c.naturalStrafeDeceleration.set(65.4607395955236);
+        }
+);
+
+ */
+public static ForesightConfig foresightConfig = new ForesightConfig(
+        c -> {
+            Controller primaryTranslationalForward = Controller.proportional(0.4834565990950392);
+            Controller secondaryTranslationalForward = Controller.proportional(0.17862429516737127);
+            Controller primaryTranslationalLateral = Controller.proportional(1.073951720862232);
+            Controller secondaryTranslationalLateral = Controller.proportional(0.3967964643401019);
+
+            c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));
+            c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));
+
+            c.coast.set(Controller.proportionalFeedforward(0.014443144649164318));
+            c.brake.set(Controller.proportionalFeedforward(0.01227667295178967));
+
+            c.headingFeedback.set(Controller.proportional(10.16863454953934));
+            c.headingBrakeCoefficients.set(Vector2D.cartesian(0.058153713307956385, 0.006660268047563476));
+
+            c.linearBrakeCoefficients.set(Matrix.diag(0.12334380429685421, 0.07587539453700272));
+            c.quadraticBrakeCoefficients.set(Matrix.diag(0.0013225485305728, 0.0016649119808245258));
+
+            c.maxAchievableForwardVelocity.set(65.36296241971955);
+            c.maxAchievableStrafeVelocity.set(46.25159119453694);
+            c.naturalForwardDeceleration.set(30.208211325954217);
+            c.naturalStrafeDeceleration.set(69.48635203426072);
         }
 );
 
