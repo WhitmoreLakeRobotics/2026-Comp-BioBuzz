@@ -68,7 +68,7 @@ public class GD_2tip_park extends OpMode {
         return Paths.line(Backup, ScorePoses.ScorePoseLT()).linear(Backup, ScorePoses.ScorePoseLT());
     }
     public Path prkPth(){
-        return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.LZparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.LZparkPose);
+        return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
     }
 
     protected Command cmdScorePark() {
@@ -91,12 +91,12 @@ public class GD_2tip_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
                 robot.driveTrain.cmdAtFollow(backup()),
                 instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
-                waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
+             //   waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.driveTrain.cmdAtFollow(prkPth()),
                 robot.cmdTripleThreatStop(),
-                robot.driveTrain.cmdHoldPos(park),
+               // robot.driveTrain.cmdHoldPos(park),
                 robot.cmdStopIntakeFeeder()
         );
 
