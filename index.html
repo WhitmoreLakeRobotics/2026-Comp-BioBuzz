@@ -1,0 +1,794 @@
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BioBuzz"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#E3A008"><link rel="apple-touch-icon" href="icon.png"><link rel="icon" href="icon.png"><link rel="manifest" href="manifest.webmanifest"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body><title data-keep="">BioBuzz Scout</title>
+<meta name="claude:viewport-fit-sides" content="cover" data-keep="">
+<link rel="preconnect" href="https://fonts.googleapis.com" data-keep="">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" data-keep="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600;700&amp;display=swap" data-keep="">
+<style data-keep="">
+/* Layout: sticky scoreboard header with the tab bar inside it, single working column; the bottom stays clear for the viewer's own banners */
+:root{
+  --bg:#E9EDEF; --surface:#FFFFFF; --sunk:#DDE3E6; --ink:#14202A; --muted:#566673; --line:#C9D2D8;
+  --honey:#E3A008; --honey-ink:#1B1406; --honey-soft:#FBEFC8;
+  --red:#C8333A; --red-soft:#F8DEDF; --blue:#2C67CF; --blue-soft:#DCE7FA;
+  --good:#1F7A4D; --warn:#A35E00; --bad:#B42318;
+  --pollen:#F2CE3A; --pollen-ink:#3D3000;
+  --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1317; --surface:#172028; --sunk:#0A0E12; --ink:#E6ECEF; --muted:#93A3AE; --line:#2B3843;
+  --honey:#F4B731; --honey-ink:#1B1406; --honey-soft:#3A2D0B;
+  --red:#F06A70; --red-soft:#3A1A1D; --blue:#6E9CF0; --blue-soft:#18264A;
+  --good:#4CC38A; --warn:#E8A33C; --bad:#F2766B;
+  --pollen:#E9C43A; --pollen-ink:#2A2100; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1317; --surface:#172028; --sunk:#0A0E12; --ink:#E6ECEF; --muted:#93A3AE; --line:#2B3843;
+  --honey:#F4B731; --honey-ink:#1B1406; --honey-soft:#3A2D0B;
+  --red:#F06A70; --red-soft:#3A1A1D; --blue:#6E9CF0; --blue-soft:#18264A;
+  --good:#4CC38A; --warn:#E8A33C; --bad:#F2766B;
+  --pollen:#E9C43A; --pollen-ink:#2A2100; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent;padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--honey);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:10px;padding-block:10px}
+.mark{flex:none;width:30px;height:30px}
+.brand{min-width:0;flex:1}
+.brand b{display:block;font-family:var(--f-display);font-weight:700;font-size:21px;letter-spacing:.02em;line-height:1;text-transform:uppercase}
+.brand span{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{flex:none;display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 10px;font-size:13px;font-weight:600;background:var(--sunk);color:var(--muted);border:0}
+.pill i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--good)} .pill.wait{color:var(--warn)} .pill.bad{color:var(--bad)}
+
+/* tabs */
+.tabs{background:var(--surface);border-top:1px solid var(--line)}
+.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding-block:6px}
+.tab{border:0;background:none;padding:8px 4px;border-radius:8px;font-family:var(--f-display);font-weight:600;font-size:16px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);position:relative}
+.tab[aria-current="page"]{color:var(--ink);background:var(--honey-soft)}
+.tab .dot{position:absolute;top:4px;right:calc(50% - 30px);min-width:18px;height:18px;border-radius:9px;background:var(--honey);color:var(--honey-ink);font-family:var(--f-body);font-size:11px;font-weight:700;line-height:18px;letter-spacing:0;padding:0 5px}
+
+main{padding-block:16px 24px;display:grid;gap:14px}
+h2{font-family:var(--f-display);font-weight:700;font-size:24px;text-transform:uppercase;letter-spacing:.03em;margin:0;text-wrap:balance;line-height:1.1}
+h3{font-family:var(--f-display);font-weight:600;font-size:18px;text-transform:uppercase;letter-spacing:.05em;margin:0;color:var(--muted)}
+p{margin:0}
+.muted{color:var(--muted)} .small{font-size:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.row > *{min-width:0}
+.field{display:grid;gap:4px;flex:1 1 140px}
+.field > span{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+input[type=text],input[type=number],input[type=search],select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px}
+textarea{min-height:90px;resize:vertical;font-size:15px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
+.btn.primary{background:var(--honey);color:var(--honey-ink);border-color:var(--honey)}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted)}
+.btn.danger{color:var(--bad)}
+.btn.armed{background:var(--bad);color:#fff;border-color:var(--bad)}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.5;cursor:default}
+a{color:var(--blue)}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:8px;background:var(--sunk);color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}
+
+/* match picker */
+.chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.chips .col{display:grid;gap:10px;align-content:start;min-width:0}
+.chips .colhead{font-family:var(--f-display);font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.chips .col.red .colhead{color:var(--red)} .chips .col.blue .colhead{color:var(--blue)}
+.chip{border:2px solid transparent;border-radius:var(--r);padding:12px;text-align:left;display:grid;gap:2px;min-height:76px;position:relative}
+.chip.red{background:var(--red-soft);border-color:var(--red)} .chip.blue{background:var(--blue-soft);border-color:var(--blue)}
+.chip .st{font-family:var(--f-display);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.chip.red .st{color:var(--red)} .chip.blue .st{color:var(--blue)}
+.chip .tn{font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.chip .nm{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip .done{position:absolute;top:8px;right:8px;font-size:12px;font-weight:700;background:var(--surface);border-radius:999px;padding:2px 8px;color:var(--good)}
+.chip.mine{box-shadow:0 0 0 3px var(--honey)}
+
+/* scouting form */
+.who{display:flex;align-items:center;gap:12px;border-radius:var(--r);padding:12px 14px;border-left:8px solid var(--line);background:var(--surface);border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.who.red{border-left-color:var(--red)} .who.blue{border-left-color:var(--blue)}
+.who .m{font-family:var(--f-display);font-weight:700;font-size:15px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.who .t{font-family:var(--f-display);font-weight:700;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.who .n{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who > div{min-width:0;flex:1}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--sunk);border-radius:var(--r);padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:7px;min-height:48px;font-family:var(--f-display);font-weight:700;font-size:20px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.seg small{font-family:var(--f-body);font-size:12px;font-weight:600;letter-spacing:0;display:block;text-transform:none;opacity:.8}
+.ctrs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctr{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px;display:grid;gap:6px;min-width:0}
+.ctr label{font-family:var(--f-display);font-weight:700;font-size:16px;letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.ctr label i{width:12px;height:12px;border-radius:50%;flex:none}
+.ctr-val{text-align:center;font-family:var(--f-display);font-weight:700;font-size:38px!important;line-height:1;padding:2px!important;min-height:50px!important;background:transparent!important;border-color:transparent!important;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.ctr-val::-webkit-outer-spin-button,.ctr-val::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.ctr-val:focus{border-color:var(--honey)!important;background:var(--bg)!important}
+.ctr-btns{display:grid;grid-template-columns:1fr 2fr;gap:6px}
+.ctr-btns button{border:0;border-radius:8px;min-height:58px;font-family:var(--f-display);font-weight:700;font-size:26px;touch-action:manipulation;user-select:none}
+.ctr-btns .minus{background:var(--sunk);color:var(--muted)}
+.k-flower .plus{background:var(--honey);color:var(--honey-ink)} .k-flower label i{background:var(--honey)}
+.k-miss .plus{background:var(--sunk);color:var(--ink);box-shadow:inset 0 0 0 2px var(--muted)} .k-miss label i{background:var(--muted)}
+.k-pollen .plus{background:var(--pollen);color:var(--pollen-ink)} .k-pollen label i{background:var(--pollen)}
+.k-nectar .plus{background:var(--nectar,var(--blue));color:#fff} .k-nectar label i{background:var(--nectar,var(--blue))}
+.ctr-btns button:active{transform:scale(.97)}
+h3.grp{display:flex;align-items:center;gap:8px;color:var(--ink);margin-bottom:-4px}
+h3.grp i{width:14px;height:14px;border-radius:50%;flex:none}
+.tally{display:grid;grid-template-columns:minmax(0,1fr) repeat(3,auto);gap:4px 16px;font-size:14px;font-variant-numeric:tabular-nums;align-items:center}
+.tally b{font-family:var(--f-display);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tally span{text-align:right}
+.tally span.tl{text-align:left;color:var(--muted)}
+.tally b.tt{color:var(--ink);font-family:var(--f-body);font-size:14px;letter-spacing:0;font-weight:700}
+.check{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 12px;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);font-weight:600;cursor:pointer}
+.check input{width:24px;height:24px;accent-color:var(--honey);flex:none}
+.check small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.check.big{border:2px solid var(--honey);background:var(--honey-soft);min-height:64px;font-size:19px;font-family:var(--f-display);letter-spacing:.04em;text-transform:uppercase}
+.check.big small{font-family:var(--f-body);text-transform:none;letter-spacing:0;color:var(--ink);opacity:.75}
+.check.big input{width:32px;height:32px}
+.check.big:has(input:checked){background:var(--honey);color:var(--honey-ink)}
+.check.big:has(input:checked) small{color:var(--honey-ink)}
+.remind{border:2px solid var(--warn);background:var(--surface);border-radius:var(--r);padding:12px 14px;display:grid;gap:10px}
+.savebar{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.savebar .btn{min-height:56px;font-size:18px}
+
+/* tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{padding:9px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+th{font-family:var(--f-display);font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:13px;color:var(--muted);background:var(--sunk);position:sticky;top:0}
+th button{border:0;background:none;padding:0;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit}
+th[aria-sort] button{color:var(--ink)}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--bg)}
+tr.sel td{background:var(--honey-soft)!important}
+td.tn{font-family:var(--f-display);font-weight:700;font-size:17px}
+td.nm{max-width:150px;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.yes{color:var(--good);font-weight:700}
+.dim{color:var(--muted)}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--honey);vertical-align:middle;margin-left:6px}
+
+.entry{display:grid;gap:4px;padding:10px 0;border-top:1px solid var(--line)}
+.entry:first-child{border-top:0;padding-top:0}
+.entry .h{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--sunk);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tag.red{background:var(--red-soft);color:var(--red)} .tag.blue{background:var(--blue-soft);color:var(--blue)} .tag.good{color:var(--good)}
+.evlist{display:grid;gap:8px}
+.ev{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.ev > div{flex:1 1 160px;min-width:0}
+.ev.cur{border-color:var(--honey);background:var(--honey-soft)}
+.ev b{display:block;font-family:var(--f-display);font-size:18px;letter-spacing:.03em}
+.pub{border-color:var(--honey);background:var(--honey-soft)}
+.seg.sm button{min-height:40px;font-size:16px}
+.seg.sm button small{font-size:11px}
+.tag.lg{background:var(--honey-soft);color:var(--honey-ink)}
+:root[data-theme="dark"] .tag.lg{color:var(--honey)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tag.lg{color:var(--honey)}}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.preview{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--sunk)}
+.preview.ok{color:var(--good)} .preview.bad{color:var(--bad)}
+.empty{text-align:center;padding:28px 16px;display:grid;gap:12px;justify-items:center}
+.empty svg{width:56px;height:56px}
+ol.steps{margin:0;padding-left:20px;display:grid;gap:6px;font-size:15px}
+#toast{position:fixed;left:50%;top:calc(124px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:15px;z-index:20;max-width:calc(100% - 32px);text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+@media (max-width:380px){.ctr-val{font-size:38px!important}.ctr-btns button{min-height:58px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.ctr-btns button:active{transform:none}}
+</style>
+<template id="shell" data-keep="">
+<header class="top"><div class="wrap">
+  <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l12 7v14l-12 7-12-7V9z" fill="var(--honey)"></path><path d="M16 9l6 3.5v7L16 23l-6-3.5v-7z" fill="var(--surface)"></path><circle cx="16" cy="16" r="3" fill="var(--honey)"></circle></svg>
+  <div class="brand"><b>BioBuzz Scout</b><span id="evname">No event selected</span></div>
+  <button class="pill" id="syncpill" data-go="sync"><i></i><span>Starting…</span></button>
+</div>
+<nav class="tabs" aria-label="Sections"><div class="wrap">
+  <button class="tab" data-go="scout">Scout</button>
+  <button class="tab" data-go="teams">Teams</button>
+  <button class="tab" data-go="event">Event</button>
+  <button class="tab" data-go="sync">Sync</button>
+</div></nav></header>
+
+<main class="wrap" id="app"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+</template>
+<script type="application/json" id="seed" data-keep="seed">{"events":[]}</script>
+<script data-keep="">
+document.body.appendChild(document.getElementById('shell').content.cloneNode(true));
+/* ---------- storage (per-device, offline) ---------- */
+const LS={
+  get(k,d){try{const v=localStorage.getItem('bbz.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('bbz.'+k,JSON.stringify(v))}catch(e){}}
+};
+/* some browsers (signed-out visitors, private windows) refuse storage: then entries live only until the page reloads */
+let STORE_OK=true;try{localStorage.setItem('bbz.t','1');STORE_OK=localStorage.getItem('bbz.t')==='1';localStorage.removeItem('bbz.t')}catch(e){STORE_OK=false}
+const S={
+  events:LS.get('events',{}), entries:LS.get('entries',{}), outbox:LS.get('outbox',{}),
+  cur:LS.get('cur',null), scout:LS.get('scout',''), station:LS.get('station',''),
+  draft:LS.get('draft',null), view:'scout', phase:'auto', pickMatch:LS.get('pickMatch',''),
+  db:null, dl:null, dbState:'connecting', readOnly:false, quota:false, flushing:false, unsubE:null,
+  sort:{k:'totL',d:-1}, detail:null, armed:null,
+  setup:{season:'2026',code:'',name:'',group:'',teamsText:'',schedText:'',editing:null}, importText:'',
+  art:null, canPublish:false, publishing:false, scope:LS.get('scope','event'), subSig:'', sentAt:LS.get('sentAt',0)
+};
+function persist(){LS.set('events',S.events);LS.set('entries',S.entries);LS.set('outbox',S.outbox);LS.set('cur',S.cur);LS.set('scout',S.scout);LS.set('station',S.station);LS.set('pickMatch',S.pickMatch);LS.set('scope',S.scope)}
+function saveDraft(){LS.set('draft',S.draft)}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+/* per period: pL/pM = pollen launched/missed, nL/nM = nectar launched/missed, pF/nF = pollen/nectar loaded into flowers */
+const PH=['pL','pM','nL','nM','pF','nF'];
+const blank=()=>({pL:0,pM:0,nL:0,nM:0,pF:0,nF:0});
+function normPhase(o){o=o||{};const r=blank();for(const k of PH)r[k]=+o[k]||0;if(o.pollen!=null&&o.pF==null)r.pF=+o.pollen||0;if(o.nectar!=null&&o.nF==null)r.nF=+o.nectar||0;return r}
+function normEntry(e){if(!e)return e;return {...e,auto:normPhase(e.auto),tele:normPhase(e.tele)}}
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('on'),2200)}
+function buzz(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}}
+
+const curEvent=()=>{const e=S.events[S.cur];return e&&!e.deleted?e:null};
+function teamName(n,ev=curEvent()){const t=ev&&ev.teams.find(t=>t.n==n);return t?t.name:''}
+const evEntries=()=>Object.values(S.entries).filter(e=>e.event===S.cur&&!e.deleted).map(normEntry);
+const pending=()=>Object.keys(S.outbox).length;
+/* leagues: events with the same League name share data; an event with no league stands alone */
+const gkey=g=>String(g||'').trim().toLowerCase();
+const leagueOf=ev=>ev?String(ev.group||'').trim():'';
+const liveEvents=()=>Object.values(S.events).filter(e=>!e.deleted);
+function leagueKeys(ev){const g=gkey(leagueOf(ev));return g?liveEvents().filter(e=>gkey(e.group)===g).map(e=>e.key):(ev?[ev.key]:[])}
+function scopeKeys(){const ev=curEvent();if(!ev)return [];return S.scope==='league'&&leagueOf(ev)?leagueKeys(ev):[ev.key]}
+function entriesFor(keys){const k=new Set(keys);return Object.values(S.entries).filter(e=>k.has(e.event)&&!e.deleted).map(normEntry)}
+function teamNameIn(n,keys){for(const k of keys){const t=(S.events[k]||{teams:[]}).teams.find(t=>t.n==n);if(t&&t.name)return t.name}return ''}
+function leagueNames(){const m=new Map();for(const e of liveEvents()){const g=leagueOf(e);if(g&&!m.has(gkey(g)))m.set(gkey(g),g)}return [...m.values()].sort()}
+
+/* ---------- parsing imports ---------- */
+function walk(o,fn){if(Array.isArray(o))o.forEach(x=>walk(x,fn));else if(o&&typeof o==='object'){fn(o);Object.values(o).forEach(v=>walk(v,fn))}}
+function tryJSON(t){t=t.trim();if(!/^[\[{]/.test(t))return null;try{return JSON.parse(t)}catch(e){return null}}
+
+function parseTeams(text){
+  const out=new Map();const j=tryJSON(text);
+  if(j){walk(j,o=>{const n=+(o.teamNumber??o.number);if(n>0&&n<100000&&!o.station&&!o.alliance){const nm=o.nameShort||o.teamName||o.name||(o.team&&o.team.name)||'';if(!out.has(n)||nm)out.set(n,String(nm||out.get(n)||''))}});}
+  else{
+    const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    for(let i=0;i<lines.length;i++){
+      const l=lines[i];let m=l.match(/^(\d{1,5})\s*[\t,|;]\s*([^\t,|;]+)/)||l.match(/^(\d{1,5})\s+(.*\D.*)$/);
+      if(m){out.set(+m[1],m[2].trim());continue}
+      if(/^\d{1,5}$/.test(l)){const nx=lines[i+1];if(nx&&!/^\d+$/.test(nx)){out.set(+l,nx.split('\t')[0].trim());i++}else out.set(+l,'')}
+    }
+  }
+  return [...out].filter(([n])=>n>0).map(([n,name])=>({n,name})).sort((a,b)=>a.n-b.n);
+}
+
+function labelFor(level,num){const lv=String(level||'').toLowerCase();if(!lv||lv.startsWith('qual'))return 'Q'+num;if(lv.startsWith('final'))return 'F'+num;return 'P'+num}
+function parseSchedule(text){
+  const j=tryJSON(text);const out=[];
+  if(j){
+    walk(j,o=>{
+      if(!Array.isArray(o.teams)||!o.teams.length||o.teams[0].teamNumber==null)return;
+      const red=[],blue=[];
+      for(const t of o.teams){const s=String(t.alliance||t.station||'');const n=+t.teamNumber;if(!n)continue;if(/^red/i.test(s))red.push(n);else if(/^blue/i.test(s))blue.push(n)}
+      if(!red.length&&!blue.length)return;
+      const num=o.matchNumber??o.matchNum??o.series??(String(o.description||'').match(/\d+/)||[0])[0];
+      const level=o.tournamentLevel||o.level||(/qual/i.test(o.description||'')?'qual':'');
+      out.push({label:labelFor(level,num),num:+num,level:String(level||'qual'),red,blue});
+    });
+  }else{
+    let cur=null;const flush=()=>{if(cur&&cur.nums.length>=4){out.push({label:cur.label||('Q'+(out.length+1)),num:cur.num||out.length+1,level:cur.level,red:cur.nums.slice(0,2),blue:cur.nums.slice(2,4)})}cur=null};
+    for(let raw of text.split(/\r?\n/)){
+      let l=raw.replace(/\d{1,2}:\d{2}(:\d{2})?\s*([ap]\.?m\.?)?/gi,' ').replace(/\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b/g,' ').replace(/\*/g,'');
+      if(!l.trim())continue;
+      const lab=l.match(/\b(qualification|qual|q|semi-?final|final|playoff|match|m)\s*#?\s*-?\s*(\d{1,3})\b/i);
+      if(lab){flush();const w=lab[1].toLowerCase();const level=w.startsWith('q')||w==='match'||w==='m'?'qual':(w.startsWith('final')?'final':'playoff');cur={label:labelFor(level,+lab[2]),num:+lab[2],level,nums:[]};l=l.slice(lab.index+lab[0].length)}
+      const nums=(l.match(/\b\d{1,5}\b/g)||[]).map(Number).filter(n=>n>0);
+      if(!cur){
+        if(nums.length>=5){out.push({label:'Q'+nums[0],num:nums[0],level:'qual',red:nums.slice(1,3),blue:nums.slice(3,5)});continue}
+        if(nums.length===4){out.push({label:'Q'+(out.length+1),num:out.length+1,level:'qual',red:nums.slice(0,2),blue:nums.slice(2,4)});continue}
+        continue;
+      }
+      for(const n of nums){if(cur.nums.length<4)cur.nums.push(n)}
+      if(cur.nums.length>=4)flush();
+    }
+    flush();
+  }
+  const seen=new Map();for(const m of out)seen.set(m.label,m);
+  const lvOrder=l=>/^q/i.test(l)?0:/^f/i.test(l)?2:1;
+  return [...seen.values()].sort((a,b)=>lvOrder(a.label)-lvOrder(b.label)||a.num-b.num);
+}
+
+/* ---------- shared store (online merge) ---------- */
+function newerThan(a,b){return !b||(a.updatedAt||0)>(b.updatedAt||0)}
+function mergeEntry(r){if(!r||!r.id)return false;const l=S.entries[r.id];if(S.outbox['e:'+r.id]&&l&&(l.updatedAt||0)>=(r.updatedAt||0))return false;if(newerThan(r,l)){S.entries[r.id]=r;return true}return false}
+function mergeEvent(r){if(!r||!r.key)return false;const l=S.events[r.key];if(S.outbox['v:'+r.key]&&l&&(l.updatedAt||0)>=(r.updatedAt||0))return false;if(newerThan(r,l)){S.events[r.key]=r;return true}return false}
+function queue(kind,id){S.outbox[kind+':'+id]=1;persist();renderStatus();flushSoon()}
+function withTimeout(p,ms){return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej({code:'timeout'}),ms))])}
+let flushT=null;function flushSoon(){clearTimeout(flushT);flushT=setTimeout(flush,400)}
+async function flush(){
+  if(!S.db||S.flushing||S.readOnly||!pending()||navigator.onLine===false){renderStatus();return}
+  S.flushing=true;renderStatus();
+  try{
+    for(const key of Object.keys(S.outbox)){
+      const [kind,id]=[key.slice(0,1),key.slice(2)];
+      const body=kind==='e'?S.entries[id]:S.events[id];
+      if(!body){delete S.outbox[key];continue}
+      try{
+        await withTimeout(S.db.collection(kind==='e'?'entries':'events').doc(id).set(JSON.parse(JSON.stringify(body))),15000);
+        delete S.outbox[key];persist();
+      }catch(e){
+        if(e&&e.code==='invalid_argument'){S.readOnly=true;break}
+        if(e&&e.code==='quota_exceeded'){S.quota=true;break}
+        if(e&&e.code==='revoked'){S.dbState='none';break}
+        break; // offline / transient: keep in outbox and try later
+      }
+    }
+  }finally{S.flushing=false;renderStatus()}
+}
+function subEvents(){
+  S.db.collection('events').onSnapshot(snap=>{let ch=false;for(const d of snap.docs)if(mergeEvent(d.data()))ch=true;if(ch){persist();if(leagueKeys(curEvent()).slice(0,30).join('|')!==S.subSig)subEntries();softRender()}},()=>{S.dbState='error';renderStatus()});
+}
+function subEntries(){
+  if(S.unsubE){try{S.unsubE()}catch(e){}S.unsubE=null}
+  S.subSig='';
+  if(!S.db||!curEvent())return;
+  const keys=leagueKeys(curEvent()).slice(0,30);S.subSig=keys.join('|');
+  const q=keys.length>1?S.db.collection('entries').where('event','in',keys):S.db.collection('entries').where('event','==',keys[0]);
+  S.unsubE=q.onSnapshot(snap=>{let ch=false;for(const d of snap.docs)if(mergeEntry(d.data()))ch=true;if(ch){persist();softRender()}},()=>{S.dbState='error';renderStatus()});
+}
+async function connect(){
+  let db=null,dl=null;
+  try{db=window.claude&&window.claude.use?await window.claude.use('db'):null}catch(e){db=null}
+  try{dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null}catch(e){dl=null}
+  S.dl=dl;
+  try{const art=window.claude&&window.claude.use?await window.claude.use('artifact'):null;const user=window.claude&&window.claude.use?await window.claude.use('user'):null;
+    S.art=art;S.canPublish=!!(art&&user&&await user.canEdit());if(S.view==='event')softRender()}catch(e){S.canPublish=false}
+  if(!db){S.dbState='none';renderStatus();if(S.view==='sync')render();return}
+  S.db=db;S.dbState='ok';subEvents();subEntries();flush();renderStatus();if(S.view==='sync')render();
+}
+window.addEventListener('online',()=>{renderStatus();flush()});
+window.addEventListener('offline',renderStatus);
+setInterval(()=>{if(pending())flush()},20000);
+
+function renderStatus(){
+  const p=pending(),pill=$('#syncpill'),t=pill.querySelector('span');pill.className='pill';
+  if(S.dbState==='connecting'){t.textContent='Starting…'}
+  else if(S.dbState==='none'){const u=unsentCount();pill.classList.add(u?'wait':'ok');t.textContent=u?`On this phone · ${u} to send`:'On this phone · all sent'}
+  else if(S.readOnly){pill.classList.add('bad');t.textContent='View only'}
+  else if(S.quota){pill.classList.add('bad');t.textContent='Storage full'}
+  else if(navigator.onLine===false){pill.classList.add('wait');t.textContent=p?`Offline · ${p} waiting`:'Offline'}
+  else if(p){pill.classList.add('wait');t.textContent=`Syncing ${p}`}
+  else if(S.dbState==='error'){pill.classList.add('bad');t.textContent='Sync paused'}
+  else{pill.classList.add('ok');t.textContent='Synced'}
+  const ev=curEvent();$('#evname').textContent=ev?`${ev.name||ev.code}${leagueOf(ev)?' · '+leagueOf(ev):''} · ${ev.season}-${String(+ev.season+1).slice(2)}`:'No event selected';
+  document.querySelectorAll('.tab').forEach(b=>{b.setAttribute('aria-current',b.dataset.go===S.view?'page':'false');const d=b.querySelector('.dot');if(d)d.remove();const dn=S.dbState==='none'?unsentCount():p;if(b.dataset.go==='sync'&&dn){const s=document.createElement('span');s.className='dot';s.textContent=dn;b.appendChild(s)}});
+}
+function softRender(){if(S.view==='scout'&&S.draft){renderStatus();return}const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&$('#app').contains(a)){renderStatus();return}render()}
+
+/* ---------- views ---------- */
+const hexEmpty='<svg viewBox="0 0 56 56" aria-hidden="true"><path d="M28 4l20 11.5v23L28 50 8 38.5v-23z" fill="none" stroke="var(--honey)" stroke-width="3"/><path d="M28 18l9 5v10l-9 5-9-5V23z" fill="var(--honey-soft)" stroke="var(--honey)" stroke-width="2"/></svg>';
+
+function render(){
+  renderStatus();
+  const v=S.view;const app=$('#app');
+  app.innerHTML=v==='scout'?vScout():v==='teams'?vTeams():v==='event'?vEvent():vSync();
+  if(v==='scout'&&S.draft)applyNectarColor();
+}
+function applyNectarColor(){const f=$('#app');if(!f)return;f.style.setProperty('--nectar',S.draft.alliance==='red'?'var(--red)':'var(--blue)')}
+
+function vScout(){
+  const ev=curEvent();
+  if(!ev)return `<section class="panel empty">${hexEmpty}<h2>Load your event</h2><p class="muted">Paste the event setup code from your lead scout on the Sync tab. Or add the event's teams and schedule yourself on the Event tab.</p><div class="btnrow" style="justify-content:center"><button class="btn primary" data-go="sync">Paste setup code</button><button class="btn" data-go="event">Add event</button></div></section>`;
+  if(S.draft&&S.draft.event===S.cur)return vForm();
+  const done=new Map();for(const e of evEntries()){const k=e.match+'|'+e.team;done.set(k,(done.get(k)||[]).concat(e.scout||'?'))}
+  const opts=ev.matches.map(m=>{const c=[...m.red,...m.blue].filter(t=>done.has(m.label+'|'+t)).length;return `<option value="${esc(m.label)}" ${m.label===S.pickMatch?'selected':''}>${esc(m.label)}  ·  ${c}/${m.red.length+m.blue.length} scouted</option>`}).join('');
+  if(!S.pickMatch&&ev.matches.length)S.pickMatch=ev.matches[0].label;
+  const m=ev.matches.find(x=>x.label===S.pickMatch);
+  let chips='';
+  if(m){
+    const chip=(t,al,i)=>{const k=m.label+'|'+t;const who=done.get(k);const st=al+i;return `<button class="chip ${al} ${S.station===st?'mine':''}" data-pick="${t}" data-al="${al}" data-st="${st}"><span class="st">${al} ${i+1}</span><span class="tn">${t}</span><span class="nm">${esc(teamName(t))||'&nbsp;'}</span>${who?`<span class="done">✓ ${esc(who.join(', '))}</span>`:''}</button>`};
+    chips=`<div class="chips"><div class="col red"><span class="colhead">Red alliance</span>${m.red.map((t,i)=>chip(t,'red',i)).join('')}</div><div class="col blue"><span class="colhead">Blue alliance</span>${m.blue.map((t,i)=>chip(t,'blue',i)).join('')}</div></div><p class="small muted">Gold outline = your usual station. It stays selected match to match.</p>`;
+  }
+  return `${reminderHTML()}${STORE_OK?'':'<div class="preview bad">This browser isn\'t saving your entries. Send your export code from the Sync tab after every few matches.</div>'}
+  <section class="panel">
+    <div class="row">
+      <label class="field"><span>Scout name</span><input type="text" id="scoutName" value="${esc(S.scout)}" placeholder="Your name" autocomplete="name"></label>
+      ${ev.matches.length?`<label class="field"><span>Match</span><select id="matchSel">${opts}</select></label>`:''}
+    </div>
+    ${ev.matches.length?`<h3>Pick the robot you're watching</h3>${chips}`:'<p class="muted small">No schedule loaded for this event. Enter the match and team below, or load the schedule on the Event tab.</p>'}
+  </section>
+  <section class="panel">
+    <h3>Not on the schedule?</h3>
+    <div class="row">
+      <label class="field"><span>Match #</span><input type="number" inputmode="numeric" id="manMatch" min="1" placeholder="12"></label>
+      <label class="field"><span>Team #</span><input type="number" inputmode="numeric" id="manTeam" min="1" placeholder="12345"></label>
+      <label class="field"><span>Alliance</span><select id="manAl"><option value="red">Red</option><option value="blue">Blue</option></select></label>
+      <button class="btn" data-act="manual">Start</button>
+    </div>
+  </section>`;
+}
+
+function ctr(p,k,label,kind){const v=S.draft[p][k];return `<div class="ctr k-${kind}"><label for="c-${p}-${k}"><i></i>${label}</label><input id="c-${p}-${k}" class="ctr-val" type="number" inputmode="numeric" min="0" value="${v}" data-p="${p}" data-k="${k}" aria-label="${label} total"><div class="ctr-btns"><button class="minus" data-act="dec" data-p="${p}" data-k="${k}" aria-label="${label} minus one">−</button><button class="plus" data-act="inc" data-p="${p}" data-k="${k}" aria-label="${label} plus one">+1</button></div></div>`}
+const TALLY=[['pL','Pollen launched'],['pM','Pollen missed'],['nL','Nectar launched'],['nM','Nectar missed'],['pF','Pollen into flowers'],['nF','Nectar into flowers']];
+function tallyHTML(){const d=S.draft;return `<b></b><b style="text-align:right">Auto</b><b style="text-align:right">Teleop</b><b style="text-align:right">Total</b>${TALLY.map(([k,lab])=>`<span class="tl">${lab}</span><span>${d.auto[k]}</span><span>${d.tele[k]}</span><span><b class="tt">${d.auto[k]+d.tele[k]}</b></span>`).join('')}`}
+function vForm(){
+  const d=S.draft;const p=S.phase;
+  return `
+  <div class="who ${d.alliance}"><div><div class="m">${esc(d.match)} · ${d.alliance} alliance${d.id?' · editing':''}</div><div class="t">${d.team}</div><div class="n">${esc(teamName(d.team))||'&nbsp;'}</div></div><button class="btn ghost" data-act="${S.armed==='change'?'change-confirm':'change'}">${S.armed==='change'?'Discard?':'Change'}</button></div>
+  <label class="check big"><input type="checkbox" id="canEmpty" ${d.canEmpty?'checked':''}><span>Can empty flowers<small>Tick it the moment this robot clears a Flower</small></span></label>
+  <div class="seg" role="group" aria-label="Match period">
+    <button data-phase="auto" aria-pressed="${p==='auto'}">Auto<small>first 30 s</small></button>
+    <button data-phase="tele" aria-pressed="${p==='tele'}">Teleop<small>driver control</small></button>
+  </div>
+  <h3 class="grp"><i style="background:var(--pollen)"></i>Pollen launches</h3>
+  <div class="ctrs">${ctr(p,'pL','Scored','pollen')}${ctr(p,'pM','Missed','miss')}</div>
+  <h3 class="grp"><i style="background:var(--nectar)"></i>Nectar launches</h3>
+  <div class="ctrs">${ctr(p,'nL','Scored','nectar')}${ctr(p,'nM','Missed','miss')}</div>
+  <h3 class="grp"><i style="background:var(--honey)"></i>Loaded into flowers</h3>
+  <div class="ctrs">${ctr(p,'pF','Pollen','flower')}${ctr(p,'nF','Nectar','flower')}</div>
+  <p class="small muted">Tap any number to type a total from a paper sheet.</p>
+  <div class="panel"><div class="tally" id="tally">${tallyHTML()}</div></div>
+  <label class="check"><input type="checkbox" id="paper" ${d.paper?'checked':''}><span>Transferred from paper<small>Totals typed in after the match</small></span></label>
+  <label class="field"><span>Notes</span><textarea id="notes" placeholder="Defense, breakdowns, driver skill…">${esc(d.notes)}</textarea></label>
+  <div class="savebar"><button class="btn" data-act="${S.armed==='reset'?'reset-confirm':'reset'}">${S.armed==='reset'?'Zero all?':'Reset'}</button><button class="btn primary" data-act="save">${d.id?'Save changes':'Save entry'}</button></div>`;
+}
+
+function teamStats(keys=scopeKeys()){
+  const by=new Map();
+  for(const k of keys)for(const t of (S.events[k]||{teams:[]}).teams){if(!by.has(+t.n))by.set(+t.n,{n:+t.n,name:t.name,list:[],ev:new Set()});else if(!by.get(+t.n).name)by.get(+t.n).name=t.name}
+  for(const e of entriesFor(keys)){if(!by.has(+e.team))by.set(+e.team,{n:+e.team,name:teamNameIn(e.team,keys),list:[],ev:new Set()});const r=by.get(+e.team);r.list.push(e);r.ev.add(e.event)}
+  return [...by.values()].map(r=>{
+    const m=r.list.length,s=f=>r.list.reduce((a,e)=>a+(+f(e)||0),0);
+    const avg=v=>m?v/m:null,acc=(h,x)=>h+x?h/(h+x):null;
+    const o={...r,m,empty:r.list.filter(e=>e.canEmpty).length};
+    for(const [ph,P] of [['auto','a'],['tele','t']]){
+      const pL=s(e=>e[ph].pL),pM=s(e=>e[ph].pM),nL=s(e=>e[ph].nL),nM=s(e=>e[ph].nM);
+      o[P+'pL']=avg(pL);o[P+'pA']=acc(pL,pM);o[P+'nL']=avg(nL);o[P+'nA']=acc(nL,nM);
+    }
+    const allL=s(e=>e.auto.pL+e.auto.nL+e.tele.pL+e.tele.nL),allM=s(e=>e.auto.pM+e.auto.nM+e.tele.pM+e.tele.nM);
+    o.totL=avg(allL);o.totA=acc(allL,allM);
+    o.pF=avg(s(e=>e.auto.pF+e.tele.pF));o.nF=avg(s(e=>e.auto.nF+e.tele.nF));
+    return o;
+  });
+}
+const f1=v=>v==null?'<span class="dim">–</span>':v.toFixed(1);
+const pct=v=>v==null?'<span class="dim">–</span>':Math.round(v*100)+'%';
+function vTeams(){
+  const ev=curEvent();
+  if(!ev)return `<section class="panel empty">${hexEmpty}<h2>No event yet</h2><p class="muted">Set up an event to see team averages.</p><button class="btn primary" data-go="event">Set up event</button></section>`;
+  const keys=scopeKeys();const lg=leagueOf(ev);const lgKeys=leagueKeys(ev);const isLg=keys.length>1||(S.scope==='league'&&lg);
+  const rows=teamStats(keys);const {k,d}=S.sort;
+  rows.sort((a,b)=>{const x=a[k],y=b[k];if(k==='name')return d*String(x).localeCompare(String(y));if(x==null&&y==null)return a.n-b.n;if(x==null)return 1;if(y==null)return -1;return d*(x-y)||a.n-b.n});
+  const maxT=Math.max(1,...rows.map(r=>r.totL||0));
+  const cols=[['n','Team','l'],['name','Name','l'],['m','M'],['totL','All L'],['totA','All %'],['apL','Auto P'],['apA','P %'],['anL','Auto N'],['anA','N %'],['tpL','Tele P'],['tpA','P %'],['tnL','Tele N'],['tnA','N %'],['pF','P→Fl'],['nF','N→Fl'],['empty','Empties']];
+  const fmt={totA:pct,apA:pct,anA:pct,tpA:pct,tnA:pct};
+  const ents=entriesFor(keys);const matchesCovered=new Set(ents.map(e=>e.event+'|'+e.match)).size;
+  const scopeBar=lg&&lgKeys.length>1?`<div class="seg sm" role="group" aria-label="Data shown"><button data-scope="event" aria-pressed="${!isLg}">This event<small>${esc(ev.code)}</small></button><button data-scope="league" aria-pressed="${!!isLg}">Whole league<small>${esc(lg)} · ${lgKeys.length} events</small></button></div>`:(lg?`<p class="small muted">Part of <b>${esc(lg)}</b>. Add the league's other events with the same league name to combine their data here.</p>`:'');
+  const detail=S.detail!=null?rows.find(r=>r.n==S.detail):null;
+  return `
+  <section class="row" style="align-items:center"><div style="flex:1;min-width:0"><h2>Team averages</h2><p class="small muted">${isLg?`${esc(lg)} · ${keys.length} events · `:''}${ents.length} entries · ${matchesCovered}${!isLg&&ev.matches.length?' of '+ev.matches.length:''} matches covered · per-match averages · L = scored launches, P = pollen, N = nectar, % = scored ÷ attempts, →Fl = loaded into flowers</p></div><button class="btn" data-act="csv">Save CSV</button></section>
+  ${scopeBar}
+  ${detail?vDetail(detail,isLg):''}
+  <div class="tablewrap"><table><thead><tr>${cols.map(([key,lab,cl])=>`<th class="${cl||''}" ${k===key?`aria-sort="${d<0?'descending':'ascending'}"`:''}><button data-sort="${key}">${lab}${k===key?(d<0?' ↓':' ↑'):''}</button></th>`).join('')}</tr></thead>
+  <tbody>${rows.map(r=>`<tr data-team="${r.n}" class="${S.detail==r.n?'sel':''}"><td class="tn">${r.n}</td><td class="l nm">${esc(r.name)}</td><td>${r.m||'<span class="dim">0</span>'}</td><td>${f1(r.totL)}${r.totL?`<span class="bar" style="width:${Math.round(28*r.totL/maxT)}px"></span>`:''}</td>${cols.slice(4,15).map(([key])=>`<td>${(fmt[key]||f1)(r[key])}</td>`).join('')}<td>${r.m?(r.empty?`<span class="yes">✓ ${r.empty}/${r.m}</span>`:'<span class="dim">0/'+r.m+'</span>'):'<span class="dim">–</span>'}</td></tr>`).join('')}</tbody></table></div>
+  <p class="small muted">Tap a column to sort. Tap a team to see and fix its entries.</p>
+  <section class="panel"><h3>Raw data</h3>
+    <p class="small muted">One row per scouted match, oldest first, with every counter. Open it in Excel or Google Sheets to follow a team's progress.</p>
+    <div class="btnrow"><button class="btn" data-raw="event">This event</button>${lg?`<button class="btn" data-raw="league">${esc(lg)}</button>`:''}<button class="btn" data-raw="season">Whole ${ev.season}-${String(+ev.season+1).slice(2)} season</button></div>
+    <p class="small muted">The season file includes league and non-league events. Its League column keeps them apart.</p>
+  </section>`;
+}
+function vDetail(r,isLg){
+  const list=r.list.slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  return `<section class="panel"><div class="row" style="align-items:center"><div style="flex:1;min-width:0"><h2>${r.n} <span class="muted" style="font-size:18px">${esc(r.name)}</span></h2></div><button class="btn ghost" data-act="close-detail">Close</button></div>
+  ${list.length?list.map(e=>`<div class="entry"><div class="h">${isLg?`<span class="tag">${esc((S.events[e.event]||{}).code||e.event)}</span>`:''}<b>${esc(e.match)}</b><span class="tag ${e.alliance}">${e.alliance}</span>${e.canEmpty?'<span class="tag good">empties</span>':''}${e.paper?'<span class="tag">paper</span>':''}<span class="small muted">by ${esc(e.scout||'?')}</span></div>
+  <div class="small">Auto: pollen ${e.auto.pL}/${e.auto.pL+e.auto.pM}, nectar ${e.auto.nL}/${e.auto.nL+e.auto.nM} · Teleop: pollen ${e.tele.pL}/${e.tele.pL+e.tele.pM}, nectar ${e.tele.nL}/${e.tele.nL+e.tele.nM} <span class="muted">(scored/attempts)</span></div>
+  <div class="small">Into flowers: pollen ${e.auto.pF+e.tele.pF}, nectar ${e.auto.nF+e.tele.nF}</div>
+  ${e.notes?`<div class="small muted">${esc(e.notes)}</div>`:''}
+  <div class="row"><button class="btn" data-edit="${e.id}">Edit</button><button class="btn ${S.armed==='del:'+e.id?'armed':'danger'}" data-del="${e.id}">${S.armed==='del:'+e.id?'Tap again to delete':'Delete'}</button></div></div>`).join(''):'<p class="muted">No entries yet for this team.</p>'}</section>`;
+}
+
+/* update the paste previews in place: redrawing the form while the paste box loses focus swallowed taps on Save */
+function refreshSetup(){if(S.view!=='event')return;const tmp=document.createElement('div');tmp.innerHTML=vEvent();for(const id of ['tPrev','mPrev','evLinks']){const a=document.getElementById(id),b=tmp.querySelector('#'+id);if(a&&b&&a.innerHTML!==b.innerHTML)a.innerHTML=b.innerHTML}const s=document.querySelector('#app [data-act=save-event]');if(s)s.disabled=!(S.setup.code.trim()&&S.setup.season.trim())}
+let refreshT=null;function refreshSoon(){clearTimeout(refreshT);refreshT=setTimeout(refreshSetup,300)}
+function vEvent(){
+  const st=S.setup;const code=st.code.trim().toUpperCase();const season=st.season.trim();
+  const tParsed=st.teamsText.trim()?parseTeams(st.teamsText):null;const mParsed=st.schedText.trim()?parseSchedule(st.schedText):null;
+  const evs=Object.values(S.events).filter(e=>!e.deleted).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  const links=code&&season?`<div class="links">
+    <a href="https://ftc-events.firstinspires.org/${encodeURIComponent(season)}/${encodeURIComponent(code)}/teams" target="_blank" rel="noopener">FTC Events · Teams</a>
+    <a href="https://ftc-events.firstinspires.org/${encodeURIComponent(season)}/${encodeURIComponent(code)}/qualifications" target="_blank" rel="noopener">FTC Events · Qual schedule</a>
+    <a href="https://api.ftcscout.org/rest/v1/events/${encodeURIComponent(season)}/${encodeURIComponent(code)}/matches" target="_blank" rel="noopener">FTCScout schedule data</a>
+  </div>`:`<p class="small muted">Find the event code on <a href="https://ftc-events.firstinspires.org/#allevents" target="_blank" rel="noopener">ftc-events.firstinspires.org</a>. It's the last part of the event's address, like USMIDEM1.</p>`;
+  const unpub=unpublishedCount();
+  const pubPanel=S.canPublish?`<section class="panel pub"><div class="row" style="align-items:center"><div style="flex:1 1 220px;min-width:0"><h3>Share with every scout</h3><p class="small muted">${unpub?`${unpub} event change${unpub===1?'':'s'} only on the shared list. Scouts without a Claude login won't see ${unpub===1?'it':'them'} until you publish.`:'Scouts without a Claude login have everything you see here.'}${SEED.publishedAt?` Last published ${new Date(SEED.publishedAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}.`:''}</p></div><button class="btn ${S.armed==='pub'?'armed':'primary'}" data-act="publish-page" ${S.publishing?'disabled':''}>${S.publishing?'Publishing…':S.armed==='pub'?'Tap again to publish':'Publish to everyone'}</button></div><p class="small muted">Builds the events on this phone into the page. Open pages reload, and scouts keep any entry they're in the middle of.</p></section>`:'';
+  return `
+  ${pubPanel}
+  ${evs.length?`<section class="panel"><h3>Send events to the iPads</h3><p class="small muted">Copies every event's teams and schedule, with no scouting entries. Scouts paste it on their Sync tab.</p><div class="btnrow"><button class="btn" data-act="copy-setup">Copy event setup code</button>${canSaveFiles()?'<button class="btn" data-act="file-setup">Save setup file</button>':''}</div><textarea id="setupBox" readonly hidden></textarea><p class="small muted">On the iPad: Sync, then paste the code and tap Merge, or tap Open backup file… and pick the setup file.</p></section>`:''}
+  ${evs.length?`<section class="panel"><h3>Events on this phone</h3><div class="evlist">${evs.map(e=>`<div class="ev ${e.key===S.cur?'cur':''}"><div><b>${esc(e.name||e.code)}</b><span class="small muted">${esc(e.code)} · ${e.teams.length} teams · ${e.matches.length} matches</span>${leagueOf(e)?` <span class="tag lg">${esc(leagueOf(e))}</span>`:' <span class="tag">Non-league</span>'}</div>${e.key===S.cur?'<span class="tag good">Current</span>':`<button class="btn" data-use="${esc(e.key)}">Use</button>`}<button class="btn ghost" data-editev="${esc(e.key)}">Edit</button><button class="btn ${S.armed==='delev:'+e.key?'armed':'ghost danger'}" data-delev="${esc(e.key)}">${S.armed==='delev:'+e.key?'Delete?':'Delete'}</button></div>`).join('')}</div></section>`:''}
+  <section class="panel">
+    <h2>${st.editing?'Update event':'Add an event'}</h2>
+    <div class="row">
+      <label class="field" style="flex:0 1 110px"><span>Season</span><input type="number" inputmode="numeric" id="suSeason" value="${esc(st.season)}"></label>
+      <label class="field"><span>Event code</span><input type="text" id="suCode" value="${esc(st.code)}" placeholder="USMIDEM1" autocapitalize="characters" ${st.editing?'readonly':''}></label>
+    </div>
+    <label class="field"><span>Event name</span><input type="text" id="suName" value="${esc(st.name)}" placeholder="Michigan Championship"></label>
+    <label class="field"><span>League</span><input type="text" id="suGroup" list="leagueList" value="${esc(st.group)}" placeholder="Leave blank for a non-league event" autocomplete="off"><datalist id="leagueList">${leagueNames().map(g=>`<option value="${esc(g)}"></option>`).join('')}</datalist></label>
+    <p class="small muted">Give every meet and the league tournament the same league name, and the Teams tab can combine them. Leave it blank for a non-league tournament, and its data stays separate.</p>
+    <p class="small muted">BioBuzz is the 2026–27 season, which FTC Events files under 2026.</p>
+    <div id="evLinks">${links}</div>
+  </section>
+  <section class="panel">
+    <h3>1 · Teams</h3>
+    <ol class="steps"><li>Open <b>FTC Events · Teams</b> above.</li><li>Select the team table, copy, and paste it here. A list like <code>12345 Gear Grinders</code>, one per line, works too.</li></ol>
+    <textarea id="suTeams" placeholder="Paste teams here">${esc(st.teamsText)}</textarea>
+    <div id="tPrev">${tParsed?`<div class="preview ${tParsed.length?'ok':'bad'}">${tParsed.length?`Found ${tParsed.length} teams: ${tParsed.slice(0,4).map(t=>t.n).join(', ')}${tParsed.length>4?'…':''}`:'No team numbers found. Check that the paste has a number at the start of each row.'}</div>`:''}</div>
+  </section>
+  <section class="panel">
+    <h3>2 · Qualification schedule</h3>
+    <ol class="steps"><li>Open <b>FTC Events · Qual schedule</b>, copy the schedule table and paste it here.</li><li>Or open <b>FTCScout schedule data</b>, select all, copy and paste. That works once the schedule is published.</li></ol>
+    <textarea id="suSched" placeholder="Paste schedule here">${esc(st.schedText)}</textarea>
+    <div id="mPrev">${mParsed?`<div class="preview ${mParsed.length?'ok':'bad'}">${mParsed.length?`Found ${mParsed.length} matches. ${esc(mParsed[0].label)}: red ${mParsed[0].red.join(' & ')} vs blue ${mParsed[0].blue.join(' & ')}`:'No matches found. Each match needs a label like Q1 followed by four team numbers.'}</div>`:''}</div>
+  </section>
+  <div class="savebar"><button class="btn" data-act="clear-setup">Clear</button><button class="btn primary" data-act="save-event" ${code&&season?'':'disabled'}>Save and share event</button></div>
+  <p class="small muted">Pasting is optional. Without a schedule, scouts type the match and team number. Without a team list, teams come from the schedule.</p>`;
+}
+
+function vSync(){
+  const p=pending();
+  const state=S.dbState==='none'?'This copy can\'t reach the shared list, so entries stay on this phone. Use Export and Import below to merge by hand.'
+    :S.readOnly?'Your access lets you read the shared list but not add to it. Ask the owner to share it with you as a Contributor.'
+    :S.quota?'The shared list is full. Delete old events\' entries to make room.'
+    :navigator.onLine===false?`You're offline. ${p} item${p===1?'':'s'} will upload when you reconnect.`
+    :p?`Uploading ${p} item${p===1?'':'s'}…`:'Everything on this phone is in the shared list.';
+  return `
+  <section class="panel"><h2>Sync</h2><p>${state}</p>
+    <div class="row"><button class="btn primary" data-act="sync-now" ${S.db&&p?'':'disabled'}>Sync now</button></div>
+    <p class="small muted">Entries save to this phone first, so scouting works with no signal. Keep this page open (or open it once while online) before you lose connection. When a phone is back online it uploads its entries and downloads everyone else's. Two scouts on the same robot are both kept.</p>
+  </section>
+  <section class="panel"><h3>Export from this phone</h3>
+    <p>This phone has <b>${exportCount()}</b> scouting entr${exportCount()===1?'y':'ies'} to send.</p>
+    ${STORE_OK?'':'<p class="preview bad">This browser isn\'t saving entries. They disappear if the page reloads or closes. Send your export code after every few matches, and before closing the page.</p>'}
+    <p class="small muted">No internet? AirDrop the backup to your lead scout's iPad. With internet, you can also paste the code into a text or email. A whole code starts with BBZ1: and ends with :END.</p>
+    ${(S.dbState!=='ok'||S.readOnly)&&exportCount()?`<p class="small">${unsentCount()?`<b>${unsentCount()}</b> not backed up or sent since ${S.sentAt?new Date(S.sentAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'you started'}.`:'Everything is backed up or sent.'}</p>`:''}
+    <div class="row">${backupBtns()}</div>
+    <textarea id="exportBox" readonly hidden></textarea>
+  </section>
+  <section class="panel"><h3>Import from another phone</h3>
+    <label class="field"><span>Paste an export code or event setup code</span><textarea id="importText" placeholder="Paste here">${esc(S.importText)}</textarea></label>
+    ${S.importMsg?`<div class="preview ${S.importOk?'ok':'bad'}">${esc(S.importMsg)}</div>`:''}
+    <div class="row"><button class="btn primary" data-act="import">Merge into this phone</button><label class="btn">Open backup file…<input type="file" id="importFile" accept=".txt,.json,text/plain,application/json" hidden></label></div>
+    <p class="small muted">Merging keeps the newest version of each entry, and anything imported uploads to the shared list when you're online. Lead scout: merge every scout's backup here. The Teams tab works offline on everything merged.</p>
+    <p class="small muted">App version: Nov 17 · C</p>
+  </section>`;
+}
+
+/* ---------- publish to everyone (rebuilds this page with the events built in) ---------- */
+function unpublishedCount(){const m=new Map((SEED.events||[]).map(e=>[e.key,e.updatedAt||0]));return Object.values(S.events).filter(e=>(e.updatedAt||0)>(m.get(e.key)||0)).length}
+function buildPage(seed){
+  let reset='';for(const st of document.head.querySelectorAll('style')){if(/safe-area/.test(st.textContent)){reset=st.textContent;break}}
+  if(!reset)reset=':root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}';
+  const seedTag='<script type="application/json" id="seed" data-keep="seed">'+JSON.stringify(seed).replace(/</g,'\\u003c')+'<\/script>';
+  const parts=[...document.querySelectorAll('[data-keep]')].map(el=>el.dataset.keep==='seed'?seedTag:el.outerHTML);
+  if(!parts.some(x=>x===seedTag))parts.splice(parts.length-1,0,seedTag);
+  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+reset+'</style></head><body>'+parts.join('\n')+'</body></html>';
+}
+async function publishPage(){
+  if(!S.art||S.publishing)return;
+  persist();saveDraft();S.publishing=true;S.armed=null;render();
+  const seed={cur:S.cur,events:Object.values(S.events),publishedAt:Date.now(),by:S.scout.trim()};
+  try{await S.art.publish(buildPage(seed));toast('Published. The page is reloading for everyone.')}
+  catch(e){
+    S.publishing=false;const c=e&&e.code;
+    if(c==='conflict')toast('The page was just updated. It will reload; then tap Publish again.');
+    else if(c==='not_writer'||c==='not_granted'||c==='not_declared'||c==='capability_disabled'||c==='consent_required'){S.canPublish=false;toast('Only the page owner or an Editor can publish.')}
+    else if(c==='rate_limited')toast('Published too recently. Wait a minute and try again.');
+    else toast('Publishing didn\'t go through. Check your connection and try again.');
+    render();
+  }
+}
+
+/* ---------- actions ---------- */
+function startDraft(team,alliance,match){
+  if(!S.scout.trim()){toast('Add your scout name first');const el=$('#scoutName');el&&el.focus();return}
+  S.draft={id:null,event:S.cur,match,team:+team,alliance,auto:blank(),tele:blank(),canEmpty:false,paper:false,notes:''};
+  S.phase='auto';S.armed=null;saveDraft();render();window.scrollTo(0,0);
+}
+function setCount(p,k,v,fromInput){
+  v=Math.max(0,Math.min(999,Math.floor(+v||0)));S.draft[p][k]=v;saveDraft();
+  if(!fromInput){const el=document.getElementById(`c-${p}-${k}`);if(el)el.value=v}
+  const t=$('#tally');if(t)t.innerHTML=tallyHTML();
+}
+function saveEntry(){
+  const d=S.draft;const now=Date.now();
+  const old=d.id?S.entries[d.id]:null;
+  const e={id:d.id||uid(),event:d.event,match:d.match,team:+d.team,alliance:d.alliance,scout:old?old.scout:S.scout.trim(),
+    auto:{...d.auto},tele:{...d.tele},canEmpty:!!d.canEmpty,paper:!!d.paper,notes:d.notes||'',createdAt:old?old.createdAt:now,updatedAt:now,deleted:false};
+  if(old&&old.scout!==S.scout.trim())e.editedBy=S.scout.trim();
+  S.entries[e.id]=e;
+  const ev=curEvent();
+  if(!d.id&&ev&&ev.matches.length){const i=ev.matches.findIndex(m=>m.label===d.match);if(i>=0&&i<ev.matches.length-1)S.pickMatch=ev.matches[i+1].label}
+  S.draft=null;saveDraft();queue('e',e.id);persist();
+  toast(`Saved ${e.match} · ${e.team}`);
+  if(old){S.view='teams';S.detail=e.team}
+  render();window.scrollTo(0,0);
+}
+function exportCount(){return Object.values(S.entries).filter(e=>!e.deleted).length}
+/* export code = BBZ1: + base64url(JSON) + :END, so email and chat apps can wrap, quote or reformat it without breaking it */
+function exportPayload(){const json=JSON.stringify({app:'biobuzz-scout',v:2,exportedAt:new Date().toISOString(),from:S.scout.trim(),events:Object.values(S.events),entries:Object.values(S.entries)});
+  const b=new TextEncoder().encode(json);let bin='';for(let i=0;i<b.length;i+=8192)bin+=String.fromCharCode.apply(null,b.subarray(i,i+8192));
+  return 'BBZ1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')+':END'}
+function decodePayload(text){
+  const t=String(text||'');const m=t.match(/B\s*B\s*Z\s*1\s*:([\s\S]*?):\s*E\s*N\s*D/i);
+  if(m){const s=m[1].replace(/[^A-Za-z0-9_-]/g,'').replace(/-/g,'+').replace(/_/g,'/');
+    try{const bin=atob(s+'==='.slice((s.length+3)%4));const u=Uint8Array.from(bin,c=>c.charCodeAt(0));return JSON.parse(new TextDecoder().decode(u))}catch(e){return 'broken'}}
+  if(/B\s*B\s*Z\s*1\s*:/i.test(t))return 'cut';
+  const a=t.indexOf('{'),z=t.lastIndexOf('}');if(a<0||z<a)return null;
+  try{return JSON.parse(t.slice(a,z+1).replace(/[“”]/g,'"'))}catch(e){return 'broken'}
+}
+function msgImport(m,ok){S.importMsg=m;S.importOk=!!ok;toast(m.length>60?(ok?'Merged. Details below.':'Couldn\'t merge. Details below.'):m);render()}
+function importPayload(text){
+  const j=decodePayload(text);
+  if(j==='cut'){msgImport('The code is cut off. A whole code starts with BBZ1: and ends with :END. Ask for it again, or have the scout use Save as file.');return}
+  if(j==='broken'){msgImport('That code got changed on the way. Ask the scout to send it again, or to use Save as file.');return}
+  if(!j||j.app!=='biobuzz-scout'){const sn=String(text||'').trim().replace(/\s+/g,' ');msgImport(sn?`That isn't a BioBuzz Scout code. What was pasted starts with: "${sn.slice(0,40)}${sn.length>40?'…':''}". A code starts with BBZ1:`:'Nothing was pasted. Copy the code again, or use Open backup file… with a setup file.');return}
+  let ne=0,nv=0;
+  for(const v of j.events||[]){if(j.kind==='events'&&v&&v.key&&!S.db){/* a setup code from the lead scout always wins on scouting devices */S.events[v.key]={...v,updatedAt:Math.max(v.updatedAt||0,((S.events[v.key]||{}).updatedAt||0)+1)};nv++;continue}if(mergeEvent(v)){nv++;S.outbox['v:'+v.key]=1}}
+  for(const e of j.entries||[])if(mergeEntry(e)){if(!e.deleted)ne++;S.outbox['e:'+e.id]=1}
+  if(!S.cur&&j.events&&j.events[0])S.cur=j.events[0].key;
+  persist();subEntries();flushSoon();S.importText='';
+  const tot=(j.entries||[]).filter(x=>x&&!x.deleted).length;const who=j.from?` from ${j.from}`:'';const when=j.exportedAt?` (made ${new Date(j.exportedAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})})`:'';
+  if(j.kind==='events'){if(j.cur&&S.events[j.cur]&&!S.events[j.cur].deleted){S.cur=j.cur;S.pickMatch='';S.scope='event';persist();subEntries()}
+    const nev=(j.events||[]).filter(x=>!x.deleted).length;msgImport(`Loaded ${nev} event${nev===1?'':'s'}${who}. Current event: ${(curEvent()||{}).name||'none'}.`,true);return}
+  if(!tot){msgImport(`This code${who}${when} has no scouting entries in it. The phone that made it isn't holding any. If that scout did scout, their browser probably isn't saving entries; the Sync tab on their phone says so.`);return}
+  msgImport(`Code${who}${when}: ${tot} entr${tot===1?'y':'ies'}. ${ne} new, ${tot-ne} already on this phone.${nv?` ${nv} event update${nv===1?'':'s'}.`:''}`,true);
+}
+function csv(){
+  const rows=teamStats();const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"';const n=v=>v==null?'':(+v).toFixed(2);
+  const head=['Team','Name','Matches','All launches scored','All accuracy','Auto pollen scored','Auto pollen accuracy','Auto nectar scored','Auto nectar accuracy','Teleop pollen scored','Teleop pollen accuracy','Teleop nectar scored','Teleop nectar accuracy','Pollen into flowers','Nectar into flowers','Matches emptying flowers'];
+  const keys=['totL','totA','apL','apA','anL','anA','tpL','tpA','tnL','tnA','pF','nF'];
+  return [head.join(','),...rows.map(r=>[r.n,q(r.name),r.m,...keys.map(k=>n(r[k])),r.empty].join(','))].join('\n');
+}
+async function fetchEntries(keys){
+  if(!S.db||navigator.onLine===false)return false;
+  try{for(let i=0;i<keys.length;i+=30){const c=keys.slice(i,i+30);const q=c.length>1?S.db.collection('entries').where('event','in',c):S.db.collection('entries').where('event','==',c[0]);
+    const snap=await withTimeout(q.get(),15000);for(const d of snap.docs)mergeEntry(d.data())}persist();return true}catch(e){return false}
+}
+async function rawExport(which){
+  const ev=curEvent();if(!ev)return;
+  const keys=which==='season'?liveEvents().filter(e=>+e.season===+ev.season).map(e=>e.key):which==='league'?leagueKeys(ev):[ev.key];
+  toast('Gathering entries…');
+  const fresh=await fetchEntries(keys);
+  const q=s=>{s=String(s??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  const first=new Map();const ents=entriesFor(keys);
+  for(const e of ents)first.set(e.event,Math.min(first.get(e.event)??Infinity,e.createdAt||0));
+  const mnum=m=>{const x=String(m||'').match(/^([A-Za-z]*)(\d+)/);return x?[{Q:0,P:1,F:2}[x[1].toUpperCase()]??1,+x[2]]:[9,0]};
+  ents.sort((a,b)=>(first.get(a.event)-first.get(b.event))||String(a.event).localeCompare(b.event)||(mnum(a.match)[0]-mnum(b.match)[0])||(mnum(a.match)[1]-mnum(b.match)[1])||(a.team-b.team)||((a.createdAt||0)-(b.createdAt||0)));
+  const P=[['pL','pollen scored'],['pM','pollen missed'],['nL','nectar scored'],['nM','nectar missed'],['pF','pollen into flowers'],['nF','nectar into flowers']];
+  const head=['Season','League','Event code','Event name','Date','Match','Match number','Team','Team name','Alliance','Scout',...P.map(([,l])=>'Auto '+l),...P.map(([,l])=>'Teleop '+l),'Total launches scored','Total launches missed','Launch accuracy','Total into flowers','Can empty flowers','From paper','Notes','Entry ID'];
+  const pad=n=>String(n).padStart(2,'0');
+  const rows=ents.map(e=>{const v=S.events[e.event]||{};const d=new Date(e.createdAt||0);
+    const sc=e.auto.pL+e.auto.nL+e.tele.pL+e.tele.nL,ms=e.auto.pM+e.auto.nM+e.tele.pM+e.tele.nM;
+    return [v.season||'',leagueOf(v)||'Non-league',v.code||e.event,v.name||'',`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`,e.match,mnum(e.match)[1]||'',e.team,teamNameIn(e.team,[e.event]),e.alliance,e.scout||'',
+      ...P.map(([k])=>e.auto[k]),...P.map(([k])=>e.tele[k]),sc,ms,sc+ms?(sc/(sc+ms)).toFixed(3):'',e.auto.pF+e.auto.nF+e.tele.pF+e.tele.nF,e.canEmpty?'Yes':'No',e.paper?'Yes':'No',e.notes||'',e.id].map(q).join(',')});
+  if(!rows.length){toast(fresh||!S.db?'No entries to export yet.':'No entries on this phone yet. Connect to download the shared list.');return}
+  const tag=which==='season'?`season-${ev.season}`:which==='league'?gkey(leagueOf(ev)).replace(/[^a-z0-9]+/g,'-'):ev.code;
+  await saveFile(`biobuzz-raw-${tag}.csv`,[head.map(q).join(','),...rows].join('\n'));
+  if(S.db&&!fresh)toast('Saved from this phone only. Go online for everyone\'s entries.');
+}
+const IN_CLAUDE=()=>!!(window.claude&&window.claude.use);
+const canSaveFiles=()=>!!S.dl||!IN_CLAUDE();
+async function saveFile(name,data){
+  if(S.dl){try{await S.dl.save({filename:name,data});toast('Saved');return true}catch(e){if(e&&e.code!=='declined')toast('Couldn\'t save the file. Use Copy instead.');return false}}
+  if(IN_CLAUDE()){toast('Saving files isn\'t available here. Use Copy instead.');return false}
+  try{const u=URL.createObjectURL(new Blob([data],{type:'text/plain'}));const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);toast('Saved. Find it in Files › Downloads');return true}
+  catch(e){toast('Couldn\'t save the file. Use Copy instead.');return false}
+}
+function unsentCount(){return Object.values(S.entries).filter(e=>!e.deleted&&(e.updatedAt||0)>(S.sentAt||0)).length}
+function markSent(){S.sentAt=Date.now();LS.set('sentAt',S.sentAt);render()}
+function backupName(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `biobuzz-backup-${(S.scout.trim()||'scout').replace(/[^A-Za-z0-9]+/g,'-')}-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.txt`}
+function reminderHTML(){
+  if(S.dbState==='ok'&&!S.readOnly)return '';
+  const n=unsentCount();if(n<5)return '';
+  return `<div class="remind"><b>${n} entries haven't been backed up or sent.</b><span class="small">Do it now, before you scout more.</span><div class="btnrow">${backupBtns()}</div></div>`;
+}
+function encodeCode(json){const b=new TextEncoder().encode(json);let bin='';for(let i=0;i<b.length;i+=8192)bin+=String.fromCharCode.apply(null,b.subarray(i,i+8192));
+  return 'BBZ1:'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')+':END'}
+/* AirDrop / share sheet: works on iPads with no internet (outside Claude only) */
+function canShareFiles(){if(IN_CLAUDE()||!navigator.canShare||!navigator.share)return false;try{return navigator.canShare({files:[new File(['x'],'x.txt',{type:'text/plain'})]})}catch(e){return false}}
+async function shareFile(){
+  const f=new File([exportPayload()],backupName(),{type:'text/plain'});
+  try{await navigator.share({files:[f],title:'BioBuzz scouting backup'});markSent();toast('Backup sent')}
+  catch(e){if(e&&e.name==='AbortError')return;toast('Sharing didn\'t work. Use Save backup file instead.')}
+}
+function backupBtns(){const sh=canShareFiles();return `${sh?'<button class="btn primary" data-act="share-file">AirDrop / share backup</button>':''}${canSaveFiles()?`<button class="btn ${sh?'':'primary'}" data-act="file-export">Save backup file</button>`:''}<button class="btn" data-act="copy-export">Copy export code</button>`}
+function setupPayload(){return encodeCode(JSON.stringify({app:'biobuzz-scout',v:2,kind:'events',exportedAt:new Date().toISOString(),from:S.scout.trim(),cur:S.cur,events:liveEvents(),entries:[]}))}
+async function copyText(t,boxId='exportBox'){
+  try{await navigator.clipboard.writeText(t);toast('Copied');return true}catch(e){
+    const box=document.getElementById(boxId);if(box){box.hidden=false;box.value=t;box.focus();box.select();toast('Copying is blocked here. Select all the text in the box and copy it.')}else toast('Copying is blocked here. Use Save file instead.');return false}
+}
+
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]');if(go){S.view=go.dataset.go;S.armed=null;render();window.scrollTo(0,0);return}
+  const b=e.target.closest('button,[data-team]');if(!b)return;
+  const ds=b.dataset;
+  if(ds.act==='inc'||ds.act==='dec'){setCount(ds.p,ds.k,S.draft[ds.p][ds.k]+(ds.act==='inc'?1:-1));buzz();return}
+  if(ds.phase){S.phase=ds.phase;render();return}
+  if(ds.pick){S.station=ds.st;persist();startDraft(+ds.pick,ds.al,S.pickMatch);return}
+  if(ds.scope){S.scope=ds.scope;S.detail=null;persist();render();return}
+  if(ds.raw){rawExport(ds.raw);return}
+  if(ds.sort){S.sort=S.sort.k===ds.sort?{k:ds.sort,d:-S.sort.d}:{k:ds.sort,d:ds.sort==='n'||ds.sort==='name'?1:-1};render();return}
+  if(ds.team){S.detail=S.detail==ds.team?null:+ds.team;S.armed=null;render();return}
+  if(ds.edit){const x=S.entries[ds.edit];if(!x)return;S.draft={id:x.id,event:x.event,match:x.match,team:x.team,alliance:x.alliance,auto:normPhase(x.auto),tele:normPhase(x.tele),canEmpty:x.canEmpty,paper:x.paper,notes:x.notes};S.cur=x.event;S.phase='auto';saveDraft();S.view='scout';render();window.scrollTo(0,0);return}
+  if(ds.del){if(S.armed!=='del:'+ds.del){S.armed='del:'+ds.del;render();return}const x=S.entries[ds.del];if(x){x.deleted=true;x.updatedAt=Date.now();queue('e',x.id)}S.armed=null;toast('Entry deleted');render();return}
+  if(ds.use){S.cur=ds.use;S.pickMatch='';S.scope='event';persist();subEntries();toast('Event switched');render();return}
+  if(ds.delev){const k=ds.delev;if(S.armed!=='delev:'+k){S.armed='delev:'+k;render();return}
+    const v=S.events[k];if(v){v.deleted=true;v.updatedAt=Date.now();queue('v',k)}
+    if(S.cur===k){S.cur=(Object.values(S.events).find(e=>!e.deleted)||{}).key||null;S.pickMatch='';subEntries()}
+    S.armed=null;persist();toast('Event deleted on every phone');render();return}
+  if(ds.editev){const v=S.events[ds.editev];S.setup={season:String(v.season),code:v.code,name:v.name||'',group:leagueOf(v),teamsText:'',schedText:'',editing:v.key};render();window.scrollTo(0,0);return}
+  switch(ds.act){
+    case 'manual':{const mm=+$('#manMatch').value,tt=+$('#manTeam').value;if(!mm||!tt){toast('Enter a match number and a team number');return}startDraft(tt,$('#manAl').value,'Q'+mm);return}
+    case 'change':S.armed=S.draft.id?null:'change';if(S.draft.id){S.draft=null;saveDraft();S.view='teams'}render();return;
+    case 'change-confirm':S.draft=null;S.armed=null;saveDraft();render();return;
+    case 'reset':S.armed='reset';render();return;
+    case 'reset-confirm':S.draft.auto=blank();S.draft.tele=blank();S.armed=null;saveDraft();render();return;
+    case 'save':saveEntry();return;
+    case 'close-detail':S.detail=null;render();return;
+    case 'csv':saveFile(`biobuzz-${(curEvent()||{}).code||'event'}-teams.csv`,csv());return;
+    case 'clear-setup':S.setup={season:'2026',code:'',name:'',group:'',teamsText:'',schedText:'',editing:null};render();return;
+    case 'save-event':{
+      const st=S.setup;const code=st.code.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');const season=String(+st.season||2026);
+      if(!code){toast('Enter the event code');return}
+      const key=season+'-'+code;const old=S.events[key];
+      let teams=st.teamsText.trim()?parseTeams(st.teamsText):(old?old.teams:[]);
+      const matches=st.schedText.trim()?parseSchedule(st.schedText):(old?old.matches:[]);
+      const have=new Set(teams.map(t=>t.n));for(const m of matches)for(const t of [...m.red,...m.blue])if(!have.has(t)){have.add(t);teams.push({n:t,name:(old&&old.teams.find(x=>x.n===t)||{}).name||''})}
+      teams.sort((a,b)=>a.n-b.n);
+      let group=String(st.group||'').trim();const same=leagueNames().find(g=>gkey(g)===gkey(group));if(same)group=same;
+      S.events[key]={key,season:+season,code,name:st.name.trim()||(old&&old.name)||code,group,teams,matches,updatedAt:Date.now()};
+      S.cur=key;S.pickMatch='';queue('v',key);subEntries();
+      S.setup={season,code:'',name:'',group:'',teamsText:'',schedText:'',editing:null};
+      toast(`Saved ${code}: ${teams.length} teams, ${matches.length} matches`);S.view=S.canPublish?'event':'scout';render();window.scrollTo(0,0);return}
+    case 'publish-page':if(S.armed!=='pub'){S.armed='pub';render();return}publishPage();return;
+    case 'sync-now':flush();toast('Syncing…');return;
+    case 'copy-export':copyText(exportPayload()).then(ok=>{if(ok){markSent();toast(`Copied ${exportCount()} entries. Paste them to your lead scout.`)}});return;
+    case 'file-export':saveFile(backupName(),exportPayload()).then(ok=>{if(ok)markSent()});return;
+    case 'share-file':shareFile();return;
+    case 'copy-setup':copyText(setupPayload(),'setupBox').then(ok=>{if(ok)toast('Copied event setup code')});return;
+    case 'file-setup':{const d=new Date(),p=n=>String(n).padStart(2,'0');saveFile(`biobuzz-setup-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.txt`,setupPayload());return}
+    case 'import':{const t=($('#importText')||{}).value||'';if(!t.trim()){toast('Paste an export code first');return}importPayload(t);return}
+  }
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.classList.contains('ctr-val')){setCount(t.dataset.p,t.dataset.k,t.value,true);return}
+  if(t.id==='scoutName'){S.scout=t.value;persist();return}
+  if(t.id==='notes'){S.draft.notes=t.value;saveDraft();return}
+  if(t.id==='suSeason'){S.setup.season=t.value;refreshSoon();return}
+  if(t.id==='suCode'){S.setup.code=t.value;refreshSoon();return}
+  if(t.id==='suName'){S.setup.name=t.value;return}
+  if(t.id==='suGroup'){S.setup.group=t.value;return}
+  if(t.id==='suTeams'){S.setup.teamsText=t.value;refreshSoon();return}
+  if(t.id==='suSched'){S.setup.schedText=t.value;refreshSoon();return}
+  if(t.id==='importText'){S.importText=t.value;return}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.classList.contains('ctr-val')){t.value=S.draft[t.dataset.p][t.dataset.k];return}
+  if(t.id==='matchSel'){S.pickMatch=t.value;persist();render();return}
+  if(t.id==='canEmpty'){S.draft.canEmpty=t.checked;saveDraft();return}
+  if(t.id==='paper'){S.draft.paper=t.checked;saveDraft();return}
+  if(['suSeason','suCode','suTeams','suSched'].includes(t.id))return; /* previews update while typing; changing layout on blur moved the Save button out from under the tap */
+  if(t.id==='importFile'&&t.files&&t.files[0]){const r=new FileReader();r.onload=()=>importPayload(String(r.result||''));r.readAsText(t.files[0]);t.value='';return}
+});
+document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('ctr-val'))setTimeout(()=>{try{e.target.select()}catch(x){}},0)});
+/* events built into the page reach every visitor, including people not signed in */
+let SEED={events:[]};
+try{const seed=SEED=JSON.parse((document.getElementById('seed')||{}).textContent||'{}');for(const v of seed.events||[])mergeEvent(v);
+  if(!S.cur||!S.events[S.cur]||S.events[S.cur].deleted)S.cur=(seed.cur&&S.events[seed.cur])?seed.cur:(Object.values(S.events).filter(e=>!e.deleted).sort((a,b)=>(b.teams.length>0)-(a.teams.length>0)||(b.updatedAt||0)-(a.updatedAt||0))[0]||{}).key||null;
+  persist()}catch(e){}
+if(S.draft&&S.draft.event!==S.cur)S.draft=null;
+if(S.draft){S.draft.auto=normPhase(S.draft.auto);S.draft.tele=normPhase(S.draft.tele)}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+render();connect();
+</script></body></html>
