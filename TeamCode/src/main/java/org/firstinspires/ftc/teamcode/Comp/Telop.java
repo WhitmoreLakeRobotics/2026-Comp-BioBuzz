@@ -168,6 +168,12 @@ private TelemetryManager telemetryM;
         if (CommonLogic.oneShot(gamepad1.y,gp1_prev_y)){goHold(ScorePoses.ScorePoseRT(),true); bAutoDrive = true;}
         if (CommonLogic.oneShot(gamepad1.x,gp1_prev_x)){goHold(ScorePoses.ScorePoseLT(),true); bAutoDrive = true;}
 
+        boolean alignHeld = gamepad1.left_trigger_pressed; // MJD: auto align to the closest positive AprilTag
+        if (alignHeld && bAutoDrive) { // MJD: the trigger takes over from a drive-to-pose
+            DriveToCommand.cancel(); // MJD
+            bAutoDrive = false; // MJD
+        } // MJD
+
         if (bAutoDrive) {
             //if((CommonLogic.DeadBand(gamepad1.left_stick_x) != 0.0) || (CommonLogic.DeadBand(gamepad1.left_stick_y) != 0.0) || (CommonLogic.DeadBand(gamepad1.right_stick_x) != 0.0)){   // MJD: old, broke out instantly
             // MJD: sticks only break out once the delay has passed, so you can press A/B/X/Y with the sticks still held
@@ -179,6 +185,13 @@ private TelemetryManager telemetryM;
        
 
 
+        }else if (alignHeld && robot.limelight.hasClosestTag()) { // MJD: sticks still drive, the turn is automatic
+            robot.driveTrain.cmdTeleOpAutoTurn( // MJD
+                    CommonLogic.joyStickMath(gamepad1.left_stick_y * -1), // MJD
+                    CommonLogic.joyStickMath(gamepad1.left_stick_x * -1), // MJD
+                    //robot.limelight.getAlignTurnPower(robot.driveTrain.getPose()), // MJD: old, moved to AutoAlign
+                    robot.autoAlign.getTurnPower(robot.driveTrain.getPose(), robot.limelight.getClosestTagField()), // MJD
+                    driveSpeed); // MJD
         }else{
 
 
@@ -299,6 +312,7 @@ private TelemetryManager telemetryM;
 
         if ((gamepad2.b)) {
             robot.intake.cmdIntakeForward();
+            robot.overrideIntakeFull(); // MJD: driver wants the intake on even if the sensors say full
             //robot.transitionR.cmdSpinng();
 
         }
@@ -484,6 +498,8 @@ private TelemetryManager telemetryM;
             telemetry.addData("Feeder at speed", robot.feeder.isFeederAtSpeed());
             telemetry.addData("Blocker open", robot.pollenBlocker.isOpen());
             telemetry.addData("Pose launch speed on", poseDriveCalled); // MJD
+            telemetry.addData("Align error (deg)", "%.1f", robot.autoAlign.getErrorDeg()); // MJD
+            telemetry.addData("Aligned", robot.autoAlign.isAligned()); // MJD
             telemetry.addData("bAutoDrive", bAutoDrive);
             telemetry.addData("Hold cmd scheduled", DriveToCommand != null && DriveToCommand.isScheduled());
             telemetry.addData("Follower busy", robot.driveTrain.isBusy());

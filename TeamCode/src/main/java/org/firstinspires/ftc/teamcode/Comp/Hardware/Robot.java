@@ -31,8 +31,13 @@ public class Robot extends BaseHardware {
     public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
     public Limelight limelight = new Limelight();
+    public AutoAlign autoAlign = new AutoAlign(); // MJD: turns the launcher toward the closest positive AprilTag
     public Flower_Ramp flower_ramp = new Flower_Ramp();
   //  public Sensors sensors = new Sensors();
+    public Sensors sensors = new Sensors(); // MJD: pollen sensors (feeder top and inside the intake)
+    // MJD: intake stop when both sensors see pollen
+    private boolean fullHandled = false;   // MJD: already dealt with the current "full"
+    private boolean stoppedByFull = false; // MJD: the intake was stopped because it was full
 
 
     /**
@@ -108,6 +113,9 @@ public class Robot extends BaseHardware {
         sensors.init();
 
         */
+        sensors.hardwareMap = this.hardwareMap; // MJD
+        sensors.telemetry = this.telemetry; // MJD
+        sensors.init(); // MJD
 
     }
 
@@ -160,6 +168,8 @@ public class Robot extends BaseHardware {
         limelight.loop();
         flower_ramp.loop();
         //sensors.loop();
+        sensors.loop(); // MJD
+        handleIntakeFull(); // MJD
     }
 
     /**
@@ -182,6 +192,40 @@ public class Robot extends BaseHardware {
         limelight.stop();
         flower_ramp.stop();
        // sensors.stop();
+        sensors.stop(); // MJD
+    }
+
+    // ---------------- INTAKE FULL (MJD) ----------------
+
+    /**
+     * MJD: both sensors see pollen -> stop the intake once (only when TripleThreat is idle).
+     * When either sensor clears again, the intake restarts if it was stopped by this.
+     * TripleThreat runs the intake itself during a volley, so this stays out of its way.
+     */
+    private void handleIntakeFull() {
+        if (!tripleThreat.isIdle()) {
+            stoppedByFull = false;   // a volley is running the intake now
+            return;
+        }
+        if (!sensors.isFull()) {
+            if (stoppedByFull) {
+                intake.cmdIntakeForward();   // pollen has left, pick up more
+            }
+            stoppedByFull = false;
+            fullHandled = false;
+            return;
+        }
+        if (!fullHandled) {
+            fullHandled = true;
+            intake.cmdIntakeStop();
+            stoppedByFull = true;
+        }
+    }
+
+    /** MJD: the driver asked for the intake while full (gamepad 2 B): do not stop it or restart it for this "full". */
+    public void overrideIntakeFull() {
+        fullHandled = true;
+        stoppedByFull = false;
     }
 
     // ---------------- IVY COMMANDS (for Pedro auto paths) ----------------

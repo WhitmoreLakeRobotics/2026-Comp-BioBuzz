@@ -34,9 +34,23 @@ public class Limelight extends BaseHardware{
     public static double HIVE_MOVE_TOL_IN = 3.0; // MJD: tag moved more than this (inches) = tipped
     public static int HIVE_CONFIRM_FRAMES = 3;   // MJD: a new state must hold this many loops before it counts
     // MJD: where the camera sits on the robot (MEASURE THESE) and which way it points
-    public static double CAM_FORWARD_IN = 10.25;   // MJD: camera ahead of robot center (negative = behind)
-    public static double CAM_LEFT_IN = 8.0;      // MJD: camera left of robot center (negative = right)
-    public static double CAM_YAW_DEG = 45;      // MJD: 0 = camera looks straight ahead, positive = turned left
+    //public static double CAM_FORWARD_IN = 10.25;   // MJD: camera ahead of robot center (negative = behind)   // MJD: old value, measured from the intake in the wrong frame
+    public static double CAM_FORWARD_IN = 0.5;   // MJD: lens is 8 in from the back edge; the center is 7.5 in from the back, so 0.5 in toward the intake
+    //public static double CAM_LEFT_IN = 8.0;      // MJD: camera left of robot center (negative = right)   // MJD: old value
+    public static double CAM_LEFT_IN = 0.0;      // MJD: lens is centered side to side
+    //public static double CAM_YAW_DEG = 45;      // MJD: 0 = camera looks straight ahead, positive = turned left   // MJD: old value, camera was assumed to look toward the intake
+    public static double CAM_YAW_DEG = 225;      // MJD: 0 = toward the intake, + = left. 180 = toward the launcher, 225 = launcher side angled 45 deg
+
+    // ---------------- AUTO ALIGN (MJD) ----------------
+    // Remembers the closest AprilTag with a positive ID. The turning itself moved to the AutoAlign class.
+    //public static double ALIGN_KP = 0.02;          // MJD: moved to AutoAlign
+    //public static double ALIGN_MIN_POWER = 0.08;   // MJD: moved to AutoAlign
+    //public static double ALIGN_MAX_POWER = 0.6;    // MJD: moved to AutoAlign
+    //public static double ALIGN_TOL_DEG = 1.5;      // MJD: moved to AutoAlign
+    //public static double ALIGN_AIM_OFFSET_DEG = 0; // MJD: moved to AutoAlign
+    public static double ALIGN_MAX_STALE_MS = 100; // MJD: ignore camera frames older than this
+    private double[] alignTagField = null;         // MJD: field x,y (in) of the closest positive tag, last seen
+    //private double alignErrDeg = 0;                // MJD: moved to AutoAlign
 
     private HiveState hiveState = HiveState.UNKNOWN; // MJD
     private HiveState rawHiveState = HiveState.UNKNOWN; // MJD
@@ -187,6 +201,9 @@ public class Limelight extends BaseHardware{
             }
         }
         updateHive(); // MJD
+        updateAlignTag(); // MJD
+        telemetry.addData("Align tag known", alignTagField != null); // MJD
+        //telemetry.addData("Align error (deg)", "%.1f", alignErrDeg); // MJD: now shown by Telop from AutoAlign
         telemetry.addData("TagDistance (m)", TagDistance); //disable after tuning
         telemetry.addData("Hive State", hiveState); // MJD
 
@@ -228,6 +245,42 @@ public class Limelight extends BaseHardware{
                 robotPose.x() + fwd * Math.cos(th) - left * Math.sin(th), // MJD
                 robotPose.y() + fwd * Math.sin(th) + left * Math.cos(th)}; // MJD
     } // MJD
+
+    // MJD: remember where the closest tag with a positive ID is on the field (kept until a newer one is seen)
+    private void updateAlignTag() { // MJD
+        if (robotPose == null || result == null || !result.isValid() // MJD
+                || result.getStaleness() > ALIGN_MAX_STALE_MS || result.getFiducialResults() == null) { // MJD
+            return; // MJD
+        } // MJD
+        double best = Double.MAX_VALUE; // MJD
+        for (LLResultTypes.FiducialResult f : result.getFiducialResults()) { // MJD
+            if (f.getFiducialId() <= 0) { // MJD
+                continue; // MJD: positive tag IDs only
+            } // MJD
+            Position p = f.getTargetPoseCameraSpace().getPosition(); // MJD
+            double d = Math.hypot(p.x, p.z); // MJD: closest = smallest distance
+            if (d < best) { // MJD
+                best = d; // MJD
+                alignTagField = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD
+            } // MJD
+        } // MJD
+    } // MJD
+
+    public boolean alignHasTarget() { return alignTagField != null; } // MJD
+    public boolean hasClosestTag() { return alignTagField != null; } // MJD: same thing, clearer name
+    public double[] getClosestTagField() { return alignTagField; } // MJD: field x,y (in) of the closest positive tag, or null
+
+    // MJD: the turn controller (getAlignTurnPower) moved to the AutoAlign class. Old version:
+    //public double getAlignTurnPower(Pose robot) {
+    //    if (alignTagField == null) { return 0; }
+    //    double desired = Math.atan2(alignTagField[1] - robot.y(), alignTagField[0] - robot.x())
+    //            + Math.PI + Math.toRadians(ALIGN_AIM_OFFSET_DEG);
+    //    double err = Math.atan2(Math.sin(desired - robot.heading()), Math.cos(desired - robot.heading()));
+    //    alignErrDeg = Math.toDegrees(err);
+    //    if (Math.abs(alignErrDeg) <= ALIGN_TOL_DEG) { return 0; }
+    //    double power = ALIGN_KP * alignErrDeg;
+    //    return Math.copySign(Math.max(ALIGN_MIN_POWER, Math.min(ALIGN_MAX_POWER, Math.abs(power))), power);
+    //}
 
     private void updateHive() { // MJD
         hiveNow = null; // MJD

@@ -105,6 +105,14 @@ follower.update();
         doTeleop();
     }
 
+    // MJD: like cmdTeleOp, but the turn power comes from auto align and is used as is (not scaled by speed or TURN_MULT)
+    public void cmdTeleOpAutoTurn(double Left_Y, double Left_X, double turnPower, double Current_Speed) { // MJD
+        LeftJoystick_x = Left_X * Current_Speed; // MJD
+        LeftJoystick_y = Left_Y * Current_Speed; // MJD
+        RightJoystick_x = Math.max(-1.0, Math.min(1.0, turnPower)); // MJD
+        doTeleop(); // MJD
+    } // MJD
+
     private void doTeleop() {
         // Field-centric: "stick forward" always means "away from the driver",
         // no matter which way the robot is facing. Uses the Pinpoint heading.
