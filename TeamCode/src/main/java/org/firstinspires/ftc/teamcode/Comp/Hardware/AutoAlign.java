@@ -18,7 +18,8 @@ public class AutoAlign {
     public static double ALIGN_MAX_POWER = 0.6;
     public static double ALIGN_TOL_DEG = 1.5;      // aligned when closer than this
     public static double ALIGN_AIM_OFFSET_DEG = 0; // trim if the launcher is not exactly on the back axis
-    public static double ALIGN_TURN_SIGN = -1;     // MJD: +1 or -1. It turned the wrong way with +1, so it is -1 now (flip it live in Panels)
+    //public static double ALIGN_TURN_SIGN = -1;  // MJD: old, -1 made the controller push AWAY from the target, so the robot settled 180 deg off
+    public static double ALIGN_TURN_SIGN = 1;      // MJD: keep this +1. -1 can only ever settle pointing the opposite way. To aim the other end, use ALIGN_AIM_OFFSET_DEG
 
     // ---------------- STATE (for telemetry and auton "wait until aligned") ----------------
     private double lastErrDeg = 0;
