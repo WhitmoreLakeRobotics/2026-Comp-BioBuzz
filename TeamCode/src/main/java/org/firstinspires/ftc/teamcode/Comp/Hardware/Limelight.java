@@ -39,7 +39,8 @@ public class Limelight extends BaseHardware{
     //public static double CAM_LEFT_IN = 8.0;      // MJD: camera left of robot center (negative = right)   // MJD: old value
     public static double CAM_LEFT_IN = 0.0;      // MJD: lens is centered side to side
     //public static double CAM_YAW_DEG = 45;      // MJD: 0 = camera looks straight ahead, positive = turned left   // MJD: old value, camera was assumed to look toward the intake
-    public static double CAM_YAW_DEG = 225;      // MJD: 0 = toward the intake, + = left. 180 = toward the launcher, 225 = launcher side angled 45 deg
+    //public static double CAM_YAW_DEG = 225;      // MJD: old, aimed 45 deg off. A tag centered in the camera is also centered on the launcher.
+    public static double CAM_YAW_DEG = 180;      // MJD: 0 = toward the intake, + = left. 180 = looks straight along the launcher axis
 
     // ---------------- AUTO ALIGN (MJD) ----------------
     // Remembers the closest AprilTag with a positive ID. The turning itself moved to the AutoAlign class.
