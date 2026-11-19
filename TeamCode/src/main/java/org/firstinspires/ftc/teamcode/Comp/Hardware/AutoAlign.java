@@ -18,6 +18,7 @@ public class AutoAlign {
     public static double ALIGN_MAX_POWER = 0.6;
     public static double ALIGN_TOL_DEG = 1.5;      // aligned when closer than this
     public static double ALIGN_AIM_OFFSET_DEG = 0; // trim if the launcher is not exactly on the back axis
+    public static double ALIGN_TURN_SIGN = -1;     // MJD: +1 or -1. It turned the wrong way with +1, so it is -1 now (flip it live in Panels)
 
     // ---------------- STATE (for telemetry and auton "wait until aligned") ----------------
     private double lastErrDeg = 0;
@@ -37,7 +38,8 @@ public class AutoAlign {
         if (aligned) {
             return 0;
         }
-        double power = ALIGN_KP * lastErrDeg;
+        //double power = ALIGN_KP * lastErrDeg;   // MJD: old, turned the wrong way
+        double power = ALIGN_TURN_SIGN * ALIGN_KP * lastErrDeg; // MJD
         return Math.copySign(Math.max(ALIGN_MIN_POWER, Math.min(ALIGN_MAX_POWER, Math.abs(power))), power);
     }
 

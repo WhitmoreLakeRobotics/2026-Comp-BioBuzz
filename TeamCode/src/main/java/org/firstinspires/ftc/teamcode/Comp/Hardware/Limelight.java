@@ -203,6 +203,11 @@ public class Limelight extends BaseHardware{
         updateHive(); // MJD
         updateAlignTag(); // MJD
         telemetry.addData("Align tag known", alignTagField != null); // MJD
+        // MJD: debug, shows which step is failing (remove when auto align works)
+        telemetry.addData("LL result / valid", "%b / %b", result != null, result != null && result.isValid()); // MJD
+        telemetry.addData("LL staleness (ms)", result != null ? result.getStaleness() : -1); // MJD
+        telemetry.addData("LL tags seen", (result != null && result.getFiducialResults() != null) ? result.getFiducialResults().size() : -1); // MJD
+        telemetry.addData("LL robotPose set", robotPose != null); // MJD
         //telemetry.addData("Align error (deg)", "%.1f", alignErrDeg); // MJD: now shown by Telop from AutoAlign
         telemetry.addData("TagDistance (m)", TagDistance); //disable after tuning
         telemetry.addData("Hive State", hiveState); // MJD
