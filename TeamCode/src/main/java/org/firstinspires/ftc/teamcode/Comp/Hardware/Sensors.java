@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 public class Sensors extends BaseHardware {
 
     // ---------------- TUNABLE CONSTANTS ----------------
-    public static double PRESENT_CM = 3.0;   // closer than this = pollen is there (tune in Panels)
+    public static double PRESENT_CM = 4.5;   // closer than this = pollen is there (tune in Panels)
     //public static int CONFIRM_LOOPS = 3;     // must see pollen this many loops in a row (stops one noisy reading)
-    public static double STABLE_SEC = 0.25;  // MJD: BOTH sensors must see pollen this long, continuously, before isFull()
+    public static double STABLE_SEC = 0.2;  // MJD: BOTH sensors must see pollen this long, continuously, before isFull()
 
     private static final String FEEDER_SENSOR_NAME = "NTKPD1";   // top of the feeder, must match the robot configuration
     private static final String INTAKE_SENSOR_NAME = "NTKPD2";   // just inside the intake
