@@ -164,6 +164,7 @@ public class Robot extends BaseHardware {
         pollenBlocker.loop();
         feeder.loop();
         lighting.loop();
+        lighting.cmdIntakeSpinning(!intake.isIntakeOff()); // MJD: second light, yellow = intake spinning, red = stopped
         limelight.setRobotPose(driveTrain.getPose()); // MJD: so the hive tag can be placed on the field
         limelight.loop();
         flower_ramp.loop();

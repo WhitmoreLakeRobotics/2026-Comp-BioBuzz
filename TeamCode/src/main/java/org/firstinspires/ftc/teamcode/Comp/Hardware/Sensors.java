@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Comp.Hardware;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor; // MJD
+import android.graphics.Color; // MJD
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.util.ElapsedTime; // MJD
@@ -17,6 +19,10 @@ public class Sensors extends BaseHardware {
     // ---------------- TUNABLE CONSTANTS ----------------
     public static double PRESENT_CM = 4.5;   // closer than this = pollen is there (tune in Panels)
     //public static int CONFIRM_LOOPS = 3;     // must see pollen this many loops in a row (stops one noisy reading)
+    public static boolean REQUIRE_YELLOW = true; // MJD: feeder sensor (NTKPD1) must also see yellow (pollen color)
+    public static double YELLOW_HUE_MIN = 40;    // MJD: degrees, tune in Panels with pollen in front of the sensor
+    public static double YELLOW_HUE_MAX = 75;    // MJD: degrees
+    public static double YELLOW_SAT_MIN = 0.45;  // MJD: 0..1, rejects white/grey
     public static double STABLE_SEC = 0.2;  // MJD: BOTH sensors must see pollen this long, continuously, before isFull()
 
     private static final String FEEDER_SENSOR_NAME = "NTKPD1";   // top of the feeder, must match the robot configuration
@@ -24,6 +30,9 @@ public class Sensors extends BaseHardware {
 
     private DistanceSensor feederSensor;
     private DistanceSensor intakeSensor;
+    private NormalizedColorSensor feederColor; // MJD: same device as NTKPD1, null if it has no color
+    private float[] hsv = new float[3]; // MJD
+    private boolean feederYellow = false; // MJD
 
     private double feederCm = Double.NaN;
     private double intakeCm = Double.NaN;
@@ -36,6 +45,7 @@ public class Sensors extends BaseHardware {
     public void init() {
         feederSensor = hardwareMap.tryGet(DistanceSensor.class, FEEDER_SENSOR_NAME);
         intakeSensor = hardwareMap.tryGet(DistanceSensor.class, INTAKE_SENSOR_NAME);
+        feederColor = hardwareMap.tryGet(NormalizedColorSensor.class, FEEDER_SENSOR_NAME); // MJD
     }
 
     @Override
@@ -53,7 +63,18 @@ public class Sensors extends BaseHardware {
 
         feederLoops = isNear(feederCm) ? feederLoops + 1 : 0;
         intakeLoops = isNear(intakeCm) ? intakeLoops + 1 : 0;
-        boolean nowBoth = isNear(feederCm) && isNear(intakeCm); // MJD
+        // MJD: only read color when something is close (saves an I2C read most loops)
+        feederYellow = false; // MJD
+        if (isNear(feederCm)) { // MJD
+            if (!REQUIRE_YELLOW || feederColor == null) {
+                feederYellow = true; // MJD: color not required, or no color sensor (see telemetry)
+            } else {
+                Color.colorToHSV(feederColor.getNormalizedColors().toColor(), hsv); // MJD
+                feederYellow = hsv[0] >= YELLOW_HUE_MIN && hsv[0] <= YELLOW_HUE_MAX && hsv[1] >= YELLOW_SAT_MIN; // MJD
+            }
+        }
+        //boolean nowBoth = isNear(feederCm) && isNear(intakeCm);
+        boolean nowBoth = feederYellow && isNear(intakeCm); // MJD: feeder must be near AND yellow
         if (nowBoth && !bothNear) bothTimer.reset(); // MJD: both just became true, start the clock
         bothNear = nowBoth; // MJD: any dropout makes this false, so the clock restarts next time
 
@@ -61,6 +82,7 @@ public class Sensors extends BaseHardware {
         telemetry.addData("Intake sensor (cm)", intakeCm);
         telemetry.addData("Pollen feeder / intake / full", "%b / %b / %b", hasFeederPollen(), hasIntakePollen(), isFull());
         telemetry.addData("Sensors found", "%b / %b", feederSensor != null, intakeSensor != null);
+        telemetry.addData("Feeder color hue / sat / yellow / has color", "%.0f / %.2f / %b / %b", hsv[0], hsv[1], feederYellow, feederColor != null); // MJD
     }
 
     @Override
@@ -72,7 +94,7 @@ public class Sensors extends BaseHardware {
     }
 
     //public boolean hasFeederPollen() { return feederLoops >= CONFIRM_LOOPS; }
-    public boolean hasFeederPollen() { return isNear(feederCm); } // MJD: raw reading now
+    public boolean hasFeederPollen() { return feederYellow; } // MJD: near AND yellow
 
     //public boolean hasIntakePollen() { return intakeLoops >= CONFIRM_LOOPS; }
     public boolean hasIntakePollen() { return isNear(intakeCm); } // MJD: raw reading now

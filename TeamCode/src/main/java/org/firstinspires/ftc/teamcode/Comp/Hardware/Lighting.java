@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Lighting extends BaseHardware{
 
     private Servo photo;
+    private Servo photo2; // MJD: second light, shows intake spinning/stopped
+    private int intakeLightState = -1; // MJD: -1 unknown, 0 stopped, 1 spinning (so the servo is only written on change)
 
     private static final String Photo = "Lighting";
     private static double Off = 0.0;
@@ -24,6 +26,7 @@ public class Lighting extends BaseHardware{
     public void init(){
         photo = hardwareMap.get(Servo.class, "Lighting");
         setColor(Red);
+        photo2 = hardwareMap.tryGet(Servo.class, "Lighting2"); // MJD: name must match the robot configuration, ignored if missing
 
     }
 
@@ -50,6 +53,7 @@ public class Lighting extends BaseHardware{
         if(photo != null){
             setColor(Off);
         }
+        if (photo2 != null) photo2.setPosition(Off); // MJD
 
     }
 
@@ -59,6 +63,14 @@ public class Lighting extends BaseHardware{
         setColor(InPosition ?Green:Red);
 
     }
+    /** MJD: second light. Yellow while the intake is spinning, red when it has stopped. */
+    public void cmdIntakeSpinning(boolean spinning) { // MJD
+        int state = spinning ? 1 : 0; // MJD
+        if (photo2 == null || state == intakeLightState) return; // MJD
+        intakeLightState = state; // MJD
+        photo2.setPosition(spinning ? Yellow : Red); // MJD
+    } // MJD
+
     private void setColor(double position){
         currentColor = position;
         photo.setPosition(position);
