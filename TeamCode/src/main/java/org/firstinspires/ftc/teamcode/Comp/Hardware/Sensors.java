@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
 /**
  * MJD: two pollen sensors. NTKPD1 is at the top of the feeder, NTKPD2 is just inside the intake.
@@ -15,7 +16,8 @@ public class Sensors extends BaseHardware {
 
     // ---------------- TUNABLE CONSTANTS ----------------
     public static double PRESENT_CM = 3.0;   // closer than this = pollen is there (tune in Panels)
-    public static int CONFIRM_LOOPS = 3;     // must see pollen this many loops in a row (stops one noisy reading)
+    //public static int CONFIRM_LOOPS = 3;     // must see pollen this many loops in a row (stops one noisy reading)
+    public static double STABLE_SEC = 0.25;  // MJD: BOTH sensors must see pollen this long, continuously, before isFull()
 
     private static final String FEEDER_SENSOR_NAME = "NTKPD1";   // top of the feeder, must match the robot configuration
     private static final String INTAKE_SENSOR_NAME = "NTKPD2";   // just inside the intake
@@ -27,6 +29,8 @@ public class Sensors extends BaseHardware {
     private double intakeCm = Double.NaN;
     private int feederLoops = 0;
     private int intakeLoops = 0;
+    private final ElapsedTime bothTimer = new ElapsedTime(); // MJD: time since both sensors started seeing pollen
+    private boolean bothNear = false; // MJD
 
     @Override
     public void init() {
@@ -49,6 +53,9 @@ public class Sensors extends BaseHardware {
 
         feederLoops = isNear(feederCm) ? feederLoops + 1 : 0;
         intakeLoops = isNear(intakeCm) ? intakeLoops + 1 : 0;
+        boolean nowBoth = isNear(feederCm) && isNear(intakeCm); // MJD
+        if (nowBoth && !bothNear) bothTimer.reset(); // MJD: both just became true, start the clock
+        bothNear = nowBoth; // MJD: any dropout makes this false, so the clock restarts next time
 
         telemetry.addData("Feeder sensor (cm)", feederCm);
         telemetry.addData("Intake sensor (cm)", intakeCm);
@@ -64,91 +71,15 @@ public class Sensors extends BaseHardware {
         return !Double.isNaN(cm) && cm <= PRESENT_CM;
     }
 
-    public boolean hasFeederPollen() { return feederLoops >= CONFIRM_LOOPS; }
+    //public boolean hasFeederPollen() { return feederLoops >= CONFIRM_LOOPS; }
+    public boolean hasFeederPollen() { return isNear(feederCm); } // MJD: raw reading now
 
-    public boolean hasIntakePollen() { return intakeLoops >= CONFIRM_LOOPS; }
+    //public boolean hasIntakePollen() { return intakeLoops >= CONFIRM_LOOPS; }
+    public boolean hasIntakePollen() { return isNear(intakeCm); } // MJD: raw reading now
 
     /** Both sensors see pollen. */
-    public boolean isFull() { return hasFeederPollen() && hasIntakePollen(); }
+    //public boolean isFull() { return hasFeederPollen() && hasIntakePollen(); }
+    public boolean isFull() { return bothNear && bothTimer.seconds() >= STABLE_SEC; } // MJD: both seen, stable for STABLE_SEC
 }
 
-// MJD: old version (3 color sensors, all commented out), kept for reference:
-/*package org.firstinspires.ftc.teamcode.Comp.Hardware;
 
-import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-@Disabled
-@Configurable
-public class Sensors extends BaseHardware{
-
-    public ColorSensor NTKPD1; //may be a range sensor
-    public ColorSensor NTKPD2;
-    public ColorSensor NTKPD3;
-
-    public double NTKPD1distance;
-    public double NTKPD2distance;
-    public double NTKPD3distance;
-
-
-
-    @Override
-    public void init() {
-
-        NTKPD3 = hardwareMap.get(ColorSensor.class, "NTKPD3");
-        NTKPD2 = hardwareMap.get(ColorSensor.class, "NTKPD2");
-        NTKPD1 = hardwareMap.get(ColorSensor.class, "NTKPD1");
-        
-    }
-
-    @Override
-    public void init_loop() {
-
-    }
-
-    @Override
-    public void start() {
-
-    }
-
-    @Override
-    public void loop() {
-
-    }
-
-    @Override
-    public void stop() {
-
-    }
-  /*  private void getDistNTKAP2() {
-        NTKPD2distance = NTKPD2.getDistance(DistanceUnit.CM);
-    }
-    private void getDistNTKAP3() {
-        NTKPD3distance = NTKPD3.getDistance(DistanceUnit.CM);
-    }
-    private void getDistNTKAP1() {
-        NTKPD1distance = NTKPD1.getDistance(DistanceUnit.CM);
-    }
-
-    public enum Distance3 {
-        FILLED3,
-        MISSING3
-    }
-
-    public enum Distance2 {
-        FILLED2,
-        MISSING2
-    }
-
-    public enum Distance1 {
-        FILLED1,
-        MISSING1
-    }
-
-
-}
-*/
