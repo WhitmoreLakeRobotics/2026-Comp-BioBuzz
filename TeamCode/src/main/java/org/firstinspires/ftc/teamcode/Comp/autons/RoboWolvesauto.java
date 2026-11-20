@@ -24,38 +24,72 @@ import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 public class RoboWolvesauto extends OpMode {
 
     Robot robot = new Robot();
+    private TelemetryManager telemetryM;
 
     public static final PoseFactory pf = PoseFactory.degrees();
 
+   // public static final Pose Startpose = pf.of();
     public static final Pose Scorepose = pf.of (61, 133, 90);
     public static final Pose Park = pf.of (11.4, 116, 90);
 
+    public Path ScorePark(){
+        return Paths.line(Scorepose,Park).constant(Scorepose);
+    }
+
+    protected Command cmdScore(){
+
+        return sequential(
+                robot.cmdLaunchVolley(4000),
+                robot.driveTrain.cmdAtFollow(ScorePark()),
+                robot.cmdTripleThreatStop()
+        );
+    }
+
+    private Command auto;
 
     @Override
     public void init() {
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+        robot.hardwareMap = hardwareMap;
+        robot.telemetry = telemetry;
+        robot.init();
+        Scheduler.reset();
+        robot.driveTrain.cmdOpmodestartPose(Scorepose);
 
     }
 
     @Override
     public void init_loop() {
-
+    robot.init_loop();
     }
 
 
     @Override
     public void start() {
-
+        robot.start();
+       // robot.intake.cmdIntakeForward();
+        auto = cmdScore();
+        schedule(auto);
     }
 
 
     @Override
     public void loop() {
+        robot.loop();
+        Scheduler.execute();
+        telemetryM.addData("pose", robot.driveTrain.getPose());
+        telemetryM.addData("auto running", auto.isScheduled());
+        telemetryM.update();   // sends to Panels only
 
+        // Driver Station: only the few things the drive team needs
+        telemetry.addData("auto running", auto.isScheduled());
+        telemetry.update();
     }
 
 
     @Override
     public void stop() {
+        robot.stop();
 
     }
 }

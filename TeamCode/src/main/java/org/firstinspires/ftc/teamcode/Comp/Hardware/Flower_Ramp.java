@@ -7,14 +7,18 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Flower_Ramp extends BaseHardware{
     private Servo servoRamp;
+    private Servo RightRamp;
     public Mode CurrentMode = Mode.Down;
-    public static double Down_POSITION = 0.30;
-    public static double Up_POSITION = 0.60;//No position right now
+    public static double Down_POSITION = 0.30;  //left
+    public static double Up_POSITION = 0.60;//No position right now //left
+    public static double UP = 0.65; // right
+    public static double DOWN = 0.40; //right
+
     @Override
     public void init() {
         servoRamp = hardwareMap.get(Servo.class, "Flower_Ramp");
 
-        cmdDown();
+        cmdUp();    //was Down VAM
 
 
     }
@@ -44,6 +48,7 @@ public class Flower_Ramp extends BaseHardware{
         CurrentMode = Mode.Down;
 
         servoRamp.setPosition(Down_POSITION);
+        RightRamp.setPosition(DOWN);
     }
 
     public void cmdUp() {
@@ -51,6 +56,7 @@ public class Flower_Ramp extends BaseHardware{
         CurrentMode = Mode.Up;
 
         servoRamp.setPosition(Up_POSITION);
+        RightRamp.setPosition(UP);
     }
     public enum Mode {
         Down,
