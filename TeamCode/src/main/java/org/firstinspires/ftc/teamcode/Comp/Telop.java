@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
 import org.firstinspires.ftc.teamcode.Common.CommonLogic;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
+import org.firstinspires.ftc.teamcode.Comp.Hardware.Flower_Ramp; // MJD
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 import org.firstinspires.ftc.teamcode.OpModeStorage;
 
@@ -206,6 +207,15 @@ private TelemetryManager telemetryM;
         }
 
         gp1_prev_a = gamepad1.a;
+        // MJD: gamepad 1 right bumper toggles the flower ramp (press = up, press again = down)
+        if (CommonLogic.oneShot(gamepad1.right_bumper, gp1_prev_right_bumper)) { // MJD
+            if (robot.flower_ramp.CurrentMode == Flower_Ramp.Mode.Up) { // MJD
+                robot.flower_ramp.cmdDown(); // MJD
+            } else { // MJD
+                robot.flower_ramp.cmdUp(); // MJD
+            } // MJD
+        } // MJD
+        gp1_prev_right_bumper = gamepad1.right_bumper; // MJD
         gp1_prev_b = gamepad1.b;
         gp1_prev_y = gamepad1.y;
         gp1_prev_x = gamepad1.x;
