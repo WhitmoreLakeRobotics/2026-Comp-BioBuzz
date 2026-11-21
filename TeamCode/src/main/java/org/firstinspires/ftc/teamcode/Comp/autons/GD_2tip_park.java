@@ -46,6 +46,8 @@ public class GD_2tip_park extends OpMode {
     public static Pose GDcp = pf.of (11.71, 50.27, 270);
     public static Pose Backup = pf.of (14, 25.3, 270);
     public static Pose park = pf.of (14.2, 115, 225);
+    public static Pose flowerpickup = pf.of (46.7, 128, 90);
+   // public static Pose
 
 
 
@@ -70,6 +72,7 @@ public class GD_2tip_park extends OpMode {
     public Path prkPth(){
         return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
     }
+
 
     protected Command cmdScorePark() {
         // MJD: the score path is only ~2 in long, so the volley used to start right after PLAY, before the
