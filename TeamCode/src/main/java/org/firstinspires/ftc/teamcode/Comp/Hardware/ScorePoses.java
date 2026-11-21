@@ -20,15 +20,15 @@ public class ScorePoses  {
 
     public static Pose ScorePoseLT(){
         return pf.of(LT_X, LT_Y,LT_Heading);
-    }
+    } //Left Top
     public static Pose ScorePoseRT(){
         return pf.of(RT_X, RT_Y,RT_Heading);
-    }
+    }  //Right Top
     public static Pose ScorePoseLB(){
         return pf.of(LB_X, LB_Y,LB_Heading);
-    }
+    } //Left Bottom
     public static Pose ScorePoseRB(){
         return pf.of(RB_X, RB_Y,RB_Heading);
-    }
+    } //Right Bottom
 
 }
