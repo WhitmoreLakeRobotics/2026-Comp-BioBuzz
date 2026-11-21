@@ -33,6 +33,7 @@ public class Robot extends BaseHardware {
     public Limelight limelight = new Limelight();
     public AutoAlign autoAlign = new AutoAlign(); // MJD: turns the launcher toward the closest positive AprilTag
     public Flower_Ramp flower_ramp = new Flower_Ramp();
+    public ShotBlocker shotBlocker = new ShotBlocker();
   //  public Sensors sensors = new Sensors();
     public Sensors sensors = new Sensors(); // MJD: pollen sensors (feeder top and inside the intake)
     // MJD: intake stop when both sensors see pollen
@@ -117,6 +118,10 @@ public class Robot extends BaseHardware {
         sensors.telemetry = this.telemetry; // MJD
         sensors.init(); // MJD
 
+        shotBlocker.hardwareMap = this.hardwareMap;
+        shotBlocker.telemetry = this.telemetry;
+        shotBlocker.init();
+
     }
 
     @Override
@@ -133,6 +138,7 @@ public class Robot extends BaseHardware {
         limelight.init_loop();
         flower_ramp.init_loop();
         //sensors.init_loop();
+        shotBlocker.init_loop();
 
     }
 
@@ -150,6 +156,7 @@ public class Robot extends BaseHardware {
         limelight.start();
         flower_ramp.start();
         //sensors.start();
+        shotBlocker.start();
     }
 
     @Override
@@ -171,6 +178,7 @@ public class Robot extends BaseHardware {
         //sensors.loop();
         sensors.loop(); // MJD
         handleIntakeFull(); // MJD
+        shotBlocker.loop();
     }
 
     /**
@@ -194,6 +202,7 @@ public class Robot extends BaseHardware {
         flower_ramp.stop();
        // sensors.stop();
         sensors.stop(); // MJD
+        shotBlocker.stop();
     }
 
     // ---------------- INTAKE FULL (MJD) ----------------

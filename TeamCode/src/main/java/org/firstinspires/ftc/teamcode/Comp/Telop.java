@@ -403,7 +403,7 @@ private TelemetryManager telemetryM;
         // CHANGED: manual blocker override. It only acts while the trigger is held (open) and
         // once on release (close), and only while TripleThreat is idle. Before, the else branch
         // ran every loop and kept closing the blocker, which cancelled the shoot sequence.
-        boolean blockerOverrideHeld = gamepad2.left_trigger > 0.6;
+        boolean  blockerOverrideHeld = gamepad2.left_trigger > 0.6;
 
         if (robot.tripleThreat.isIdle()) {
             if (blockerOverrideHeld){
