@@ -20,9 +20,9 @@ public class Sensors extends BaseHardware {
     public static double PRESENT_CM = 4.5;   // closer than this = pollen is there (tune in Panels)
     //public static int CONFIRM_LOOPS = 3;     // must see pollen this many loops in a row (stops one noisy reading)
     public static boolean REQUIRE_YELLOW = true; // MJD: feeder sensor (NTKPD1) must also see yellow (pollen color)
-    public static double YELLOW_HUE_MIN = 40;    // MJD: degrees, tune in Panels with pollen in front of the sensor
-    public static double YELLOW_HUE_MAX = 75;    // MJD: degrees
-    public static double YELLOW_SAT_MIN = 0.45;  // MJD: 0..1, rejects white/grey
+    public static double YELLOW_HUE_MIN = 100;    // MJD: degrees, tune in Panels with pollen in front of the sensor
+    public static double YELLOW_HUE_MAX = 160;    // MJD: degrees
+    public static double YELLOW_SAT_MIN = 0.35;  // MJD: 0..1, rejects white/grey
     public static double STABLE_SEC = 0.2;  // MJD: BOTH sensors must see pollen this long, continuously, before isFull()
 
     private static final String FEEDER_SENSOR_NAME = "NTKPD1";   // top of the feeder, must match the robot configuration
