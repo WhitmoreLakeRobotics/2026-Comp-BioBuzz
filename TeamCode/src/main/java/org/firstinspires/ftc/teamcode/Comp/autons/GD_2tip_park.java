@@ -47,6 +47,7 @@ public class GD_2tip_park extends OpMode {
     public static Pose Backup = pf.of (14, 25.3, 270);
     public static Pose park = pf.of (14.2, 115, 225);
     public static Pose flowerpickup = pf.of (46.7, 128, 90);
+    public static Pose flowerpickup2 = pf.of (46.7, 128, 90);
    // public static Pose
 
 
@@ -68,6 +69,12 @@ public class GD_2tip_park extends OpMode {
     }
     public Path ToLaunch(){
         return Paths.line(Backup, ScorePoses.ScorePoseLT()).linear(Backup, ScorePoses.ScorePoseLT());
+    }
+    public Path flower(){
+        return Paths.line(ScorePoses.ScorePoseLT(),flowerpickup).linear(ScorePoses.ScorePoseLT(),flowerpickup);
+    }
+    public Path Toscore2(){
+        return Paths.line(flowerpickup,ScorePoses.ScorePoseLT()).linear(flowerpickup,ScorePoses.ScorePoseLT());
     }
     public Path prkPth(){
         return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
@@ -96,6 +103,9 @@ public class GD_2tip_park extends OpMode {
                 instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
              //   waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
+                robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
+                robot.driveTrain.cmdAtFollow(flower()),
+                robot.driveTrain.cmdAtFollow(Toscore2()),
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.driveTrain.cmdAtFollow(prkPth()),
                 robot.cmdTripleThreatStop(),

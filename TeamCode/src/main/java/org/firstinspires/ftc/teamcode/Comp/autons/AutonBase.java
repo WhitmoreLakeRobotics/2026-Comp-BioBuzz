@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Comp.autons;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 
 public class AutonBase {
@@ -17,7 +18,7 @@ public class AutonBase {
     // 7.5 from the launcher edge and 10.25 from the front of the intake.
     // PP actually sets to 0,0 off the field. the far wall is not 144, but 141.5 so don't measure from far wall
     public static Pose GDstartPose = Pf.of(55.25, 12.25, 270);
-    public static Pose GDscorePose = Pf.of(55, 16, 270);
+    public static Pose GDscorePose = Pf.of(58, 16, 270);
     public static Pose GDparkPose = Pf.of(13, 92, 0);
     public static Pose GDpickup = Pf.of(8,10.5,270); // pickup from the garden
 
@@ -40,7 +41,7 @@ public class AutonBase {
     public static final Pose scorePoseX = Pf.of(86.4, 15, 310); // right side of the red hive on the left side relative to the driveteam
 
    //Timer constants
-    public static final double LAUNCH_TIMER = 2000.0;
+    public static final double LAUNCH_TIMER = 1500.0;
     public static final double PICKUP_MAX_MS = 3000.0;
 
 
