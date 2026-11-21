@@ -52,9 +52,15 @@ public class KUDOS extends OpMode {
         return Paths.line(AutonBase.GDstartPose,AutonBase.GDscorePose) .linear(AutonBase.GDstartPose,AutonBase.GDscorePose);
     }
 
-    public Path GdPickup(){
-        return Paths.line(AutonBase.GDscorePose,AutonBase.GDpickup).linear(AutonBase.GDscorePose,AutonBase.GDpickup);
-    }
+    public static final Pose GDcp = pf.of(11.71, 50.27, 270); // MJD: control point that makes the garden drive an arc (same as GD_2tip_park)
+
+    //public Path GdPickup(){
+    //    return Paths.line(AutonBase.GDscorePose,AutonBase.GDpickup).linear(AutonBase.GDscorePose,AutonBase.GDpickup);
+    //}   // MJD: old, a straight line with the same heading at both ends, so the robot strafed straight over
+
+    public Path GdPickup(){ // MJD: curve through GDcp so the robot drives an arc
+        return Paths.curve(AutonBase.GDscorePose,GDcp,AutonBase.GDpickup).linear(AutonBase.GDscorePose,AutonBase.GDpickup); // MJD
+    } // MJD
 
     public Path Backup(){
         return Paths.line(AutonBase.GDpickup,backup).linear(AutonBase.GDpickup,backup);
@@ -84,9 +90,11 @@ public class KUDOS extends OpMode {
                 robot.driveTrain.cmdAtFollow(Backup()),
                 robot.driveTrain.cmdAtFollow(ToScore()), // MJD: drive to the score pose (LB); the hive check and launch happen from here
                 instant(() -> spinTimer.reset()),
-                waitUntil(() -> robot.limelight.getHiveState() != Limelight.HiveState.UNKNOWN || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
+                //waitUntil(() -> robot.limelight.getHiveState() != Limelight.HiveState.UNKNOWN || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD: old, any reading ended the wait
+                waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD: give the camera time to see the hive in its original spot
                 conditional( // MJD
-                        () -> robot.limelight.isHiveTipped(),
+                        //() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
+                        () -> !robot.limelight.isHiveUpright(), // MJD: tipped = the tag is not back in its original spot (moved OR not visible)
                         sequential(
                                 waitUntil(() -> robot.limelight.isHiveUpright() || timeLeftSec() <= PARK_TIME_LEFT_SEC), // MJD
                                 conditional(
@@ -95,7 +103,7 @@ public class KUDOS extends OpMode {
                                         instant(() -> { })
                                 )
                         ),
-                        robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER) // MJD: NOT tipped (or no reading), launch now
+                        robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER) // MJD: hive is upright, launch now
                 ),
                 robot.cmdCeaseFireSequence(),
                 robot.driveTrain.cmdAtFollow(Park()),
