@@ -45,6 +45,7 @@ public class GD_2cycle_park extends OpMode {
   //  public static Pose GDpickup = pf.of(10.6,7.7,180);
     public static Pose GDcp = pf.of (11.71, 50.27, 270);
     public static Pose Backup = pf.of (14, 25.3, 270);
+    public static Pose cpGDtoLTPOSE = pf.of(39,40,270); //naj control point to avoid parked partner
     public static Pose park = pf.of (14.2, 115, 225);
     public static Pose flowerpickup = pf.of (46.7, 128, 90);
    // public static Pose
@@ -66,8 +67,8 @@ public class GD_2cycle_park extends OpMode {
     public Path backup(){
         return Paths.line(AutonBase.GDpickup, Backup).linear(AutonBase.GDpickup, Backup);
     }
-    public Path ToLaunch(){
-        return Paths.line(Backup, ScorePoses.ScorePoseLT()).linear(Backup, ScorePoses.ScorePoseLT());
+    public Path ToLaunchLT(){
+        return Paths.curve(Backup, cpGDtoLTPOSE, ScorePoses.ScorePoseLT()).linear(Backup, ScorePoses.ScorePoseLT());
     }
     public Path prkPth(){
         return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
@@ -94,8 +95,8 @@ public class GD_2cycle_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
                 robot.driveTrain.cmdAtFollow(backup()),
                 instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
-             //   waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
-                robot.driveTrain.cmdAtFollow(ToLaunch()),
+                waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
+                robot.driveTrain.cmdAtFollow(ToLaunchLT()),
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.driveTrain.cmdAtFollow(prkPth()),
                 robot.cmdTripleThreatStop(),
