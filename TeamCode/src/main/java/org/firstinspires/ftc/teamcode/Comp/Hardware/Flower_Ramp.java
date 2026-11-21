@@ -13,7 +13,7 @@ public class Flower_Ramp extends BaseHardware{
     //public static double Up_POSITION = 0.60;//No position right now //left
     //public static double UP = 0.65; // right
     //public static double DOWN = 0.40; //right
-    public static double Down_POSITION = 0.85;  // MJD: center 0.5 minus 0.25, used by BOTH servos (right is reversed)
+    public static double Down_POSITION = 0.83;  // MJD: center 0.5 minus 0.25, used by BOTH servos (right is reversed)
     public static double Up_POSITION = 0.30;    // MJD: center 0.5 plus 0.25, used by BOTH servos (right is reversed)
 
     @Override

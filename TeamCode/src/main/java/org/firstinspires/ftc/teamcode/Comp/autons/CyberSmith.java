@@ -46,10 +46,10 @@ public class CyberSmith extends OpMode {
     public static Pose actualyScore=pf.of(37,110,130);
 
     public Path pth1Forward() {
-        return Paths.line(AutonBase.LZstartPose, AutonBase.LZscorePose).constant(AutonBase.LZscorePose);
+        return Paths.line(AutonBase.LZstartPose, AutonBase.LZscorePose2).constant(AutonBase.LZscorePose2);
     }
     public Path pth1Score() {
-        return Paths.line(AutonBase.LZscorePose, ScorePoses.ScorePoseLT()).constant(ScorePoses.ScorePoseLT());
+        return Paths.line(AutonBase.LZscorePose2, ScorePoses.ScorePoseLT()).constant(ScorePoses.ScorePoseLT());
     }
 
     public Path pthPark() {

@@ -23,7 +23,8 @@ public class AutonBase {
     public static Pose GDpickup = Pf.of(8,10.5,270); // pickup from the garden
 
     public static Pose LZstartPose = Pf.of(59, 133.25, 90);
-    public static Pose LZscorePose = Pf.of(55, 120, 90);
+    public static Pose LZscorePose = Pf.of(50, 126, 90);
+    public static Pose LZscorePose2 = Pf.of(58, 109, 90);
     public static Pose LZparkPose = Pf.of(13, 120, 0);
 
 
@@ -43,7 +44,7 @@ public class AutonBase {
    //Timer constants
     public static final double LAUNCH_TIMER = 1500.0;
     public static final double PICKUP_MAX_MS = 3000.0;
-
+    public static final double Ramp_TIMER = 1500.0;
 
 /* Changed class from Opmode to Object so these are not needed
 

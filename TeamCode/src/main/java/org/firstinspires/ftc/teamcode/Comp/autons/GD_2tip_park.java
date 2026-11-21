@@ -6,6 +6,9 @@ import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
+
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.api.Paths;
@@ -18,6 +21,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
+import org.firstinspires.ftc.teamcode.Comp.Hardware.Flower_Ramp;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 
@@ -47,7 +51,8 @@ public class GD_2tip_park extends OpMode {
     public static Pose Backup = pf.of (14, 25.3, 270);
     public static Pose park = pf.of (14.2, 115, 225);
     public static Pose flowerpickup = pf.of (46.7, 128, 90);
-    public static Pose flowerpickup2 = pf.of (46.7, 128, 90);
+    public static Pose toscore = pf.of(32, 83,270);
+    public static Pose flowerBack = pf .of(47, 108,90);
    // public static Pose
 
 
@@ -67,14 +72,23 @@ public class GD_2tip_park extends OpMode {
     public Path backup(){
         return Paths.line(AutonBase.GDpickup, Backup).linear(AutonBase.GDpickup, Backup);
     }
+    public Path toscore(){
+        return Paths.line(Backup,toscore).linear(Backup,toscore);
+    }
     public Path ToLaunch(){
-        return Paths.line(Backup, ScorePoses.ScorePoseLT()).linear(Backup, ScorePoses.ScorePoseLT());
+        return Paths.line(toscore,LZscorePose).linear(toscore,LZscorePose);
+    }
+    public Path flowerback(){
+        return Paths.line(LZscorePose,flowerBack).linear(LZscorePose,flowerBack);
     }
     public Path flower(){
-        return Paths.line(ScorePoses.ScorePoseLT(),flowerpickup).linear(ScorePoses.ScorePoseLT(),flowerpickup);
+        return Paths.line(flowerBack,flowerpickup).linear(flowerBack,flowerpickup);
+    }
+    public Path flowerback2(){
+        return Paths.line(flowerpickup,flowerBack).linear(flowerpickup,flowerBack);
     }
     public Path Toscore2(){
-        return Paths.line(flowerpickup,ScorePoses.ScorePoseLT()).linear(flowerpickup,ScorePoses.ScorePoseLT());
+        return Paths.line(flowerBack,ScorePoses.ScorePoseLT()).linear(flowerBack,ScorePoses.ScorePoseLT());
     }
     public Path prkPth(){
         return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
@@ -102,9 +116,15 @@ public class GD_2tip_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(backup()),
                 instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
              //   waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
+                robot.driveTrain.cmdAtFollow(toscore()),
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
+                robot.driveTrain.cmdAtFollow(flowerback()),
+                robot.cmdDown(),
                 robot.driveTrain.cmdAtFollow(flower()),
+                waitMs(AutonBase.Ramp_TIMER),
+                robot.driveTrain.cmdAtFollow(flowerback2()),
+                robot.cmdUp(),
                 robot.driveTrain.cmdAtFollow(Toscore2()),
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.driveTrain.cmdAtFollow(prkPth()),

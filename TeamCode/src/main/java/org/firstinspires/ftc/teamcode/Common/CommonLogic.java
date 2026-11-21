@@ -46,7 +46,7 @@ public class CommonLogic extends Object {
         return Math.abs(Math.pow(joyValue, 2)) * sign;
     }
 
-    //*******************************************************************************
+
     // MJD: fixed - old version treated every negative stick value as zero
     public static double DeadBand(double joyValue){ // MJD
         return Math.abs(joyValue) < Settings.JOYSTICK_DEADBAND_STICK ? 0.0 : joyValue; // MJD

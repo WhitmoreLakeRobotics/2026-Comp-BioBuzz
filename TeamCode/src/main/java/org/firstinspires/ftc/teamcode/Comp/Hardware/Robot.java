@@ -26,7 +26,7 @@ public class Robot extends BaseHardware {
     //public TransitionR transitionR = new TransitionR();
     public PollenBlocker pollenBlocker = new PollenBlocker();
     public Feeder feeder = new Feeder();
-    //public Flower_Ramp Ramp = new Flower_Ramp();   // MJD: duplicate of flower_ramp below, both drove the same servo
+    //public Flower_Ramp Ramp = new flower_Ramp();   // MJD: duplicate of flower_ramp below, both drove the same servo
     // CHANGED: runs the launch sequence. Declared AFTER the parts it uses.
     public TripleThreat tripleThreat = new TripleThreat(launcher, feeder, pollenBlocker, intake);
     public Lighting lighting = new Lighting();
@@ -285,7 +285,19 @@ public class Robot extends BaseHardware {
                 instant(() -> feeder.cmdFeederStop()),
                 instant(() -> intake.cmdIntakeStop())
         );
+
+
     }
+    public Command cmdDown(){
+        return sequential(
+                instant(() -> flower_ramp.cmdDown()));
+    }
+    public Command cmdUp(){
+            return sequential(
+                    instant(() -> flower_ramp.cmdUp()));
+    }
+
+
 
 
 
