@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
+import org.firstinspires.ftc.teamcode.Comp.Hardware.Flower_Ramp;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 
@@ -42,6 +43,7 @@ public class GD_2cycle_park extends OpMode {
         public static Pose scorePose = pf.of(56, 25, 90);
         public static Pose parkpose = pf.of(10, 90, 90);
     */
+    public static Pose toscore = pf.of(32, 83,270);
     public static Pose CPparkpath = pf.of(24, 39, 0);
     //  public static Pose GDpickup = pf.of(10.6,7.7,180);
     public static Pose GDcp = pf.of(11.71, 50.27, 270);
@@ -68,10 +70,12 @@ public class GD_2cycle_park extends OpMode {
     public Path backup() {
         return Paths.line(AutonBase.GDpickup, Backup).linear(AutonBase.GDpickup, Backup);
     }
-
+  public Path toscore(){
+        return Paths.line(Backup,toscore).linear(Backup,toscore);
+  }
     //back to launch at first hive again
     public Path ToLaunchA() {
-        return Paths.line(Backup, ScorePoses.ScorePoseLB()).linear(Backup, ScorePoses.ScorePoseLB());
+        return Paths.line(toscore, ScorePoses.ScorePoseLB()).linear(toscore, ScorePoses.ScorePoseLB());
     }
 
     // from 2nd launch to flower on the other side
