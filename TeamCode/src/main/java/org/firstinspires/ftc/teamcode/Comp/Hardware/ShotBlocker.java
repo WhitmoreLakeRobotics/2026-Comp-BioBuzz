@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ShotBlocker extends BaseHardware{
     public Servo ShotBlocker;
 
-    private static double UP = 0.80;
-    private static double Down = 0.30;
+    private static double UP = 0.35;
+    private static double Down = 0.80;
 
     public Mode CurrentMode = Mode.Down;
 

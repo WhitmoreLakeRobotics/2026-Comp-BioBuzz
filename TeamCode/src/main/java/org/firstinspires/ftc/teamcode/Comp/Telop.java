@@ -385,9 +385,11 @@ private TelemetryManager telemetryM;
 
         // CHANGED: feeder backward while held (the TODO "map a button to cmdFeederBackward").
         if (gamepad2.dpad_left) {
+            robot.shotBlocker.cmdUp();
         }
 
         if (gamepad2.dpad_right) {
+            robot.shotBlocker.cmdDown();
 
         }
 
