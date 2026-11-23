@@ -50,7 +50,16 @@ public class Limelight extends BaseHardware{
     //public static double ALIGN_TOL_DEG = 1.5;      // MJD: moved to AutoAlign
     //public static double ALIGN_AIM_OFFSET_DEG = 0; // MJD: moved to AutoAlign
     public static double ALIGN_MAX_STALE_MS = 100; // MJD: ignore camera frames older than this
-    private double[] alignTagField = null;         // MJD: field x,y (in) of the closest positive tag, last seen
+    private double[] alignTagField = null;         // MJD: field x,y (in) of the AIM point (the tag, or the spot behind it), last seen
+    // MJD: aim BEHIND the tag. The point is moved along the tag's own direction (into the wall), which only changes
+    // the aim angle when the robot is off to the side of the tag. 0 = off (aim at the tag itself).
+    public static double AIM_BEHIND_IN = 4;          // MJD: inches behind the tag face to aim at (0 = off, tune in Panels, try 4-8)
+    public static int NORMAL_ANGLE_SOURCE = 1;       // MJD: which tag angle is the left/right turn of the tag: 0 = yaw, 1 = pitch, 2 = roll (check the telemetry)
+    public static double NORMAL_SIGN = 1;            // MJD: flip to -1 if the "behind" point lands on the wrong side
+    public static double BEHIND_MAX_TURN_DEG = 60;   // MJD: tag turned more than this = reading too steep to trust, aim at the tag itself
+    private double[] alignTagRaw = null;             // MJD: field x,y of the tag itself (telemetry)
+    private double lastTagYawDeg = 0;                // MJD: the tag angle that was used (telemetry)
+    private double lastBehindDirDeg = 0;             // MJD: field angle (deg) of the "behind the tag" direction (telemetry)
     //private double alignErrDeg = 0;                // MJD: moved to AutoAlign
 
     private HiveState hiveState = HiveState.UNKNOWN; // MJD
@@ -204,6 +213,10 @@ public class Limelight extends BaseHardware{
         updateHive(); // MJD
         updateAlignTag(); // MJD
         telemetry.addData("Align tag known", alignTagField != null); // MJD
+        if (alignTagField != null && alignTagRaw != null) { // MJD
+            telemetry.addData("Aim point vs tag (in)", "%.1f,%.1f vs %.1f,%.1f", alignTagField[0], alignTagField[1], alignTagRaw[0], alignTagRaw[1]); // MJD
+            telemetry.addData("Tag turn used (deg) / behind dir (field deg)", "%.1f / %.1f", lastTagYawDeg, lastBehindDirDeg); // MJD
+        } // MJD
         // MJD: debug, shows which step is failing (remove when auto align works)
         telemetry.addData("LL result / valid", "%b / %b", result != null, result != null && result.isValid()); // MJD
         telemetry.addData("LL staleness (ms)", result != null ? result.getStaleness() : -1); // MJD
@@ -252,6 +265,37 @@ public class Limelight extends BaseHardware{
                 robotPose.y() + fwd * Math.sin(th) + left * Math.cos(th)}; // MJD
     } // MJD
 
+    // MJD: the point AIM_BEHIND_IN inches behind the tag face. "Behind" is the tag's own direction away from the camera,
+    // worked out from how far the tag is turned left/right as the camera sees it.
+    private double[] aimPointBehindTag(Pose3D camPose, double[] tagField) { // MJD
+        if (AIM_BEHIND_IN == 0 || tagField == null || camPose.getOrientation() == null) { // MJD
+            return tagField; // MJD
+        } // MJD
+        YawPitchRollAngles o = camPose.getOrientation(); // MJD
+        double turnDeg = (NORMAL_ANGLE_SOURCE == 0) ? o.getYaw(AngleUnit.DEGREES) // MJD
+                : (NORMAL_ANGLE_SOURCE == 1) ? o.getPitch(AngleUnit.DEGREES) // MJD
+                : o.getRoll(AngleUnit.DEGREES); // MJD
+        turnDeg = Math.atan2(Math.sin(Math.toRadians(turnDeg)), Math.cos(Math.toRadians(turnDeg))) * 180.0 / Math.PI; // MJD: wrap to +-180
+        lastTagYawDeg = turnDeg; // MJD
+        if (Math.abs(turnDeg) > BEHIND_MAX_TURN_DEG) { // MJD
+            return tagField; // MJD: too steep, aim at the tag
+        } // MJD
+        double psi = Math.toRadians(turnDeg) * NORMAL_SIGN; // MJD
+        // the tag's direction in camera space (x right, z forward). A tag facing the camera straight on (psi = 0) points straight away from it.
+        double cx = Math.sin(psi); // MJD
+        double cz = Math.cos(psi); // MJD
+        if (cz < 0) { cx = -cx; cz = -cz; } // MJD: always the way that points away from the camera
+        // camera space -> robot forward/left (rotation only, same math as tagFieldPosition) -> field
+        double phi = Math.toRadians(CAM_YAW_DEG); // MJD
+        double fwd = cz * Math.cos(phi) + cx * Math.sin(phi); // MJD
+        double left = cz * Math.sin(phi) - cx * Math.cos(phi); // MJD
+        double th = robotPose.heading(); // MJD
+        double dx = fwd * Math.cos(th) - left * Math.sin(th); // MJD
+        double dy = fwd * Math.sin(th) + left * Math.cos(th); // MJD
+        lastBehindDirDeg = Math.toDegrees(Math.atan2(dy, dx)); // MJD
+        return new double[]{tagField[0] + AIM_BEHIND_IN * dx, tagField[1] + AIM_BEHIND_IN * dy}; // MJD
+    } // MJD
+
     // MJD: remember where the closest tag with a positive ID is on the field (kept until a newer one is seen)
     private void updateAlignTag() { // MJD
         if (robotPose == null || result == null || !result.isValid() // MJD
@@ -267,7 +311,9 @@ public class Limelight extends BaseHardware{
             double d = Math.hypot(p.x, p.z); // MJD: closest = smallest distance
             if (d < best) { // MJD
                 best = d; // MJD
-                alignTagField = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD
+                //alignTagField = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD: old, aimed at the tag itself
+                alignTagRaw = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD
+                alignTagField = aimPointBehindTag(f.getTargetPoseCameraSpace(), alignTagRaw); // MJD
             } // MJD
         } // MJD
     } // MJD

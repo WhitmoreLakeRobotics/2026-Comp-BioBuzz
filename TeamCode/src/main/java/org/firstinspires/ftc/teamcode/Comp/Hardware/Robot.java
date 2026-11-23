@@ -171,7 +171,9 @@ public class Robot extends BaseHardware {
         pollenBlocker.loop();
         feeder.loop();
         lighting.loop();
-        lighting.cmdIntakeSpinning(!intake.isIntakeOff()); // MJD: second light, yellow = intake spinning, red = stopped
+        //lighting.cmdIntakeSpinning(!intake.isIntakeOff()); // MJD: old, red only came after the intake coasted below 50 RPM
+        //lighting.cmdIntakeSpinning(intake.isCommandedOn()); // MJD: old, no reverse color
+        lighting.cmdIntakeLight(intake.isCommandedOn(), intake.isCommandedReverse()); // MJD: second light, yellow = forward, purple = reverse, red = stopped
         limelight.setRobotPose(driveTrain.getPose()); // MJD: so the hive tag can be placed on the field
         limelight.loop();
         flower_ramp.loop();

@@ -71,6 +71,14 @@ public class Lighting extends BaseHardware{
         photo2.setPosition(spinning ? Yellow : Red); // MJD
     } // MJD
 
+    /** MJD: second light with reverse. Yellow = forward, purple = reverse, red = stopped. */
+    public void cmdIntakeLight(boolean on, boolean reverse) { // MJD
+        int state = !on ? 0 : (reverse ? 2 : 1); // MJD
+        if (photo2 == null || state == intakeLightState) return; // MJD
+        intakeLightState = state; // MJD
+        photo2.setPosition(state == 0 ? Red : (state == 2 ? Purple : Yellow)); // MJD
+    } // MJD
+
     private void setColor(double position){
         currentColor = position;
         photo.setPosition(position);

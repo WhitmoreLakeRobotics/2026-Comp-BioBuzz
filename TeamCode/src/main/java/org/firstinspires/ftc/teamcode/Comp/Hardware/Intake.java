@@ -203,6 +203,16 @@ public class Intake extends BaseHardware {
         return targetPower < 0 || pendingPower < 0; // MJD
     } // MJD
 
+    // MJD: true if the intake has been told to run (forward or reverse). False the moment it is told to stop, even while it is still coasting down.
+    public boolean isCommandedOn() { // MJD
+        return targetPower != 0 || pendingPower != 0; // MJD
+    } // MJD
+
+    // MJD: true if the intake has been told to run in reverse (positive power)
+    public boolean isCommandedReverse() { // MJD
+        return targetPower > 0 || pendingPower > 0; // MJD
+    } // MJD
+
     public double getMotorRPM() {
         return (NTKM.getVelocity() / TICKS_PER_REV) * 60.0;
     }
