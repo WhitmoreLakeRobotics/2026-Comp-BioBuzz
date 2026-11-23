@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.instant;
-import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil;
 import static com.pedropathing.ivy.groups.Groups.sequential;
+
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZparkPose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePoseFD;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -20,32 +21,37 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
-import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
-public class RoboWolvesauto extends OpMode {
 
+@Autonomous
+public class CornerLZScore extends OpMode {
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
+    private final ElapsedTime spinTimer = new ElapsedTime();
+    private static final double SPINUP_WAIT_MAX_SEC = 4.0;
 
-    public static final PoseFactory pf = PoseFactory.degrees();
 
-   // public static final Pose Startpose = pf.of();
-    public static final Pose Scorepose = pf.of (61, 133, 90);
-    public static final Pose Park = pf.of (11.4, 116, 90);
 
-    public Path ScorePark(){
-        return Paths.line(Scorepose,Park).constant(Scorepose);
+
+    private final PoseFactory Pf = PoseFactory.degrees();
+
+
+
+
+
+
+    private final Pose point1Control1 = Pf.of(45, 97, 0);
+
+
+    public Path pthscore1() {
+        return Paths.line(LZstartPose,LZscorePoseFD).linear(LZstartPose, LZscorePoseFD);
+
+
     }
-
-    protected Command cmdScore(){
-
-        return sequential(
-                robot.cmdLaunchVolley(4000),
-                robot.driveTrain.cmdAtFollow(ScorePark()),
-                robot.cmdTripleThreatStop()
-        );
+    public Path pthpark() {
+        return Paths.line(LZscorePoseFD,LZparkPose).linear(LZscorePoseFD,LZparkPose);
     }
-
     private Command auto;
+
 
     @Override
     public void init() {
@@ -54,22 +60,46 @@ public class RoboWolvesauto extends OpMode {
         robot.telemetry = telemetry;
         robot.init();
         Scheduler.reset();
-        robot.driveTrain.cmdOpmodestartPose(Scorepose);
+        robot.driveTrain.cmdOpmodestartPose(LZstartPose);
+
 
     }
+    protected Command cmdLZpark() {
+        return sequential(
+                robot.driveTrain.cmdAtFollow(pthscore1()),
+                instant(() -> spinTimer.reset()),
+                waitUntil(() -> robot.launcher.isLauncherAtSpeed() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC),
+                robot.cmdLaunchVolley(6000),
+                robot.driveTrain.cmdAtFollow(pthpark())
+
+
+
+
+        );
+    }
+
+
+
 
     @Override
     public void init_loop() {
-    robot.init_loop();
+        robot.init_loop();
+
+
     }
+
+
 
 
     @Override
     public void start() {
         robot.start();
-       // robot.intake.cmdIntakeForward();
-        auto = cmdScore();
+        auto = cmdLZpark();
         schedule(auto);
+
+
+
+
     }
 
 
@@ -81,15 +111,22 @@ public class RoboWolvesauto extends OpMode {
         telemetryM.addData("auto running", auto.isScheduled());
         telemetryM.update();   // sends to Panels only
 
+
         // Driver Station: only the few things the drive team needs
         telemetry.addData("auto running", auto.isScheduled());
         telemetry.update();
     }
 
 
+
+
     @Override
     public void stop() {
         robot.stop();
 
+
+
+
     }
+
 }

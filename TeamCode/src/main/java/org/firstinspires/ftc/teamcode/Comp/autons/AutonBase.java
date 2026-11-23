@@ -22,8 +22,10 @@ public class AutonBase {
     public static Pose GDparkPose = Pf.of(13, 92, 0);
     public static Pose GDpickup = Pf.of(8,10.5,270); // pickup from the garden
 
+    public static Pose LZstartPoseFD = Pf.of(8, 133, 90);
     public static Pose LZstartPose = Pf.of(59, 133.25, 90);
     public static Pose LZscorePose = Pf.of(50, 126, 90);
+    public static Pose LZscorePoseFD = Pf.of(20, 125, 90);
     public static Pose LZscorePose2 = Pf.of(58, 109, 90);
     public static Pose LZparkPose = Pf.of(13, 120, 0);
 

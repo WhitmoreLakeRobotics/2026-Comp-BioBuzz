@@ -8,7 +8,6 @@ import static com.pedropathing.ivy.commands.Commands.instant; // MJD
 import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
-import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -19,16 +18,12 @@ import com.pedropathing.ivy.Scheduler;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
-import org.firstinspires.ftc.teamcode.Comp.Hardware.Flower_Ramp;
-import org.firstinspires.ftc.teamcode.Comp.Hardware.Limelight; // MJD
-import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 
-@Autonomous(name = "KUDOS", group = "") // MJD: was missing, so KUDOS never showed up on the Driver Station
-public class KUDOS extends OpMode {
+@Autonomous(name = "GD_Waits_2ndTip", group = "") // MJD: was missing, so GD_Waits_2ndTip never showed up on the Driver Station
+public class GD_Waits_2ndTip extends OpMode {
 
     Robot robot = new Robot();
     public static final PoseFactory pf = PoseFactory.degrees();
