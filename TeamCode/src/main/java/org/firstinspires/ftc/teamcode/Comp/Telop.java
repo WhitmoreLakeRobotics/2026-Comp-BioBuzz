@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Comp;
 
+import com.bylazar.telemetry.JoinedTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.api.PoseFactory;
@@ -116,6 +117,8 @@ private TelemetryManager telemetryM;
     public void init() {
         Scheduler.reset();
         robot.hardwareMap = hardwareMap;
+        // naj the below is to connect regular telemetry to Panels
+        telemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
         robot.telemetry = telemetry;
         robot.init();
 
