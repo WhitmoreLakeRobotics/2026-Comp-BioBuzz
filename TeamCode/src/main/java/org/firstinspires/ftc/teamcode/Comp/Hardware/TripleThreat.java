@@ -26,7 +26,7 @@ public class TripleThreat extends BaseHardware {
     public static double BLOCKER_OPEN_SEC = 0.30;      // servo travel time before we call it FIRING (tune!)
     public static boolean WAIT_FOR_FEEDER_SPEED = true; // false = open the blocker as soon as the feeder is commanded
     public static double BLOCKER_DELAY_AFTER_FEEDER_SEC = 0.5; // MJD: open the blocker this long after the feeder starts
-    public static double INTAKE_FIRING_SCALE = 0.60;   // MJD: intake runs at this fraction of its normal power while firing
+    public static double INTAKE_FIRING_SCALE = 0.50;   // MJD: intake runs at this fraction of its normal power while firing
 
     // ---------------- STATE ----------------
     private TripleThreatState tripleThreatState = TripleThreatState.IDLE;

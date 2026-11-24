@@ -8,15 +8,15 @@ import com.pedropathing.math.Pose;
 public class ScorePoses  {
     private static final PoseFactory pf = PoseFactory.degrees();
 
-    public static double LT_X = 30.7,LT_Y = 129.8, LT_Heading = 120;
-    public static double RT_X = 78.2, RT_Y = 134.5, RT_Heading = 63.2; // y was 124
-    public static double LB_X = 27, LB_Y = 15, LB_Heading = 233; //y was 15, h was 238, 230
+    public static double LT_X = 30,LT_Y = 129, LT_Heading = 130;
+    public static double RT_X = 86.5, RT_Y = 131, RT_Heading = 58; // y was 124
+    public static double LB_X = 29.5, LB_Y = 19, LB_Heading = 231; //y was 15, h was 238, 230
 
     // MJD: RB is now an exact mirror of LB about x = 58 (the same line LT/RT use): X = 116 - LB_X, Y = LB_Y, heading = 180 - LB_Heading.
     // MJD: previous RB values, in case you want them back:
     //   public static double RB_X = 83, RB_Y = 16, RB_Heading = 296;   // MJD: the RB right before the mirror
     //   public static double RB_X = 76, RB_Y = 15, RB_Heading = 290;   // MJD: the RB before that (x was 71, y was 15 before it)
-    public static double RB_X = 86, RB_Y = 17, RB_Heading = 308; // MJD: mirror of LB (27, 15, 233)
+    public static double RB_X = 87, RB_Y = 19, RB_Heading = 303; // MJD: mirror of LB (27, 15, 233)
 
     public static Pose ScorePoseLT(){
         return pf.of(LT_X, LT_Y,LT_Heading);
