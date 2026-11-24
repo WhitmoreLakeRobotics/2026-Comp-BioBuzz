@@ -10,7 +10,7 @@ public class Lighting extends BaseHardware{
 
     private Servo photo;
     private Servo photo2; // MJD: second light, shows intake spinning/stopped
-    private int intakeLightState = -1; // MJD: -1 unknown, 0 stopped, 1 spinning (so the servo is only written on change)
+    private int intakeLightState = 0; // MJD: 0 stopped (the default, red), 1 forward (yellow), 2 reverse (purple)
 
     private static final String Photo = "Lighting";
     private static double Off = 0.0;
@@ -33,17 +33,19 @@ public class Lighting extends BaseHardware{
 
     @Override
     public void init_loop(){
-
+        writeIntakeLight(); // MJD: keep the intake light on (red) the whole time INIT is waiting
     }
 
     @Override
     public void start(){
-
+        writeIntakeLight(); // MJD
     }
 
     @Override
     public void loop(){
+        writeIntakeLight(); // MJD: red unless the intake is running, written every loop
         telemetry.addData("Lighting", currentColor);
+        telemetry.addData("Intake light: found / state (0 stop, 1 fwd, 2 rev) / last servo pos", "%b / %d / %.3f", photo2 != null, intakeLightState, photo2 != null ? photo2.getPosition() : -1.0); // MJD
 
 
     }
@@ -78,7 +80,13 @@ public class Lighting extends BaseHardware{
         //if (photo2 == null || state == intakeLightState) return; // MJD: old, only wrote when the color changed
         if (photo2 == null) return; // MJD
         intakeLightState = state; // MJD
-        photo2.setPosition(state == 0 ? Red : (state == 2 ? Purple : Yellow)); // MJD: written every loop, like the first light, so it stays on
+        writeIntakeLight(); // MJD
+    } // MJD
+
+    /** MJD: red by default, yellow while the intake runs forward, purple in reverse. */
+    private void writeIntakeLight() { // MJD
+        if (photo2 == null) return; // MJD
+        photo2.setPosition(intakeLightState == 0 ? Red : (intakeLightState == 2 ? Purple : Yellow)); // MJD
     } // MJD
 
     private void setColor(double position){

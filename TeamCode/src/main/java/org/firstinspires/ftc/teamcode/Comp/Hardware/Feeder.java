@@ -82,6 +82,7 @@ public class Feeder extends BaseHardware {
         telemetry.addData("Feeder State", feederState);
         telemetry.addData("Feeder RPM", rpm);
         telemetry.addData("Feeder Target", targetRPM);
+        telemetry.addData("Feeder raw ticks/s / position", "%.1f / %d", feederMotor.getVelocity(), feederMotor.getCurrentPosition()); // MJD: encoder check, if both stay 0 while it spins the encoder cable is the problem
     }
 
     @Override
