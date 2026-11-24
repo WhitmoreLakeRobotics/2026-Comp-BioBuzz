@@ -30,6 +30,7 @@ public class Limelight extends BaseHardware{
     //   tag not seen / no baseline yet       -> UNKNOWN
     public enum HiveState { UNKNOWN, UPRIGHT, TIPPED } // MJD
 
+    public static int LIMELIGHT_PIPELINE = 0;     // MJD: which Limelight pipeline to run (applies when the OpMode starts)
     public static int HIVE_TAG_ID = -1;          // MJD: -1 = use the first tag seen, otherwise only this tag ID
     public static double HIVE_MOVE_TOL_IN = 3.0; // MJD: tag moved more than this (inches) = tipped
     public static int HIVE_CONFIRM_FRAMES = 3;   // MJD: a new state must hold this many loops before it counts
@@ -57,6 +58,7 @@ public class Limelight extends BaseHardware{
     public static int NORMAL_ANGLE_SOURCE = 1;       // MJD: which tag angle is the left/right turn of the tag: 0 = yaw, 1 = pitch, 2 = roll (check the telemetry)
     public static double NORMAL_SIGN = 1;            // MJD: flip to -1 if the "behind" point lands on the wrong side
     public static double BEHIND_MAX_TURN_DEG = 60;   // MJD: tag turned more than this = reading too steep to trust, aim at the tag itself
+    private int alignTagsSeen = 0;                   // MJD: tags used for the aim point, 1 or 2 (telemetry)
     private double[] alignTagRaw = null;             // MJD: field x,y of the tag itself (telemetry)
     private double lastTagYawDeg = 0;                // MJD: the tag angle that was used (telemetry)
     private double lastBehindDirDeg = 0;             // MJD: field angle (deg) of the "behind the tag" direction (telemetry)
@@ -126,7 +128,8 @@ public class Limelight extends BaseHardware{
 
         //telemetry.setMsTransmissionInterval(11);
 
-        Limey.pipelineSwitch(1);
+        //Limey.pipelineSwitch(1); // MJD: old, pipeline 1
+        Limey.pipelineSwitch(LIMELIGHT_PIPELINE); // MJD: pipeline 0
         Limey.start();
         Limey.setPollRateHz(100);
 
@@ -213,6 +216,7 @@ public class Limelight extends BaseHardware{
         updateHive(); // MJD
         updateAlignTag(); // MJD
         telemetry.addData("Align tag known", alignTagField != null); // MJD
+        telemetry.addData("Align tags used (1 or 2)", alignTagsSeen); // MJD
         if (alignTagField != null && alignTagRaw != null) { // MJD
             telemetry.addData("Aim point vs tag (in)", "%.1f,%.1f vs %.1f,%.1f", alignTagField[0], alignTagField[1], alignTagRaw[0], alignTagRaw[1]); // MJD
             telemetry.addData("Tag turn used (deg) / behind dir (field deg)", "%.1f / %.1f", lastTagYawDeg, lastBehindDirDeg); // MJD
@@ -297,12 +301,47 @@ public class Limelight extends BaseHardware{
     } // MJD
 
     // MJD: remember where the closest tag with a positive ID is on the field (kept until a newer one is seen)
+    //private void updateAlignTag() { // MJD
+    //    if (robotPose == null || result == null || !result.isValid() // MJD
+    //            || result.getStaleness() > ALIGN_MAX_STALE_MS || result.getFiducialResults() == null) { // MJD
+    //        return; // MJD
+    //    } // MJD
+    //    double best = Double.MAX_VALUE; // MJD
+    //    for (LLResultTypes.FiducialResult f : result.getFiducialResults()) { // MJD
+    //        if (f.getFiducialId() <= 0) { // MJD
+    //            continue; // MJD: positive tag IDs only
+    //        } // MJD
+    //        Position p = f.getTargetPoseCameraSpace().getPosition(); // MJD
+    //        double d = Math.hypot(p.x, p.z); // MJD: closest = smallest distance
+    //        if (d < best) { // MJD
+    //            best = d; // MJD
+    //            //alignTagField = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD: old, aimed at the tag itself
+    //            alignTagRaw = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD
+    //            alignTagField = aimPointBehindTag(f.getTargetPoseCameraSpace(), alignTagRaw); // MJD
+    //        } // MJD
+    //    } // MJD
+    //} // MJD
+    // MJD: hive center tag pairs that sit together. Tag 31 pairs with 32, 35 with 36, 39 with 40, 43 with 44.
+    private static final int[] PAIR_IDS = {31, 32, 35, 36, 39, 40, 43, 44}; // MJD
+
+    private static int partnerOf(int id) { // MJD: the other tag in the pair, or -1 if this tag is not in a pair
+        for (int k = 0; k < PAIR_IDS.length; k++) { // MJD
+            if (PAIR_IDS[k] == id) { // MJD
+                return (k % 2 == 0) ? PAIR_IDS[k + 1] : PAIR_IDS[k - 1]; // MJD
+            } // MJD
+        } // MJD
+        return -1; // MJD
+    } // MJD
+
+    // MJD: old version (above) aimed at the one closest tag. Now: find the closest tag. If its pair partner is also in view,
+    // aim AIM_BEHIND_IN inches behind the middle of the two. With one tag, aim AIM_BEHIND_IN inches behind that tag.
     private void updateAlignTag() { // MJD
         if (robotPose == null || result == null || !result.isValid() // MJD
                 || result.getStaleness() > ALIGN_MAX_STALE_MS || result.getFiducialResults() == null) { // MJD
             return; // MJD
         } // MJD
         double best = Double.MAX_VALUE; // MJD
+        LLResultTypes.FiducialResult closest = null; // MJD
         for (LLResultTypes.FiducialResult f : result.getFiducialResults()) { // MJD
             if (f.getFiducialId() <= 0) { // MJD
                 continue; // MJD: positive tag IDs only
@@ -311,11 +350,44 @@ public class Limelight extends BaseHardware{
             double d = Math.hypot(p.x, p.z); // MJD: closest = smallest distance
             if (d < best) { // MJD
                 best = d; // MJD
-                //alignTagField = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD: old, aimed at the tag itself
-                alignTagRaw = tagFieldPosition(f.getTargetPoseCameraSpace()); // MJD
-                alignTagField = aimPointBehindTag(f.getTargetPoseCameraSpace(), alignTagRaw); // MJD
+                closest = f; // MJD
             } // MJD
         } // MJD
+        if (closest == null) { // MJD
+            alignTagsSeen = 0; // MJD
+            return; // MJD: no tag this frame, keep the last aim point
+        } // MJD
+        int partnerId = partnerOf(closest.getFiducialId()); // MJD
+        LLResultTypes.FiducialResult partner = null; // MJD
+        if (partnerId > 0) { // MJD
+            for (LLResultTypes.FiducialResult f : result.getFiducialResults()) { // MJD
+                if (f.getFiducialId() == partnerId) { // MJD
+                    partner = f; // MJD
+                    break; // MJD
+                } // MJD
+            } // MJD
+        } // MJD
+        double[] t1 = tagFieldPosition(closest.getTargetPoseCameraSpace()); // MJD
+        if (partner != null) { // MJD
+            double[] t2 = tagFieldPosition(partner.getTargetPoseCameraSpace()); // MJD
+            double lx = t2[0] - t1[0], ly = t2[1] - t1[1]; // MJD: the line along the hive face between the two tags
+            double len = Math.hypot(lx, ly); // MJD
+            if (len > 1.0) { // MJD: tags farther than 1 in apart, otherwise treat as one tag
+                double mx = (t1[0] + t2[0]) / 2.0, my = (t1[1] + t2[1]) / 2.0; // MJD: middle of the two tags
+                double px = -ly / len, py = lx / len; // MJD: perpendicular to that line = into the hive
+                if (px * (mx - robotPose.x()) + py * (my - robotPose.y()) < 0) { // MJD
+                    px = -px; py = -py; // MJD: pick the side that points away from the robot
+                } // MJD
+                alignTagsSeen = 2; // MJD
+                alignTagRaw = new double[]{mx, my}; // MJD
+                alignTagField = new double[]{mx + AIM_BEHIND_IN * px, my + AIM_BEHIND_IN * py}; // MJD
+                lastBehindDirDeg = Math.toDegrees(Math.atan2(py, px)); // MJD
+                return; // MJD
+            } // MJD
+        } // MJD
+        alignTagsSeen = 1; // MJD
+        alignTagRaw = t1; // MJD: only one tag
+        alignTagField = aimPointBehindTag(closest.getTargetPoseCameraSpace(), t1); // MJD: behind it by AIM_BEHIND_IN, using the tag's own direction
     } // MJD
 
     public boolean alignHasTarget() { return alignTagField != null; } // MJD
