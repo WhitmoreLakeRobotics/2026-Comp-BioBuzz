@@ -29,8 +29,8 @@ public class DriveTrain extends BaseHardware {
     public final double MINPOWER = -1.0;
 
     public final double MORNINGSPEED = 0.50; //was 25
-    public final double NORMALSPEED = 0.80;//was 65
-    public final double FASTSPEED = 0.95;
+    public final double NORMALSPEED = 0.90;//was 65
+    public final double FASTSPEED = 1.0;
 
     private double RightJoystick_x;
     private double LeftJoystick_x;

@@ -27,6 +27,7 @@ public class Lighting extends BaseHardware{
         photo = hardwareMap.get(Servo.class, "Lighting");
         setColor(Red);
         photo2 = hardwareMap.tryGet(Servo.class, "Lighting2"); // MJD: name must match the robot configuration, ignored if missing
+        if (photo2 != null) photo2.setPosition(Red); // MJD: start red (intake not running) so it is lit at INIT
 
     }
 
@@ -69,6 +70,15 @@ public class Lighting extends BaseHardware{
         if (photo2 == null || state == intakeLightState) return; // MJD
         intakeLightState = state; // MJD
         photo2.setPosition(spinning ? Yellow : Red); // MJD
+    } // MJD
+
+    /** MJD: second light with reverse. Yellow = forward, purple = reverse, red = stopped. */
+    public void cmdIntakeLight(boolean on, boolean reverse) { // MJD
+        int state = !on ? 0 : (reverse ? 2 : 1); // MJD
+        //if (photo2 == null || state == intakeLightState) return; // MJD: old, only wrote when the color changed
+        if (photo2 == null) return; // MJD
+        intakeLightState = state; // MJD
+        photo2.setPosition(state == 0 ? Red : (state == 2 ? Purple : Yellow)); // MJD: written every loop, like the first light, so it stays on
     } // MJD
 
     private void setColor(double position){
