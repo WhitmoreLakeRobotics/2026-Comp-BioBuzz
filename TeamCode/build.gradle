@@ -48,5 +48,5 @@ dependencies {
     implementation project(':FtcRobotController')
 
     // Panels (main release, works with Sloth since 1.0.16)
-    implementation("com.bylazar:fullpanels:1.0.19")
+    implementation("com.bylazar:fullpanels:1.0.20")
 }
