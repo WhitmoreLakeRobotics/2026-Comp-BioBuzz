@@ -8,9 +8,6 @@ import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePose;
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
-
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.api.Paths;
@@ -23,7 +20,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
-import org.firstinspires.ftc.teamcode.Comp.Hardware.Flower_Ramp;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 import org.firstinspires.ftc.teamcode.Comp.pedro.Constants;
@@ -63,7 +59,7 @@ public class GD_2tip_park extends OpMode {
 
 
     public Path pth1Score() {
-        return Paths.line(AutonBase.GDstartPose, AutonBase.GDscorePose).constant(AutonBase.GDscorePose);
+        return Paths.line(AutonBase.GDstartPose, AutonBase.GDscoreCenterPose).constant(AutonBase.GDscoreCenterPose);
     }
 
   /*  public Path pthPark() {
@@ -71,11 +67,11 @@ public class GD_2tip_park extends OpMode {
     }
 
    */
-    public Path Grdnpickup(){
-        return Paths.curve(AutonBase.GDscorePose,GDcp, AutonBase.GDpickup). linear(AutonBase.GDscorePose, AutonBase.GDpickup);
+    public Path GrdnpickupPth(){
+        return Paths.curve(AutonBase.GDscoreCenterPose,GDcp, AutonBase.GDpickupPose). linear(AutonBase.GDscoreCenterPose, AutonBase.GDpickupPose);
     }
-    public Path backup(){
-        return Paths.line(AutonBase.GDpickup, Backup).linear(AutonBase.GDpickup, Backup);
+    public Path backupPth(){
+        return Paths.line(AutonBase.GDpickupPose, Backup).linear(AutonBase.GDpickupPose, Backup);
     }
     public Path limecheck(){
         return Paths.line(Backup,ScorePoses.ScorePoseLB()).linear(Backup,ScorePoses.ScorePoseLB());
@@ -100,7 +96,7 @@ public class GD_2tip_park extends OpMode {
         return Paths.line(flowerpickup,flowerBack).linear(flowerpickup,flowerBack);
     }
     public Path Toscore2(){
-        return Paths.line(flowerBack,ScorePoses.ScorePoseLT()).linear(flowerBack,ScorePoses.ScorePoseLT());
+        return Paths.line(flowerBack,AutonBase.LZscoreCenterPose).linear(flowerBack,AutonBase.LZscoreCenterPose);
     }
     public Path prkPth(){
         return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
@@ -141,8 +137,8 @@ public class GD_2tip_park extends OpMode {
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),  // tune ms to finish all 4 pollen
                 robot.cmdCeaseFireSequence(),
                // robot.driveTrain.cmdAtFollow(Grdnpickup()),
-                robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
-                robot.driveTrain.cmdAtFollow(backup()),
+                robot.driveTrain.cmdAtFollow(GrdnpickupPth()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
+                robot.driveTrain.cmdAtFollow(backupPth()),
                 //waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC),
                 //conditional(// MJD
                 ////() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
@@ -194,7 +190,7 @@ public class GD_2tip_park extends OpMode {
                         instant(() -> { }) // MJD: tipped or tag not seen, skip the launch
                 ), // MJD
                 robot.driveTrain.cmdAtFollow(limebackontrack()), // MJD: LB -> toscore, same for both outcomes
-                robot.driveTrain.cmdAtFollow(ToLaunch()),
+                robot.driveTrain.cmdAtFollow(ToLaunch()), //naj Want to put in a check if the hive is upright or not?
                 cmdAimAtTag(), // MJD: turn the launcher onto the hive tag at LT
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.cmdDown(),

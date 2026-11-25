@@ -46,10 +46,10 @@ public class LZ_Score_Park extends OpMode {
 public static Pose actualyScore=pf.of(37,110,130);
 
     public Path pth1Forward() {
-        return Paths.line(AutonBase.LZstartPose, AutonBase.LZscorePose).constant(AutonBase.LZscorePose);
+        return Paths.line(AutonBase.LZstartPose, AutonBase.LZscoreCenterPose).constant(AutonBase.LZscoreCenterPose);
     }
     public Path pth1Score() {
-        return Paths.line(AutonBase.LZscorePose, ScorePoses.ScorePoseLT()).constant(ScorePoses.ScorePoseLT());
+        return Paths.line(AutonBase.LZscoreCenterPose, ScorePoses.ScorePoseLT()).constant(ScorePoses.ScorePoseLT());
     }
 
     public Path pthPark() {

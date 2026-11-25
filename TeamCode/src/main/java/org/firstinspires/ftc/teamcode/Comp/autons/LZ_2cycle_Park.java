@@ -5,14 +5,13 @@ import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDparkPose;;
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDscorePose;
+;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GDscoreCenterPose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.GardenPose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZparkPose;
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePose;
+import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscoreCenterPose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.OpGDFlowerPose;
-import static org.firstinspires.ftc.teamcode.Comp.autons.GD1cycle_Park.scorePose;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -20,7 +19,6 @@ import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.Scheduler;
-import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -45,26 +43,26 @@ public class LZ_2cycle_Park extends OpMode {
 */
     //public static Pose Pickupgarden = pf.of(9, 10, 270);
     public Path pthScore1() {
-        return Paths.line(LZstartPose, LZscorePose).linear(LZstartPose, LZscorePose);
+        return Paths.line(LZstartPose, LZscoreCenterPose).linear(LZstartPose, LZscoreCenterPose);
 
     }
 
     public Path pthFlower() {
-        return Paths.line(LZscorePose, OpGDFlowerPose).linear(LZscorePose, OpGDFlowerPose);
+        return Paths.line(LZscoreCenterPose, OpGDFlowerPose).linear(LZscoreCenterPose, OpGDFlowerPose);
     }
 
     public Path pthScore2() {
-        return Paths.line(OpGDFlowerPose, GDscorePose).linear(OpGDFlowerPose, GDscorePose);
+        return Paths.line(OpGDFlowerPose, GDscoreCenterPose).linear(OpGDFlowerPose, GDscoreCenterPose);
     }
 
     public Path pthgarden() {
-        return Paths.line(GDscorePose,GardenPose).linear(GDscorePose,GardenPose);
+        return Paths.line(GDscoreCenterPose,GardenPose).linear(GDscoreCenterPose,GardenPose);
     }
     public  Path pthscore3(){
-        return Paths.line(GardenPose,GDscorePose).linear(GardenPose,GDscorePose);
+        return Paths.line(GardenPose, GDscoreCenterPose).linear(GardenPose, GDscoreCenterPose);
     }
     public Path pthPark() {
-        return Paths.line(GDscorePose, LZparkPose).linear(GDscorePose, LZparkPose);
+        return Paths.line(GDscoreCenterPose, LZparkPose).linear(GDscoreCenterPose, LZparkPose);
 
     }
 

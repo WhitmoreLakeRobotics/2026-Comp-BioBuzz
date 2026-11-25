@@ -5,7 +5,6 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZparkPose;
-import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZscorePose;
 import static org.firstinspires.ftc.teamcode.Comp.autons.AutonBase.LZstartPose;
 
 import com.bylazar.telemetry.PanelsTelemetry;

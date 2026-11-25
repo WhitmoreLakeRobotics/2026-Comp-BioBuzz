@@ -43,11 +43,11 @@ public class GD_Score_Park extends OpMode {
 
 
     public Path pth1Score() {
-        return Paths.line(AutonBase.GDstartPose, AutonBase.GDscorePose).constant(AutonBase.GDscorePose);
+        return Paths.line(AutonBase.GDstartPose, AutonBase.GDscoreCenterPose).constant(AutonBase.GDscoreCenterPose);
     }
 
     public Path pthPark() {
-        return Paths.curve(AutonBase.GDscorePose, CPparkpath, AutonBase.GDparkPose).constant(AutonBase.GDparkPose);
+        return Paths.curve(AutonBase.GDscoreCenterPose, CPparkpath, AutonBase.GDparkPose).constant(AutonBase.GDparkPose);
     }
 
     protected Command cmdScorePark() {

@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
-import static com.pedropathing.ivy.commands.Commands.conditional;
 import static com.pedropathing.ivy.commands.Commands.instant; // MJD
 import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
-import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -20,7 +18,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 
-import org.firstinspires.ftc.teamcode.Comp.Hardware.Flower_Ramp;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
 
@@ -55,7 +52,7 @@ public class GD_2cycle_park extends OpMode {
 
 
     public Path pth1Score() {
-        return Paths.line(AutonBase.GDstartPose, AutonBase.GDscorePose).constant(AutonBase.GDscorePose);
+        return Paths.line(AutonBase.GDstartPose, AutonBase.GDscoreCenterPose).constant(AutonBase.GDscoreCenterPose);
     }
 
     /*  public Path pthPark() {
@@ -64,11 +61,11 @@ public class GD_2cycle_park extends OpMode {
 
      */
     public Path Grdnpickup() {
-        return Paths.curve(AutonBase.GDscorePose, GDcp, AutonBase.GDpickup).linear(AutonBase.GDscorePose, AutonBase.GDpickup);
+        return Paths.curve(AutonBase.GDscoreCenterPose, GDcp, AutonBase.GDpickupPose).linear(AutonBase.GDscoreCenterPose, AutonBase.GDpickupPose);
     }
 
     public Path backup() {
-        return Paths.line(AutonBase.GDpickup, Backup).linear(AutonBase.GDpickup, Backup);
+        return Paths.line(AutonBase.GDpickupPose, Backup).linear(AutonBase.GDpickupPose, Backup);
     }
   public Path toscore(){
         return Paths.line(Backup,toscore).linear(Backup,toscore);

@@ -44,7 +44,7 @@ public class GD_Waits_2ndTip extends OpMode {
     public static final Pose backup = pf.of (11,24.6,230);
 
     public Path ScoreOne(){
-        return Paths.line(AutonBase.GDstartPose,AutonBase.GDscorePose) .linear(AutonBase.GDstartPose,AutonBase.GDscorePose);
+        return Paths.line(AutonBase.GDstartPose,AutonBase.GDscoreCenterPose) .linear(AutonBase.GDstartPose,AutonBase.GDscoreCenterPose);
     }
 
     public static final Pose GDcp = pf.of(11.71, 50.27, 270); // MJD: control point that makes the garden drive an arc (same as GD_2tip_park)
@@ -54,11 +54,11 @@ public class GD_Waits_2ndTip extends OpMode {
     //}   // MJD: old, a straight line with the same heading at both ends, so the robot strafed straight over
 
     public Path GdPickup(){ // MJD: curve through GDcp so the robot drives an arc
-        return Paths.curve(AutonBase.GDscorePose,GDcp,AutonBase.GDpickup).linear(AutonBase.GDscorePose,AutonBase.GDpickup); // MJD
+        return Paths.curve(AutonBase.GDscoreCenterPose,GDcp,AutonBase.GDpickupPose).linear(AutonBase.GDscoreCenterPose,AutonBase.GDpickupPose); // MJD
     } // MJD
 
     public Path Backup(){
-        return Paths.line(AutonBase.GDpickup,backup).linear(AutonBase.GDpickup,backup);
+        return Paths.line(AutonBase.GDpickupPose,backup).linear(AutonBase.GDpickupPose,backup);
     }
 
     //public Path Park(){
