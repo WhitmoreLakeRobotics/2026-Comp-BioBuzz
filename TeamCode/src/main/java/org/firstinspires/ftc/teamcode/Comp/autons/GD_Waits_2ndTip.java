@@ -90,10 +90,10 @@ public class GD_Waits_2ndTip extends OpMode {
                 conditional( // MJD
                         //() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
                         () -> !robot.limelight.isHiveUpright(), // MJD: tipped = the tag is not back in its original spot (moved OR not visible)
-                        sequential(
+                        sequential( //naj waiting until either the hive is upright or the time is up
                                 waitUntil(() -> robot.limelight.isHiveUpright() || timeLeftSec() <= PARK_TIME_LEFT_SEC), // MJD
                                 conditional(
-                                        () -> robot.limelight.isHiveUpright() && timeLeftSec() > PARK_TIME_LEFT_SEC,
+                                        () -> robot.limelight.isHiveUpright() && timeLeftSec() > PARK_TIME_LEFT_SEC, //naj: the hive is upright and we have enough time left
                                         robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                                         instant(() -> { })
                                 )

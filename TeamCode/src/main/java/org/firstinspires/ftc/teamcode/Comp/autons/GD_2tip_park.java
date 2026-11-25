@@ -25,6 +25,7 @@ import com.qualcomm.robotcore.util.ElapsedTime; // MJD
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Flower_Ramp;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Comp.Hardware.ScorePoses;
+import org.firstinspires.ftc.teamcode.Comp.pedro.Constants;
 
 @Autonomous (name = "GD_2tip_park", group = "")
 public class GD_2tip_park extends OpMode {
@@ -53,7 +54,7 @@ public class GD_2tip_park extends OpMode {
     public static Pose park = pf.of (14.2, 115, 225);
     public static Pose flowerpickup = pf.of (49.7, 129, 90);
     public static Pose toscore = pf.of(32, 83,270);
-    public static Pose flowerBack = pf .of(47, 108,90);
+    public static Pose flowerBack = pf .of(47, 119,90);
    // public static Pose
 
 
@@ -89,8 +90,8 @@ public class GD_2tip_park extends OpMode {
         return Paths.line(ScorePoses.ScorePoseLT(), flowerBack).linear(ScorePoses.ScorePoseLT(), flowerBack);
     }
 
-    public Path flower(){
-        return Paths.line(flowerBack,flowerpickup).linear(flowerBack,flowerpickup);
+    public Path flower(){  // naj path adjusted to change the speed of this backup you do this by overriding the maxpower in pp constants
+        return Paths.line(flowerBack,flowerpickup).linear(flowerBack,flowerpickup).with(Constants.foresightConfig.maxPathSpeed.at(0.5));   // 50% speed on this path only;
     }
     public Path flowerback2(){
         return Paths.line(flowerpickup,flowerBack).linear(flowerpickup,flowerBack);
