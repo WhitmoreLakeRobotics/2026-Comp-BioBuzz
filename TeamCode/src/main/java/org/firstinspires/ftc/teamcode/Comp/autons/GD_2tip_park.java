@@ -122,28 +122,57 @@ public class GD_2tip_park extends OpMode {
                // robot.driveTrain.cmdAtFollow(Grdnpickup()),
                 robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
                 robot.driveTrain.cmdAtFollow(backup()),
-                waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC),
-                conditional(// MJD
-                        //() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
-                        () -> !robot.limelight.isHiveUpright(), // MJD: tipped = the tag is not back in its original spot (moved OR not visible)
-                         instant(() -> { }),
-                        sequential(
-                                waitUntil(() -> robot.limelight.isHiveUpright()), // MJD
-                                conditional(
-                                        () -> robot.limelight.isHiveUpright(),
-                                        sequential(
-                                                robot.driveTrain.cmdAtFollow(limecheck()),
-                                                robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
-                                                robot.driveTrain.cmdAtFollow(limebackontrack())
-                                        ),
-                                        instant(() -> { })
-                                ),
-                                instant(() -> { })
-                        )
-                ),
-                instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
-             //   waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
-                robot.driveTrain.cmdAtFollow(toscore()),
+                //waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC),
+                //conditional(// MJD
+                ////() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
+                //() -> !robot.limelight.isHiveUpright(), // MJD: tipped = the tag is not back in its original spot (moved OR not visible)
+                //instant(() -> { }),
+                //sequential(
+                //waitUntil(() -> robot.limelight.isHiveUpright()), // MJD
+                //conditional(
+                //() -> robot.limelight.isHiveUpright(),
+                //sequential(
+                //robot.driveTrain.cmdAtFollow(limecheck()),
+                //robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
+                //robot.driveTrain.cmdAtFollow(limebackontrack())
+                //),
+                //instant(() -> { })
+                //),
+                //instant(() -> { })
+                //)
+                //),
+                //instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
+                ////   waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
+                //robot.driveTrain.cmdAtFollow(toscore()),
+                // MJD: hive check. The old block above had these problems: spinTimer was not reset, so the 4 s wait was already over and the
+                // check ended instantly; it had an unlimited waitUntil that could hang the auto; and after launching at LB it still ran toscore(),
+                // which starts from Backup, so the robot would drive back toward Backup.
+                // Now: wait up to HIVE_VERIFY_MAX_SEC to see the hive tag where it was at the first launch.
+                //   upright (the hive did not tip) -> go to LB, launch what we picked up, then drive on to toscore
+                //   tipped / tag not seen          -> skip the launch and drive straight to toscore
+                //instant(() -> spinTimer.reset()), // MJD
+                //waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
+                //conditional( // MJD
+                //() -> robot.limelight.isHiveUpright(), // MJD
+                //sequential( // MJD
+                //robot.driveTrain.cmdAtFollow(limecheck()), // MJD: Backup -> LB
+                //robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER), // MJD
+                //robot.driveTrain.cmdAtFollow(limebackontrack()) // MJD: LB -> toscore (already there after this)
+                //), // MJD
+                //robot.driveTrain.cmdAtFollow(toscore()) // MJD: Backup -> toscore
+                //), // MJD
+                // MJD: version 3. The camera is on the launcher side, so the hive is only in view from the LB score pose
+                // (the launcher faces it there), not from the backup pose. Drive to LB first, check the hive there,
+                // launch if it is still upright, then go on to toscore from LB either way.
+                robot.driveTrain.cmdAtFollow(limecheck()), // MJD: Backup -> LB
+                instant(() -> spinTimer.reset()), // MJD
+                waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD: wait up to 2 s to see the hive tag where it was
+                conditional( // MJD
+                        () -> robot.limelight.isHiveUpright(), // MJD: upright = the hive did not tip
+                        robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER), // MJD: launch what we picked up, from LB
+                        instant(() -> { }) // MJD: tipped or tag not seen, skip the launch
+                ), // MJD
+                robot.driveTrain.cmdAtFollow(limebackontrack()), // MJD: LB -> toscore, same for both outcomes
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.driveTrain.cmdAtFollow(flowerback()),
