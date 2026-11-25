@@ -32,6 +32,8 @@ public class GD_2tip_park extends OpMode {
     private TelemetryManager telemetryM;
     private final ElapsedTime spinTimer = new ElapsedTime(); // MJD
     private static final double HIVE_VERIFY_MAX_SEC = 1.5; // MJD: longest we wait to see the hive tip before going on anyway
+    private static final double PICKUP_DWELL_MAX_MS = 1500.0; // MJD: after ARRIVING at the garden, wait at most this long for the intake to fill
+    private static final double PICKUP_TOTAL_MAX_MS = 5000.0; // MJD: safety cap for the whole pickup (drive + wait) so a stuck path can't eat the auto
     private static final double ALIGN_AUTO_TOL_DEG = 2.0; // MJD: the LT aim is done when the launcher is within this many degrees of the tag
     private static final double ALIGN_AUTO_MAX_MS = 1000.0; // MJD: never spend longer than this turning to the tag
     private static final double SPINUP_WAIT_MAX_SEC = 2.0; // MJD: longest we wait for the launcher before firing anyway
@@ -137,8 +139,18 @@ public class GD_2tip_park extends OpMode {
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),  // tune ms to finish all 4 pollen
                 robot.cmdCeaseFireSequence(),
                // robot.driveTrain.cmdAtFollow(Grdnpickup()),
+<<<<<<< Updated upstream
                 robot.driveTrain.cmdAtFollow(GrdnpickupPth()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
                 robot.driveTrain.cmdAtFollow(backupPth()),
+=======
+                //robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),   // MJD: old. The 2 s timer started with the drive, and the arc to the garden uses most of it, so the robot left before the pollen were in
+                sequential( // MJD: drive to the garden, THEN wait there for the intake to fill (or the dwell limit)
+                        robot.driveTrain.cmdAtFollow(Grdnpickup()), // MJD
+                        instant(() -> spinTimer.reset()), // MJD
+                        waitUntil(() -> robot.sensors.isFull() || spinTimer.seconds() * 1000.0 >= PICKUP_DWELL_MAX_MS) // MJD
+                ).raceWith(waitMs(PICKUP_TOTAL_MAX_MS)), // MJD
+                robot.driveTrain.cmdAtFollow(backup()),
+>>>>>>> Stashed changes
                 //waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC),
                 //conditional(// MJD
                 ////() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
