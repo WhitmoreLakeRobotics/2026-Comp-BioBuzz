@@ -259,10 +259,12 @@ public class Robot extends BaseHardware {
     public Command cmdCeaseFireSequence() {
         return instant(() -> tripleThreat.cmdCeaseFire()).requiring(this);
     }
-    public Command cmdIntakeatSpeed() {
+    public Command cmdIntakeatSpeed() { //also feeder
         return sequential(
                 instant(() -> intake.cmdIntakeForward()),
-               waitMs(4000),instant(() -> intake.cmdIntakeStop()));
+               instant(()  -> feeder.cmdFeederForward()),
+               waitMs(4000),instant(() -> intake.cmdIntakeStop()),
+               instant(()  -> feeder.cmdFeederStop()));
     }
 
     /** Spin up -> feed -> unblock, fire for ms, then feeder off and blocker closed.

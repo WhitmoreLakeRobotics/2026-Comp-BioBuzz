@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Comp.autons;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.conditional;
 import static com.pedropathing.ivy.commands.Commands.instant; // MJD
 import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
@@ -72,15 +73,22 @@ public class GD_2tip_park extends OpMode {
     public Path backup(){
         return Paths.line(AutonBase.GDpickup, Backup).linear(AutonBase.GDpickup, Backup);
     }
+    public Path limecheck(){
+        return Paths.line(Backup,ScorePoses.ScorePoseLB()).linear(Backup,ScorePoses.ScorePoseLB());
+    }
+    public Path limebackontrack(){
+        return Paths.line(ScorePoses.ScorePoseLB(),toscore).linear(ScorePoses.ScorePoseLB(),toscore);
+    }
     public Path toscore(){
         return Paths.line(Backup,toscore).linear(Backup,toscore);
     }
     public Path ToLaunch(){
         return Paths.line(toscore,LZscorePose).linear(toscore,LZscorePose);
     }
-    public Path flowerback(){
-        return Paths.line(LZscorePose,flowerBack).linear(LZscorePose,flowerBack);
+    public Path flowerback() {
+        return Paths.line(LZscorePose, flowerBack).linear(LZscorePose, flowerBack);
     }
+
     public Path flower(){
         return Paths.line(flowerBack,flowerpickup).linear(flowerBack,flowerpickup);
     }
@@ -114,6 +122,24 @@ public class GD_2tip_park extends OpMode {
                // robot.driveTrain.cmdAtFollow(Grdnpickup()),
                 robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
                 robot.driveTrain.cmdAtFollow(backup()),
+                conditional( // MJD
+                        //() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
+                        () -> !robot.limelight.isHiveUpright(), // MJD: tipped = the tag is not back in its original spot (moved OR not visible)
+                         instant(() -> { }),
+                        sequential(
+                                waitUntil(() -> robot.limelight.isHiveUpright()), // MJD
+                                conditional(
+                                        () -> robot.limelight.isHiveUpright(),
+                                        sequential(
+                                                robot.driveTrain.cmdAtFollow(limecheck()),
+                                                robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
+                                                robot.driveTrain.cmdAtFollow(limebackontrack())
+                                        ),
+                                        instant(() -> { })
+                                ),
+                                instant(() -> { })
+                        )
+                ),
                 instant(() -> spinTimer.reset()), // MJD: verify the hive tipped (or give up after HIVE_VERIFY_MAX_SEC)
              //   waitUntil(() -> robot.limelight.isHiveTipped() || spinTimer.seconds() > HIVE_VERIFY_MAX_SEC), // MJD
                 robot.driveTrain.cmdAtFollow(toscore()),
@@ -122,6 +148,7 @@ public class GD_2tip_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(flowerback()),
                 robot.cmdDown(),
                 robot.driveTrain.cmdAtFollow(flower()),
+                robot.cmdIntakeatSpeed(),
                 waitMs(AutonBase.Ramp_TIMER),
                 robot.driveTrain.cmdAtFollow(flowerback2()),
                 robot.cmdUp(),
@@ -131,7 +158,7 @@ public class GD_2tip_park extends OpMode {
                 robot.cmdTripleThreatStop(),
                // robot.driveTrain.cmdHoldPos(park),
                 robot.cmdStopIntakeFeeder()
-        );
+       ) ;
 
     }
 

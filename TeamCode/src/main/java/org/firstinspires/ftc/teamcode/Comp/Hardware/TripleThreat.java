@@ -120,7 +120,7 @@ public class TripleThreat extends BaseHardware {
                 if (launcher.isLauncherAtSpeed()) {
                     feeder.cmdFeederForward();
                     //intake.cmdIntakeForward();   // MJD: old, full speed
-                    intake.cmdIntakeForwardScaled(INTAKE_FIRING_SCALE); // MJD: slowed to 75 percent while firing
+                    // intake.cmdIntakeForwardScaled(INTAKE_FIRING_SCALE); // MJD: slowed to 75 percent while firing
                     stateTimer.reset();
                     tripleThreatState = TripleThreatState.STARTING_FEEDER;
                 } else if (stateTimer.seconds() > SPINUP_TIMEOUT_SEC) {
@@ -132,6 +132,7 @@ public class TripleThreat extends BaseHardware {
                 if (stateTimer.seconds() >= BLOCKER_DELAY_AFTER_FEEDER_SEC) { // MJD
                     blocker.cmdOpen(); // MJD
                     stateTimer.reset(); // MJD
+                    intake.cmdIntakeForwardScaled(INTAKE_FIRING_SCALE);
                     tripleThreatState = TripleThreatState.OPENING; // MJD
                 }
                 /* MJD: old version, waited for feeder RPM and aborted on timeout
