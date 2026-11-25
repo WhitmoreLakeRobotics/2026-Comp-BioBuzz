@@ -44,6 +44,17 @@ public class AutoAlign {
         return Math.copySign(Math.max(ALIGN_MIN_POWER, Math.min(ALIGN_MAX_POWER, Math.abs(power))), power);
     }
 
+    /** MJD: heading (radians) that points the launcher at tagField {x, y} from the robot's current x, y. No state, for autons. */
+    public double desiredHeading(Pose robot, double[] tagField) { // MJD
+        return Math.atan2(tagField[1] - robot.y(), tagField[0] - robot.x()) + Math.PI + Math.toRadians(ALIGN_AIM_OFFSET_DEG); // MJD
+    } // MJD
+
+    /** MJD: how far (degrees, wrapped +-180) the robot heading is from pointing the launcher at tagField. No state, for autons. */
+    public double headingErrorDeg(Pose robot, double[] tagField) { // MJD
+        double desired = desiredHeading(robot, tagField); // MJD
+        return Math.toDegrees(Math.atan2(Math.sin(desired - robot.heading()), Math.cos(desired - robot.heading()))); // MJD
+    } // MJD
+
     public boolean isAligned() { return aligned; }
 
     public double getErrorDeg() { return lastErrDeg; }
