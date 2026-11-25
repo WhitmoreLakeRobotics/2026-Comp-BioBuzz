@@ -19,7 +19,7 @@ public class Feeder extends BaseHardware {
     private VoltageSensor battery;
 
     // ---------------- TUNABLE CONSTANTS ----------------
-    public static double FEEDER_FORWARD_RPM = 4000; //was 4000
+    public static double FEEDER_FORWARD_RPM = 4500; //was 4000
     public static double FEEDER_BACKWARD_RPM = -500;   // default until a real value is chosen
     public static double RPM_TOLERANCE = 250;           // "at speed" window around the target RPM
     public static double AT_SPEED_HOLD_SEC = 0.15;     // RPM must stay in tolerance this long
@@ -27,10 +27,10 @@ public class Feeder extends BaseHardware {
 
 
     // ---------------- PID CONSTANTS ----------------
-    public static double FEEDER_KP = 0.00070;
+    public static double FEEDER_KP = 0.00125;
     public static double FEEDER_KI = 0.0;              // still unused
-    public static double FEEDER_KD = 0.0000015;
-    public static double FEEDER_KF = 1.24 / 6000.0;    // feedforward per RPM
+    public static double FEEDER_KD = 0.0000045;
+    public static double FEEDER_KF = 0.00021;    // feedforward per RPM 1.24 / 6000.0
 
     private static final double TICKS_PER_REV = 28;    // motor-shaft encoder; change if geared
     private static final double MIN_POWER = -1.0;
