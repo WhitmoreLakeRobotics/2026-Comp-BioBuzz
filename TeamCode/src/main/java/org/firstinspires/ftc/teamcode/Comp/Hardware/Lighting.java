@@ -10,6 +10,7 @@ public class Lighting extends BaseHardware{
 
     private Servo photo;
     private Servo photo2; // MJD: second light, shows intake spinning/stopped
+    public static double INTAKE_RED = 0.30;        // MJD: red for the intake light only. 0.277 sits on the edge of the red band and this light drops out there, so this is a bit higher. Tune live in Panels (0.28 to 0.32)
     public static int INTAKE_LIGHT_FORCE = -1;    // MJD: TEST in Panels. -1 = normal, 0 = hold red, 1 = hold yellow, 2 = hold purple, whatever the intake is doing
     private int intakeLightState = 0; // MJD: 0 stopped (the default, red), 1 forward (yellow), 2 reverse (purple)
 
@@ -19,7 +20,7 @@ public class Lighting extends BaseHardware{
     private double currentColor = Off;
     private double Red = 0.277;// MJD
     private double Blue = 0.6111;
-    private double Yellow = 0.388;
+    private double Yellow = 0.4;
     private double Orange = 0.333;
     private double Purple = 0.722;
 
@@ -28,7 +29,8 @@ public class Lighting extends BaseHardware{
         photo = hardwareMap.get(Servo.class, "Lighting");
         setColor(Red);
         photo2 = hardwareMap.tryGet(Servo.class, "Lighting2"); // MJD: name must match the robot configuration, ignored if missing
-        if (photo2 != null) photo2.setPosition(Red); // MJD: start red (intake not running) so it is lit at INIT
+        //if (photo2 != null) photo2.setPosition(Red); // MJD: old red value
+        if (photo2 != null) photo2.setPosition(INTAKE_RED); // MJD: start red (intake not running) so it is lit at INIT
 
     }
 
@@ -58,7 +60,7 @@ public class Lighting extends BaseHardware{
             setColor(Off);
         }
         //if (photo2 != null) photo2.setPosition(Off); // MJD: old, the intake light went dark when the OpMode ended
-        if (photo2 != null) photo2.setPosition(Red); // MJD: the intake light's default is red, not off
+        if (photo2 != null) photo2.setPosition(INTAKE_RED); // MJD: the intake light's default is red, not off
 
     }
 
@@ -73,7 +75,7 @@ public class Lighting extends BaseHardware{
         int state = spinning ? 1 : 0; // MJD
         if (photo2 == null || state == intakeLightState) return; // MJD
         intakeLightState = state; // MJD
-        photo2.setPosition(spinning ? Yellow : Red); // MJD
+        photo2.setPosition(spinning ? Yellow : INTAKE_RED); // MJD
     } // MJD
 
     /** MJD: second light with reverse. Yellow = forward, purple = reverse, red = stopped. */
@@ -89,7 +91,8 @@ public class Lighting extends BaseHardware{
     private void writeIntakeLight() { // MJD
         if (photo2 == null) return; // MJD
         int shown = (INTAKE_LIGHT_FORCE >= 0 && INTAKE_LIGHT_FORCE <= 2) ? INTAKE_LIGHT_FORCE : intakeLightState; // MJD: force value for testing
-        photo2.setPosition(shown == 0 ? Red : (shown == 2 ? Purple : Yellow)); // MJD
+        //photo2.setPosition(shown == 0 ? Red : (shown == 2 ? Purple : Yellow)); // MJD: old, used the shared Red (0.277)
+        photo2.setPosition(shown == 0 ? INTAKE_RED : (shown == 2 ? Purple : Yellow)); // MJD
     } // MJD
 
     private void setColor(double position){
