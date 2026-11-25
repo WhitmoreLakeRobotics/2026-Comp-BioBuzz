@@ -51,7 +51,7 @@ public class GD_2tip_park extends OpMode {
     public static Pose GDcp = pf.of (11.71, 50.27, 270);
     public static Pose Backup = pf.of (14, 25.3, 270);
     public static Pose park = pf.of (14.2, 115, 225);
-    public static Pose flowerpickup = pf.of (46.7, 128, 90);
+    public static Pose flowerpickup = pf.of (46.7, 132, 90);
     public static Pose toscore = pf.of(32, 83,270);
     public static Pose flowerBack = pf .of(47, 108,90);
    // public static Pose
@@ -122,7 +122,8 @@ public class GD_2tip_park extends OpMode {
                // robot.driveTrain.cmdAtFollow(Grdnpickup()),
                 robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
                 robot.driveTrain.cmdAtFollow(backup()),
-                conditional( // MJD
+                waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC),
+                conditional(// MJD
                         //() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
                         () -> !robot.limelight.isHiveUpright(), // MJD: tipped = the tag is not back in its original spot (moved OR not visible)
                          instant(() -> { }),
