@@ -45,8 +45,8 @@ public class AutonBase {
 
    //Timer constants
     public static final double LAUNCH_TIMER = 1500.0;
-    public static final double PICKUP_MAX_MS = 3000.0;
-    public static final double Ramp_TIMER = 1500.0;
+    public static final double PICKUP_MAX_MS = 2000.0;
+    public static final double Ramp_TIMER = 1250.0;
 
 /* Changed class from Opmode to Object so these are not needed
 

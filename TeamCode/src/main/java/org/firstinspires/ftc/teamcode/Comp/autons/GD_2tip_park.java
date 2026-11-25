@@ -33,8 +33,8 @@ public class GD_2tip_park extends OpMode {
     Robot robot = new Robot();
     private TelemetryManager telemetryM;
     private final ElapsedTime spinTimer = new ElapsedTime(); // MJD
-    private static final double HIVE_VERIFY_MAX_SEC = 2.0; // MJD: longest we wait to see the hive tip before going on anyway
-    private static final double SPINUP_WAIT_MAX_SEC = 4.0; // MJD: longest we wait for the launcher before firing anyway
+    private static final double HIVE_VERIFY_MAX_SEC = 1.5; // MJD: longest we wait to see the hive tip before going on anyway
+    private static final double SPINUP_WAIT_MAX_SEC = 2.0; // MJD: longest we wait for the launcher before firing anyway
 
 
 
@@ -51,7 +51,7 @@ public class GD_2tip_park extends OpMode {
     public static Pose GDcp = pf.of (11.71, 50.27, 270);
     public static Pose Backup = pf.of (14, 25.3, 270);
     public static Pose park = pf.of (14.2, 115, 225);
-    public static Pose flowerpickup = pf.of (46.7, 128, 90);
+    public static Pose flowerpickup = pf.of (49.7, 129, 90);
     public static Pose toscore = pf.of(32, 83,270);
     public static Pose flowerBack = pf .of(47, 108,90);
    // public static Pose
@@ -175,8 +175,8 @@ public class GD_2tip_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(limebackontrack()), // MJD: LB -> toscore, same for both outcomes
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
-                robot.driveTrain.cmdAtFollow(flowerback()),
                 robot.cmdDown(),
+                robot.driveTrain.cmdAtFollow(flowerback()),
                 robot.driveTrain.cmdAtFollow(flower()),
                 robot.cmdIntakeatSpeed(),
                 waitMs(AutonBase.Ramp_TIMER),
