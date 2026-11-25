@@ -10,6 +10,7 @@ public class Lighting extends BaseHardware{
 
     private Servo photo;
     private Servo photo2; // MJD: second light, shows intake spinning/stopped
+    public static int INTAKE_LIGHT_FORCE = -1;    // MJD: TEST in Panels. -1 = normal, 0 = hold red, 1 = hold yellow, 2 = hold purple, whatever the intake is doing
     private int intakeLightState = 0; // MJD: 0 stopped (the default, red), 1 forward (yellow), 2 reverse (purple)
 
     private static final String Photo = "Lighting";
@@ -56,7 +57,8 @@ public class Lighting extends BaseHardware{
         if(photo != null){
             setColor(Off);
         }
-        if (photo2 != null) photo2.setPosition(Off); // MJD
+        //if (photo2 != null) photo2.setPosition(Off); // MJD: old, the intake light went dark when the OpMode ended
+        if (photo2 != null) photo2.setPosition(Red); // MJD: the intake light's default is red, not off
 
     }
 
@@ -86,7 +88,8 @@ public class Lighting extends BaseHardware{
     /** MJD: red by default, yellow while the intake runs forward, purple in reverse. */
     private void writeIntakeLight() { // MJD
         if (photo2 == null) return; // MJD
-        photo2.setPosition(intakeLightState == 0 ? Red : (intakeLightState == 2 ? Purple : Yellow)); // MJD
+        int shown = (INTAKE_LIGHT_FORCE >= 0 && INTAKE_LIGHT_FORCE <= 2) ? INTAKE_LIGHT_FORCE : intakeLightState; // MJD: force value for testing
+        photo2.setPosition(shown == 0 ? Red : (shown == 2 ? Purple : Yellow)); // MJD
     } // MJD
 
     private void setColor(double position){
