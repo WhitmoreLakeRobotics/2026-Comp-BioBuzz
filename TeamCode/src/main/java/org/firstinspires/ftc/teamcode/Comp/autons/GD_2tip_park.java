@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Comp.autons;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.commands.Commands.conditional;
 import static com.pedropathing.ivy.commands.Commands.instant; // MJD
+import static com.pedropathing.ivy.commands.Commands.lazy; // MJD
 import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.commands.Commands.waitUntil; // MJD
 import static com.pedropathing.ivy.groups.Groups.sequential;
@@ -34,6 +35,8 @@ public class GD_2tip_park extends OpMode {
     private TelemetryManager telemetryM;
     private final ElapsedTime spinTimer = new ElapsedTime(); // MJD
     private static final double HIVE_VERIFY_MAX_SEC = 1.5; // MJD: longest we wait to see the hive tip before going on anyway
+    private static final double ALIGN_AUTO_TOL_DEG = 2.0; // MJD: the LT aim is done when the launcher is within this many degrees of the tag
+    private static final double ALIGN_AUTO_MAX_MS = 1000.0; // MJD: never spend longer than this turning to the tag
     private static final double SPINUP_WAIT_MAX_SEC = 2.0; // MJD: longest we wait for the launcher before firing anyway
 
 
@@ -102,6 +105,23 @@ public class GD_2tip_park extends OpMode {
         return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
     }
 
+
+    // MJD: turn in place at the LT score pose so the launcher points at the closest hive tag, then fire.
+    // Uses the last tag position the Limelight saw. If no tag has been seen yet it does nothing. Ends as soon as the
+    // aim is within ALIGN_AUTO_TOL_DEG (so it costs nothing when the path heading is already right) or after ALIGN_AUTO_MAX_MS.
+    protected Command cmdAimAtTag() { // MJD
+        return lazy(() -> { // MJD
+            if (!robot.limelight.hasClosestTag()) { // MJD
+                return instant(() -> { }); // MJD: no tag seen, keep the path heading
+            } // MJD
+            final double[] tag = robot.limelight.getClosestTagField(); // MJD
+            Pose cur = robot.driveTrain.getPose(); // MJD
+            Pose aimed = new Pose(cur.x(), cur.y(), robot.autoAlign.desiredHeading(cur, tag)); // MJD: same spot, new heading
+            return robot.driveTrain.cmdHoldPos(aimed) // MJD
+                    .raceWith(waitUntil(() -> Math.abs(robot.autoAlign.headingErrorDeg(robot.driveTrain.getPose(), tag)) <= ALIGN_AUTO_TOL_DEG)) // MJD
+                    .raceWith(waitMs(ALIGN_AUTO_MAX_MS)); // MJD
+        }); // MJD
+    } // MJD
 
     protected Command cmdScorePark() {
         // MJD: the score path is only ~2 in long, so the volley used to start right after PLAY, before the
@@ -174,15 +194,19 @@ public class GD_2tip_park extends OpMode {
                 ), // MJD
                 robot.driveTrain.cmdAtFollow(limebackontrack()), // MJD: LB -> toscore, same for both outcomes
                 robot.driveTrain.cmdAtFollow(ToLaunch()),
+                cmdAimAtTag(), // MJD: turn the launcher onto the hive tag at LT
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.cmdDown(),
                 robot.driveTrain.cmdAtFollow(flowerback()),
+                instant(() -> robot.intake.cmdIntakeForward()), // MJD: intake is already at speed when we get to the flower
                 robot.driveTrain.cmdAtFollow(flower()),
-                robot.cmdIntakeatSpeed(),
-                waitMs(AutonBase.Ramp_TIMER),
+                //robot.cmdIntakeatSpeed(),   // MJD: old, intake forward + a 4000 ms wait + stop. That wait ran before the Ramp_TIMER wait below, so the robot sat ~5.25 s at the flower
+                waitMs(AutonBase.Ramp_TIMER), // MJD: the intake runs during this wait, ~1.25 s at the flower instead of ~5.25 s
+                instant(() -> robot.intake.cmdIntakeStop()), // MJD: stop the intake, as cmdIntakeatSpeed used to
                 robot.driveTrain.cmdAtFollow(flowerback2()),
                 robot.cmdUp(),
                 robot.driveTrain.cmdAtFollow(Toscore2()),
+                cmdAimAtTag(), // MJD: turn the launcher onto the hive tag at LT
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
                 robot.driveTrain.cmdAtFollow(prkPth()),
                 robot.cmdTripleThreatStop(),
