@@ -51,7 +51,7 @@ public class GD_2tip_park extends OpMode {
     public static Pose GDcp = pf.of (11.71, 50.27, 270);
     public static Pose Backup = pf.of (14, 25.3, 270);
     public static Pose park = pf.of (14.2, 115, 225);
-    public static Pose flowerpickup = pf.of (46.7, 132, 90);
+    public static Pose flowerpickup = pf.of (46.7, 128, 90);
     public static Pose toscore = pf.of(32, 83,270);
     public static Pose flowerBack = pf .of(47, 108,90);
    // public static Pose
@@ -83,10 +83,10 @@ public class GD_2tip_park extends OpMode {
         return Paths.line(Backup,toscore).linear(Backup,toscore);
     }
     public Path ToLaunch(){
-        return Paths.line(toscore,LZscorePose).linear(toscore,LZscorePose);
+        return Paths.line(toscore,ScorePoses.ScorePoseLT()).linear(toscore,ScorePoses.ScorePoseLT());
     }
     public Path flowerback() {
-        return Paths.line(LZscorePose, flowerBack).linear(LZscorePose, flowerBack);
+        return Paths.line(ScorePoses.ScorePoseLT(), flowerBack).linear(ScorePoses.ScorePoseLT(), flowerBack);
     }
 
     public Path flower(){
