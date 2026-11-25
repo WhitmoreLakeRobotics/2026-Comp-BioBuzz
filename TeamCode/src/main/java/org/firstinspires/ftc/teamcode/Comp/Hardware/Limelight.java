@@ -254,6 +254,7 @@ public class Limelight extends BaseHardware{
     public HiveState getHiveState() { return hiveState; } // MJD
     public boolean isHiveUpright() { return hiveState == HiveState.UPRIGHT; } // MJD
     public boolean isHiveTipped() { return hiveState == HiveState.TIPPED; } // MJD
+    public boolean isHiveUnknown() { return hiveState == HiveState.UNKNOWN; } // MJD
     public boolean hasHiveBaseline() { return hiveBaseline != null; } // MJD
 
     // MJD: camera-space tag position -> field x,y (inches), using the robot pose and camera mount.
