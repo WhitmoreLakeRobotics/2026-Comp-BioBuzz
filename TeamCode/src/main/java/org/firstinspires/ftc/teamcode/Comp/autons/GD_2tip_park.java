@@ -32,8 +32,11 @@ public class GD_2tip_park extends OpMode {
     private TelemetryManager telemetryM;
     private final ElapsedTime spinTimer = new ElapsedTime(); // MJD
     private static final double HIVE_VERIFY_MAX_SEC = 1.5; // MJD: longest we wait to see the hive tip before going on anyway
-    private static final double PICKUP_DWELL_MAX_MS = 1500.0; // MJD: after ARRIVING at the garden, wait at most this long for the intake to fill
-    private static final double PICKUP_TOTAL_MAX_MS = 5000.0; // MJD: safety cap for the whole pickup (drive + wait) so a stuck path can't eat the auto
+    //private static final double PICKUP_DWELL_MAX_MS = 1500.0; // MJD: after ARRIVING at the garden, wait at most this long for the intake to fill
+    //private static final double PICKUP_ARRIVE_IN = 3.0; // MJD: the garden drive counts as done when the robot is this close (inches) to the pickup pose
+    //private static final double PICKUP_TOTAL_MAX_MS = 5000.0; // MJD: safety cap for the whole pickup (drive + wait) so a stuck path can't eat the auto
+    private static final double PICKUP_DRIVE_MAX_MS = 4000.0; // MJD: the drive to the garden counts as arrived when the path ends, or after this long
+    private static final double PICKUP_WAIT_MAX_MS = 3000.0; // MJD: after arriving, wait at most this long for the sensors to stop the intake
     private static final double ALIGN_AUTO_TOL_DEG = 2.0; // MJD: the LT aim is done when the launcher is within this many degrees of the tag
     private static final double ALIGN_AUTO_MAX_MS = 1000.0; // MJD: never spend longer than this turning to the tag
     private static final double SPINUP_WAIT_MAX_SEC = 2.0; // MJD: longest we wait for the launcher before firing anyway
@@ -108,6 +111,11 @@ public class GD_2tip_park extends OpMode {
     // MJD: turn in place at the LT score pose so the launcher points at the closest hive tag, then fire.
     // Uses the last tag position the Limelight saw. If no tag has been seen yet it does nothing. Ends as soon as the
     // aim is within ALIGN_AUTO_TOL_DEG (so it costs nothing when the path heading is already right) or after ALIGN_AUTO_MAX_MS.
+    //private boolean nearPickup() { // MJD: is the robot at the garden pickup pose
+    //Pose p = robot.driveTrain.getPose(); // MJD
+    //return Math.hypot(p.x() - AutonBase.GDpickupPose.x(), p.y() - AutonBase.GDpickupPose.y()) <= PICKUP_ARRIVE_IN; // MJD
+    //} // MJD
+
     protected Command cmdAimAtTag() { // MJD
         return lazy(() -> { // MJD
             if (!robot.limelight.hasClosestTag()) { // MJD
@@ -116,9 +124,11 @@ public class GD_2tip_park extends OpMode {
             final double[] tag = robot.limelight.getClosestTagField(); // MJD
             Pose cur = robot.driveTrain.getPose(); // MJD
             Pose aimed = new Pose(cur.x(), cur.y(), robot.autoAlign.desiredHeading(cur, tag)); // MJD: same spot, new heading
-            return robot.driveTrain.cmdHoldPos(aimed) // MJD
-                    .raceWith(waitUntil(() -> Math.abs(robot.autoAlign.headingErrorDeg(robot.driveTrain.getPose(), tag)) <= ALIGN_AUTO_TOL_DEG)) // MJD
-                    .raceWith(waitMs(ALIGN_AUTO_MAX_MS)); // MJD
+            //return robot.driveTrain.cmdHoldPos(aimed).raceWith(waitUntil(...)).raceWith(waitMs(...));   // MJD: old. hold() finishes instantly, so the race ended at once and the volley started before the robot had turned
+            return sequential( // MJD: start the hold, THEN wait for the turn
+                    robot.driveTrain.cmdHoldPos(aimed), // MJD
+                    waitUntil(() -> Math.abs(robot.autoAlign.headingErrorDeg(robot.driveTrain.getPose(), tag)) <= ALIGN_AUTO_TOL_DEG) // MJD
+            ).raceWith(waitMs(ALIGN_AUTO_MAX_MS)); // MJD
         }); // MJD
     } // MJD
 
@@ -139,18 +149,24 @@ public class GD_2tip_park extends OpMode {
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),  // tune ms to finish all 4 pollen
                 robot.cmdCeaseFireSequence(),
                // robot.driveTrain.cmdAtFollow(Grdnpickup()),
-<<<<<<< Updated upstream
-                robot.driveTrain.cmdAtFollow(GrdnpickupPth()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),
+                //robot.driveTrain.cmdAtFollow(GrdnpickupPth()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),   // MJD: old. The 2 s timer started with the drive, and the arc to the garden uses most of it, so the robot left before the pollen were in
+                //// MJD: drive to the garden, THEN wait there for the intake to fill (or the dwell limit).
+                //// The drive ends when the robot is within PICKUP_ARRIVE_IN of the pickup pose. The path itself may never report "finished"
+                //// at the corner (the robot is against the wall), which kept it fighting at the corner until the 5 s cap.
+                //sequential( // MJD
+                //robot.driveTrain.cmdAtFollow(GrdnpickupPth()) // MJD
+                //.raceWith(waitUntil(() -> nearPickup())), // MJD
+                //instant(() -> spinTimer.reset()), // MJD
+                //waitUntil(() -> robot.sensors.isFull() || spinTimer.seconds() * 1000.0 >= PICKUP_DWELL_MAX_MS) // MJD
+                //).raceWith(waitMs(PICKUP_TOTAL_MAX_MS)), // MJD
+                // MJD: drive to the garden. "Arrived" = the path reached its end (PICKUP_DRIVE_MAX_MS is only a safety cap).
+                // Then HOLD the pickup pose so the robot does not back away or fight the wall, and wait up to PICKUP_WAIT_MAX_MS
+                // or until the sensors stop the intake (it is full).
+                robot.driveTrain.cmdAtFollow(GrdnpickupPth()).raceWith(waitMs(PICKUP_DRIVE_MAX_MS)), // MJD
+                robot.driveTrain.cmdHoldPos(AutonBase.GDpickupPose), // MJD: stay put at the corner
+                instant(() -> spinTimer.reset()), // MJD
+                waitUntil(() -> !robot.intake.isCommandedOn() || robot.sensors.isFull() || spinTimer.seconds() * 1000.0 >= PICKUP_WAIT_MAX_MS), // MJD
                 robot.driveTrain.cmdAtFollow(backupPth()),
-=======
-                //robot.driveTrain.cmdAtFollow(Grdnpickup()).raceWith(waitMs(AutonBase.PICKUP_MAX_MS)),   // MJD: old. The 2 s timer started with the drive, and the arc to the garden uses most of it, so the robot left before the pollen were in
-                sequential( // MJD: drive to the garden, THEN wait there for the intake to fill (or the dwell limit)
-                        robot.driveTrain.cmdAtFollow(Grdnpickup()), // MJD
-                        instant(() -> spinTimer.reset()), // MJD
-                        waitUntil(() -> robot.sensors.isFull() || spinTimer.seconds() * 1000.0 >= PICKUP_DWELL_MAX_MS) // MJD
-                ).raceWith(waitMs(PICKUP_TOTAL_MAX_MS)), // MJD
-                robot.driveTrain.cmdAtFollow(backup()),
->>>>>>> Stashed changes
                 //waitUntil(() -> robot.limelight.isHiveUpright() || spinTimer.seconds() > SPINUP_WAIT_MAX_SEC),
                 //conditional(// MJD
                 ////() -> robot.limelight.isHiveTipped(),   // MJD: old, a hive that was NOT seen counted as "not tipped" and we launched right away
