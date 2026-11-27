@@ -229,6 +229,7 @@ public class Limelight extends BaseHardware{
         //telemetry.addData("Align error (deg)", "%.1f", alignErrDeg); // MJD: now shown by Telop from AutoAlign
         telemetry.addData("TagDistance (m)", TagDistance); //disable after tuning
         telemetry.addData("Hive State", hiveState); // MJD
+        telemetry.addData("HiveBaseline:", hiveBaseline); //naj
 
         //Always show connection status
         // status  = Limey.getStatus();

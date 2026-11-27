@@ -59,7 +59,8 @@ public class GD_2tip_park extends OpMode {
     public static Pose flowerpickup = pf.of (49.7, 129, 90);
     public static Pose toscore = pf.of(32, 83,270);
     public static Pose flowerBack = pf .of(47, 119,90);
-   // public static Pose
+    public static Pose AfterFlowerp = pf.of(40,119,45);
+    public static Pose CPpark = pf.of(33,84,23);
 
 
 
@@ -88,10 +89,10 @@ public class GD_2tip_park extends OpMode {
         return Paths.line(Backup,toscore).linear(Backup,toscore);
     }
     public Path ToLaunch(){
-        return Paths.line(toscore,ScorePoses.ScorePoseLT()).linear(toscore,ScorePoses.ScorePoseLT());
+        return Paths.line(toscore,AutonBase.LZscoreCenterPose).linear(toscore,AutonBase.LZscoreCenterPose);
     }
     public Path flowerback() {
-        return Paths.line(ScorePoses.ScorePoseLT(), flowerBack).linear(ScorePoses.ScorePoseLT(), flowerBack);
+        return Paths.line(AutonBase.LZscoreCenterPose, flowerBack).linear(AutonBase.LZscoreCenterPose, flowerBack);
     }
 
     public Path flower(){  // naj path adjusted to change the speed of this backup you do this by overriding the maxpower in pp constants
@@ -103,9 +104,19 @@ public class GD_2tip_park extends OpMode {
     public Path Toscore2(){
         return Paths.line(flowerBack,AutonBase.LZscoreCenterPose).linear(flowerBack,AutonBase.LZscoreCenterPose);
     }
-    public Path prkPth(){
+
+    public Path Scoretopark(){
+        return Paths.line(AutonBase.LZscoreCenterPose,AfterFlowerp).linear(AutonBase.LZscoreCenterPose,AfterFlowerp);
+    }
+
+    public Path Path2Prk(){
+       return Paths.curve(AfterFlowerp,CPpark,AutonBase.GDparkPose).linear(AutonBase.LZparkPose,AutonBase.GDparkPose);
+    }
+ /*   public Path prkPth(){
         return Paths.line(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose).linear(ScorePoses.ScorePoseLT(), AutonBase.GDparkPose);
     }
+
+  */
 
 
     // MJD: turn in place at the LT score pose so the launcher points at the closest hive tag, then fire.
@@ -233,7 +244,8 @@ public class GD_2tip_park extends OpMode {
                 robot.driveTrain.cmdAtFollow(Toscore2()),
                 cmdAimAtTag(), // MJD: turn the launcher onto the hive tag at LT
                 robot.cmdLaunchVolley(AutonBase.LAUNCH_TIMER),
-                robot.driveTrain.cmdAtFollow(prkPth()),
+               // robot.driveTrain.cmdAtFollow(prkPth()),
+                robot.driveTrain.cmdAtFollow(Path2Prk()),
                 robot.cmdTripleThreatStop(),
                // robot.driveTrain.cmdHoldPos(park),
                 robot.cmdStopIntakeFeeder()
